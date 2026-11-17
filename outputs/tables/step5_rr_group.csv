@@ -1,0 +1,21 @@
+player_id,player_name,role,sub_role,score,score_lo80,score_hi80,nationality,overseas,ipl2026_involvement_balls,main_batting_type,main_pace_or_spin
+152,Ravindra Jadeja,All-rounder,All-rounder,63.69153641198038,31.65545039395612,80.85412939598078,Indian (capped: India T20Is in data),False,395,LHB,Spin
+3298,Jofra Archer,Bowler,Pace bowler,93.5711120724246,64.48249089907138,98.38197923907444,Overseas (inferred),True,395,RHB,Pace
+7260,Dhruv Jurel,Batter,Middle-order batter,12.170957098410174,1.4028574212487406,47.17267725939767,Indian (capped: India T20Is in data),False,330,RHB,
+50284,Vaibhav Sooryavanshi,Batter,Top-order batter,99.97069518714258,98.66510094409637,99.99964469306708,Indian (capped: India T20Is in data),False,313,LHB,
+67036,Brijesh Sharma,Bowler,Pace bowler,75.05053405363446,27.05400451926004,88.91624860215161,UNKNOWN (no international data),,277,RHB,Pace
+7312,Nandre Burger,Bowler,Pace bowler,67.50152815884061,21.056077373887238,83.77349032567486,Overseas (inferred),True,258,LHB,Pace
+6819,Yashasvi Jaiswal,Batter,Top-order batter,41.09888568845895,15.25424337028884,73.69386937553583,Indian (capped: India T20Is in data),False,248,LHB,Spin
+6423,Riyan Parag,Batter,Middle-order batter,22.012197924768333,11.251310327049046,76.43053466134083,Indian (capped: India T20Is in data),False,210,RHB,Spin
+8182,Donovan Ferreira,Not scorable (sample),,,,,Overseas (inferred),,195,RHB,Spin
+41503,Yash Punja,Not scorable (sample),,,,,UNKNOWN,,180,,Spin
+7503,Ravi Bishnoi,Bowler,Spin bowler,45.045012231568506,9.842470293122572,82.85578544239978,Indian (capped: India T20Is in data),False,147,RHB,Spin
+6806,Tushar Deshpande,Bowler,Pace bowler (death specialist),45.305520871307664,9.674791800804533,80.31613698977839,Indian (capped: India T20Is in data),False,140,LHB,Pace
+2411,Sandeep Sharma,Bowler,Pace bowler (death specialist),71.02735541356424,27.519629176175453,96.3016769632445,UNKNOWN (no international data),,100,RHB,Pace
+2436,Dasun Shanaka,Not scorable (sample),,,,,Overseas (inferred),,82,RHB,Pace
+3297,Shimron Hetmyer,Batter,Finisher,38.18198193464859,7.070207870700963,61.19735646759223,Overseas (inferred),True,62,LHB,
+25139,Shubham Dubey,Not scorable (sample),,,,,UNKNOWN,,58,LHB,
+7269,Sushant Mishra,Not scorable (sample),,,,,UNKNOWN,,41,LHB,Pace
+1487,Adam Milne,Not scorable (sample),,,,,Overseas (inferred),,22,RHB,Pace
+43798,Lhuan Pretorius,Not scorable (sample),,,,,Overseas (inferred),,8,LHB,
+60700,Ravi Singh,Not scorable (sample),,,,,UNKNOWN,,2,LHB,

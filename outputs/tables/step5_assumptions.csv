@@ -1,0 +1,12 @@
+id,item,value_used,reason
+A1,RR's current group,"RR players who appeared for RR in IPL 2026, from the data",RR's 2027 retention list is UNKNOWN (F1-019: not published or not readable). The 2026 group is the best data-based proxy. Recheck at F2
+A2,Availability of every non-RR player,UNKNOWN: treated as 'possibly in the auction pool',"Retention and release lists can't be read (network policy, D23). Every shortlist card says 'pursue only if in the official auction list'"
+A3,Likely retained (excluded from shortlist),Each franchise's 6 most-involved players in IPL 2026 (balls faced + legal balls bowled),"Franchises usually keep their core in a mini-auction. A transparent proxy, not a fact. These players still appear on the leaderboard"
+A4,RR auction purse,Rs 15.0 crore,"UNKNOWN (F1-022). Reported context: Rs 2.65 cr left after the 2026 auction (F1-024), with 2027 releases unknown. Illustrative only; the dashboard budget builder lets the user change it"
+A5,RR open slots,"6 slots, of which up to 2 overseas",UNKNOWN (F1-023). Squad limits 18–25 and overseas max 8 are REPORTED (F1-006/007)
+A6,Price bands,Rule-based from data: Established (≥3 of 2023–26 seasons with ≥10 matches) Indian Rs 8–14 cr / overseas Rs 6–12 cr; Regular (2 such seasons) Rs 3–8 / Rs 3–7 cr; Emerging Rs 0.3–3 cr. Walk-away = top of band,"No market data could be read. Bands are illustrative assumptions, not predictions"
+A7,Overseas / Indian status,Inferred from the dataset: a player who appears for a non-India national side (T20Is in this dataset) is overseas; one who appears for India is Indian (capped). Otherwise UNKNOWN,"Evidence-based inference, not verified externally"
+A8,Age,UNKNOWN for every player,Not in the data and not verifiable here
+A9,Overseas limit in XI,"4 (REPORTED, F1-008)",One source only
+A11,Wicketkeeper,Dhruv Jurel keeps wicket in the sample XI,The keeper is not recorded in the data (no fielder column). Jurel is RR's most-involved middle-order batter in 2026; keeper status is external and unverified here
+A10,Optimiser value,"score/100 x 1.5 if the player fills a measured RR gap (Step 5 gap table), x 0.6 otherwise","Puts the purse on RR's measured weaknesses. RR's bowling is above league in every phase, so extra bowlers add less"

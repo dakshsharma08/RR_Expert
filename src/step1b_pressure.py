@@ -146,7 +146,7 @@ for (mid, inn), idx in b.groupby(["match_id", "innings"]).indices.items():
         coll[i] = 1.0 if (wb[k] - wb[j]) >= 2 else 0.0
 b["collapse"] = coll
 # hindsight close-game flag (comparison only, D8)
-close = (b.margin_runs.fillna(99) <= 10) | (b.margin_wickets.fillna(99) <= 2)
+close = (b.margin_runs.fillna(99) <= 10) | (b.margin_wickets.fillna(99) <= 2) | b.match_id.isin(matches.loc[matches.result_category == "TIE_DECIDED_BY_SUPER_OVER", "match_id"])
 b["close_game_last5"] = (close & (b.overid.astype(int) >= 16)).astype(float)
 
 # double-counting check on the 2022 reference balls only (decided before any scored season is used)

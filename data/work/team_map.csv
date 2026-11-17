@@ -1,0 +1,11 @@
+team_id,short_name,franchise,seasons,method,status,evidence_rows
+1,CSK,Chennai Super Kings,2022-2026,regular players per id (scripts/teams.py); consistent with reported results; critic cross-check,"INFERRED (external verification blocked, D23)",5
+2,MI,Mumbai Indians,2022-2026,regular players per id (scripts/teams.py); consistent with reported results; critic cross-check,"INFERRED (external verification blocked, D23)",5
+3,RR,Rajasthan Royals,2022-2026,regular players per id (scripts/teams.py); consistent with reported results; critic cross-check,"INFERRED (external verification blocked, D23)",5
+4,PBKS,Punjab Kings,2022-2026,regular players per id (scripts/teams.py); consistent with reported results; critic cross-check,"INFERRED (external verification blocked, D23)",5
+5,RCB,Royal Challengers Bengaluru,2022-2026,regular players per id (scripts/teams.py); consistent with reported results; critic cross-check,"INFERRED (external verification blocked, D23)",5
+7,DC,Delhi Capitals,2022-2026,regular players per id (scripts/teams.py); consistent with reported results; critic cross-check,"INFERRED (external verification blocked, D23)",5
+8,KKR,Kolkata Knight Riders,2022-2026,regular players per id (scripts/teams.py); consistent with reported results; critic cross-check,"INFERRED (external verification blocked, D23)",5
+242,SRH,Sunrisers Hyderabad,2022-2026,regular players per id (scripts/teams.py); consistent with reported results; critic cross-check,"INFERRED (external verification blocked, D23)",5
+3508,GT,Gujarat Titans,2022-2026 (joined 2022),regular players per id (scripts/teams.py); consistent with reported results; critic cross-check,"INFERRED (external verification blocked, D23)",5
+3509,LSG,Lucknow Super Giants,2022-2026 (joined 2022),regular players per id (scripts/teams.py); consistent with reported results; critic cross-check,"INFERRED (external verification blocked, D23)",5

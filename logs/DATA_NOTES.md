@@ -49,3 +49,19 @@ Every drop, merge, filter, fix or obstacle is logged here (Golden Rule 3). The r
 | Data reaches end of IPL 2026? | 74 matches in 2026, last 2026-05-31 | Reported at the top of the audit summary | 74 matches is the full 70 + 4 format; confirm the final externally |
 
 <!-- STEP0_DATA_NOTES_END -->
+
+
+## Supervisor additions at the Step 0 gate (responding to the Step 0 critic)
+
+| Issue | Rows affected | Action taken | Why |
+|---|---|---|---|
+| Venue not in the data; external mapping blocked | 367 IPL matches | Venue = UNKNOWN for every match. No venue term in any model | Network policy blocks the source sites (D23). Never guess (D1/D12) |
+| Team names not in the data (ids only) | 10 franchise ids | `data/work/team_map.csv` built: INFERRED from regular players, consistent with reported results | Raw data has ids only; external verification blocked |
+| Over 14 has 5 legal balls (a dropped ball in the source) in 14130 (both innings) and 14164 (innings 1) | 3 overs | Both matches left out of win-probability training. True count of reduced-overs/DLS matches = **11**, not 13; 2 are dropped-ball cases | The missing ball breaks the balls-left count. Both are 2022 matches (training only) |
+| Match 40751 (PBKS v DC, 8 May 2025): abandoned after 63 balls, then replayed in full as 43057 | 63 balls | Not eligible for win probability, so it gets no pressure score and is **excluded from every player metric**; it remains only in the raw/ball tables. Official status of its stats: UNKNOWN (F1-029) | Avoids double counting the fixture |
+| Raw defect in 20182: a dismissed batter (out on ball 67) appears as non-striker on ball 70 | 1 ball | No change. The match is ineligible (DLS) and excluded from pressure metrics | Raw values are never edited |
+| `bowling_type` inconsistent for 24 bowlers (e.g. fast bowlers labelled "medium" on half their balls) | 24 bowlers | Only `pace_or_spin` is used, which is 100% consistent per player | Reliability of the attribute |
+| `is_four`/`is_six` not set on 9 balls with runs = 4 and 2 with runs = 6 (all-run boundaries or labelling) | 11 balls | Boundary % counts bat runs of 4 or 6 | Consistent definition from runs |
+| "None" text used as a null in `stroke` and `delivery_style` | many | Columns not used | Not needed |
+| Tie at the end of the main innings | 2 matches (40725, 50359) | Win-probability label 0.5 for both sides. Super-over winner shown as the result. The close-game comparison flag includes ties | G4. The tie is the closest possible game |
+| Data starts in 2022 | — | 2022 used only for training (D10) | No earlier seasons available |

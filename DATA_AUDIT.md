@@ -53,7 +53,7 @@ Fingerprints: the merged file's sha256 is `01e2b437…f554cb312ef93d9588f3f32a82
 - **2025 has 70 league games.**
   - PBKS v DC appears twice: 40751 (8 May) stopped after 63 balls of innings 1, and 43057 (24 May) is a full game.
   - RCB v KKR appears once. The only unused id in the 2025 range, 40761, was never in the source.
-  - Every other team has 14 league games, **RR included**.
+  - RCB and KKR have 13 league games each (their second meeting is absent from the source). PBKS and DC have 15 entries each (the abandoned match 40751 plus its replay 43057). The other six teams have 14, **RR included**.
 - The other 500 matches are T20 internationals and the Emerging/A-team Asia Cups (2024, 2025).
 - Team names are inferred from each team id's regular players (`scripts/teams.py`). The IPL ids are 1 CSK, 2 MI, **3 RR**, 4 PBKS, 5 RCB, 7 DC, 8 KKR, 242 SRH, 3508 GT, 3509 LSG. No match mixes IPL and non-IPL teams.
 
