@@ -198,7 +198,8 @@ lb = {"bat": lb_rows(sb, "bat"), "bowl": lb_rows(sw, "bowl"),
 
 # ------------------------------------------------ squad fit
 xi_names = list(xi.player_name)
-gap_rows = [dict(area=r.area, rr=r1(r.rr_group_per100), league=r1(r.league_per100), gap=r1(r.gap_vs_league_per100), balls=int(r.rr_balls))
+gap_rows = [dict(area=r.area, rr=r1(r.rr_group_per100), league=r1(r.league_per100), gap=r1(r.gap_vs_league_per100), balls=int(r.rr_balls),
+                 se=r1(r.se_per100), lo=r1(r.gap_lo80), hi=r1(r.gap_hi80), verdict=r.verdict)
             for r in gaps.itertuples()]
 # Plan A phase strength: group per-100 by phase with and without Plan A picks (High pressure, 2025-26)
 hi = b[(b.season >= 2025) & (b.bucket == "High")]
@@ -226,10 +227,11 @@ squad = dict(group=[dict(id=r.player_id, name=r.player_name, role=r.role, nation
              overseas_used={"A": int(plans[plans.plan == "A"].overseas.fillna(False).astype(bool).sum()),
                             "B": int(plans[plans.plan == "B"].overseas.fillna(False).astype(bool).sum())},
              xi=[dict(id=r.player_id, name=r.player_name, role=r.role, sub=r.sub_role if isinstance(r.sub_role, str) else "",
-                      overseas=bool(r.overseas_b), order=None if pd.isna(r.bat_order) else r1(r.bat_order, 1)) for r in xi.itertuples()],
+                      overseas=bool(r.overseas_b), order=None if pd.isna(r.bat_order) else r1(r.bat_order, 1), why=r.why) for r in xi.itertuples()],
+             impact_why=str(xmeta.impact_why.iloc[0]),
              impact=str(xmeta.impact_player.iloc[0]), bench=list(bench.player_name),
              bowling_plan=[dict(phase=r.phase, overs=int(r.overs), bowlers=r.bowlers) for r in bplan.itertuples()],
-             lhb_in_xi=int(sum(1 for p in xi.player_id if p in set(cand.player_id) and False)),
+             lhb_in_xi=int(xmeta.lhb_in_xi.iloc[0]),
              still_lacks="")
 
 # ------------------------------------------------ auction board
@@ -238,12 +240,15 @@ tier_cards = [dict(id=r.player_id, tier=r.tier, score=r1(r.score), lo=r1(r.score
                    sub=r.sub_role, nationality=r.nationality) for r in short.itertuples()]
 auction = dict(tiers=tier_cards, planA=sorted(planA_ids), planB=sorted(planB_ids),
                planB_rule=dict(if_player=str(planb.if_player.iloc[0]), past_cr=r1(planb.goes_past_cr.iloc[0], 1),
-                               switch_to=str(planb.switch_to.iloc[0]), loses=str(planb.rr_loses.iloc[0])),
+                               switch_to=str(planb.switch_to.iloc[0]), loses=f"{planb.rr_loses_pct.iloc[0]:.0f}% of Plan A's pressure value"),
+               planB_table=[dict(if_player=r.if_player, past_cr=r1(r.goes_past_cr, 1), switch_to=r.switch_to,
+                                 loses_pct=r1(r.rr_loses_pct, 0), what_changes=r.what_changes) for r in planb.itertuples()],
+               plans_meta=T("step5_plans_meta").to_dict("records"),
                value_map=[dict(id=r.player_id, score=r1(r.score), price=r1((r.price_lo_cr + r.price_hi_cr) / 2, 2), tier=r.price_tier,
                                core=bool(r.likely_retained_core), rr=bool(r.in_rr_2026)) for r in cand.itertuples()],
-               contrarian=[dict(id=r.player_id, score=r1(r.score), lo=r1(r.score_lo80), hi=r1(r.score_hi80)) for r in contr.itertuples()],
-               unsung=[dict(id=r.player_id, score=r1(r.score), lo=r1(r.score_lo80), hi=r1(r.score_hi80)) for r in uns.itertuples()],
-               avoid=[dict(id=r.player_id, score=r1(r.score), lo=r1(r.score_lo80), hi=r1(r.score_hi80)) for r in avoid.itertuples()],
+               contrarian=[dict(id=r.player_id, score=r1(r.score), lo=r1(r.score_lo80), hi=r1(r.score_hi80), reason=r.reason) for r in contr.itertuples()],
+               unsung=[dict(id=r.player_id, score=r1(r.score), lo=r1(r.score_lo80), hi=r1(r.score_hi80), reason=r.reason) for r in uns.itertuples()],
+               avoid=[dict(id=r.player_id, score=r1(r.score), lo=r1(r.score_lo80), hi=r1(r.score_hi80), reason=r.reason) for r in avoid.itertuples()],
                not_scorable=[dict(id=r.player_id, name=r.player_name, faced=int(r.hi_balls_faced), bowled=int(r.hi_legal_bowled), reason=r.reason)
                              for r in ns.itertuples()],
                assumptions=assum.to_dict("records"), limits=dict(squad="18–25 [REPORTED F1-006]", overseas="8 in squad [REPORTED F1-007]",
@@ -277,8 +282,10 @@ summary = dict(
 verdict_word = ("evidence of persistence" if all("evidence of persistence" in str(btp.loc[r_, "claim"]) for r_ in ("bat", "bowl"))
                 else "persistence not demonstrated")
 summary["claim"] = f"Historical pressure-performance indicator; {verdict_word}. Its ability to predict IPL 2027 is not established (D15)."
-squad["still_lacks"] = (f"Even with Plan A, RR's measured weakness is {summary['top_gaps'][0].split(': ')[1].lower()}-overs batting under pressure; "
-                        f"the picks narrow the gap but no option in an assumed Rs 15 cr purse closes it with certainty.") if summary["top_gaps"] else ""
+squad["still_lacks"] = (f"RR's gaps are directional, not proven (every phase gap is within noise except powerplay batting, which is above league). "
+                        f"Plan A adds pressure-proven options for {', '.join(g.split(': ')[1].lower() + '-overs batting' for g in summary['top_gaps'])}, "
+                        f"but at walk-away prices it costs Rs {T('step5_plans_meta').query('plan == "A"').cost_walkaway_cr.iloc[0]:.0f} cr against an assumed Rs 15 cr purse, "
+                        f"and Must-Back players' availability is unverified.") if summary["top_gaps"] else ""
 
 method = dict(
     flow=["Data: 367 IPL matches 2022–26, ball by ball; 2022 used only to train.",

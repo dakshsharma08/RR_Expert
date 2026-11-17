@@ -1,7 +1,7 @@
-area,rr_group_per100,league_per100,rr_balls,gap_vs_league_per100,metric
-Batting under pressure: Middle,-9.714405715255353,-2.381285804895348,243,-7.333119910360005,runs above expected per 100 High-pressure balls
-Batting under pressure: Death,3.8555926263168945,7.012910491922014,359,-3.1573178656051195,runs above expected per 100 High-pressure balls
-Bowling under pressure: Middle,1.4167019499352669,-0.423969622057278,310,1.8406715719925448,runs saved vs expected per 100 High-pressure balls
-Bowling under pressure: Death,-1.7199321378559755,-7.429043615156634,256,5.709111477300659,runs saved vs expected per 100 High-pressure balls
-Bowling under pressure: Powerplay,4.098209302235349,-3.012213365875891,199,7.110422668111241,runs saved vs expected per 100 High-pressure balls
-Batting under pressure: Powerplay,55.96982947568172,3.0755849216215956,228,52.89424455406012,runs above expected per 100 High-pressure balls
+area,rr_group_per100,league_per100,rr_balls,gap_vs_league_per100,se_per100,gap_lo80,gap_hi80,verdict,metric
+Batting under pressure: Middle,-9.714405715255351,-2.381285804895348,243,-7.333119910360003,11.347746569739495,-21.876391914138143,7.210152093418135,within noise (directional only),runs above expected per 100 High-pressure balls
+Batting under pressure: Death,3.855592626316897,7.012910491922014,359,-3.1573178656051173,10.81604082720728,-17.019155789753967,10.704520058543734,within noise (directional only),runs above expected per 100 High-pressure balls
+Bowling under pressure: Middle,1.4167019499352669,-0.42396962205727756,310,1.8406715719925444,9.98862470461207,-10.960749849438285,14.642092993423374,within noise (directional only),runs saved vs expected per 100 High-pressure balls
+Bowling under pressure: Death,-1.7199321378559722,-7.429043615156634,256,5.709111477300662,11.763423717246752,-9.366892358722776,20.785115313324102,within noise (directional only),runs saved vs expected per 100 High-pressure balls
+Bowling under pressure: Powerplay,4.098209302235349,-3.0122133658758896,199,7.110422668111238,13.132987139486435,-9.720813649854577,23.94165898607705,within noise (directional only),runs saved vs expected per 100 High-pressure balls
+Batting under pressure: Powerplay,55.969829475681735,3.075584921621596,228,52.89424455406013,15.443891941608237,33.101352641695016,72.68713646642524,above league,runs above expected per 100 High-pressure balls

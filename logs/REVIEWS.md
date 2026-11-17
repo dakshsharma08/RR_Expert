@@ -37,3 +37,17 @@ The critic is a fresh sub-agent that did not build the work it reviews (Part 2).
 | Step 3–4 | 1 | Backtest claims outrun the evidence; no base rate | #6 | Major | yes | Base rate added; pre-registered wording only (D31d, D31e) | Fixed |
 | Step 3–4 | 1 | Batter outs undercounted | #7 | Major | yes | Wides and non-striker outs counted (D31f) | Fixed |
 | Step 3–4 | 1 | Minors: vacuous sensitivity, missing top-10 overlaps, death economy, AR interval, splits without minimums | #8–20 | Minor | yes | Skill-only, consistency-only and equal-weight sensitivities added; top-10 overlaps added; High death economy added; splits show n in the profile; AR interval documented as an average of bounds | Mostly fixed |
+| Step 5 | 1 | BLOCKER: bowling plan names a batter (3 career balls) as death bowler | `critic_step5.csv` #1 | Blocker | yes | Ranked by phase volume, ≥60 legal balls (D35) | Fixed |
+| Step 5 | 1 | Gaps within noise drive the optimiser; no interval | #2 | Major | yes | Standard error, 80% interval and verdict per gap; A10 says the weighting is judgement | Fixed / disclosed |
+| Step 5 | 1 | Must-Back not in Plan A or the XI | #3 | Major | yes | Must-Back needs a gap filled and recent volume; forced into Plan A | Fixed |
+| Step 5 | 1 | Purse fits only at midpoints | #4 | Major | yes | Walk-away cost reported (Rs 21 cr against the assumed Rs 15 cr) | Disclosed |
+| Step 5 | 1 | Squad arithmetic breaks the 25 and 8 limits | #5 | Major | yes | Slots and overseas room derived from the group (A5) | Fixed |
+| Step 5 | 1 | Plan B a tie; tracks the priciest player | #6 | Major | yes | Plan B for every Plan A player, sorted by loss | Fixed |
+| Step 5 | 1 | Plan A buys surplus pacers | #7 | Major | yes | At most one non-gap pick | Fixed |
+| Step 5 | 1 | Crude "likely retained" proxy | #8 | Major | yes | Regulars (≥80% of matches) proxy; still an assumption | Improved |
+| Step 5 | 1 | Low-volume Must-Back without a risk tag | #9 | Major | yes | "Low IPL 2026 volume" risk tag; recency needed for Must-Back | Fixed |
+| Step 5 | 1 | Hidden Gems were the noisiest samples | #10 | Major | yes | Ranked by the lower bound of the 80% range | Fixed |
+| Step 5 | 1 | 23 players' nationality UNKNOWN; counted as Indian | #11 | Major | yes | Flagged in A7 and in `step5_xi_meta` (`unknown_nationality_in_xi`) | Disclosed |
+| Step 5 | 1 | Price bands ignore reputation | #12 | Major | suspected | Tagged [ASSUMPTION A6], illustrative | Disclosed (named risk) |
+| Step 5 | 1 | XI order, keeper and impact choices unexplained | #13 | Major | yes | Slot-based XI with a "why" per player; spinner rule; LHB count computed | Fixed |
+| Step 5 | 1 | Minors: reasons missing, unsung bar, numeric tags | minors | Minor | yes | One-line data reasons added; unsung ranked by lower bound of the 80% range | Fixed |
