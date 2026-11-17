@@ -1,0 +1,20 @@
+type,match_id,season,official_result,official_stage
+winner,14130,2022.0,Lucknow Super Giants Won 36  Runs,League
+winner,20182,2023.0,Punjab Kings Won by 7 Runs(D/L Method),League
+winner,21586,2023.0,Chennai Super Kings Won by 5 wickets  (DLS method),Final
+winner,31278,2024.0,Kolkata Knight Riders Won by 18 runs,League
+winner,40749,2025.0,Gujarat Titans Won by 3 wickets (DLS Method),League
+winner,50137,2026.0,Rajasthan Royals Won by 27 runs,League
+winner,50371,2026.0,Lucknow Super Giants Won by 9 runs (DLS method),League
+reduced_overs,14130,2022.0,Lucknow Super Giants Won 36  Runs,League
+reduced_overs,14164,2022.0,Punjab Kings Won by 5 wickets,League
+reduced_overs,20182,2023.0,Punjab Kings Won by 7 Runs(D/L Method),League
+reduced_overs,20226,2023.0,Match Abandoned,League
+reduced_overs,31278,2024.0,Kolkata Knight Riders Won by 18 runs,League
+reduced_overs,40737,2025.0,No Result,League
+reduced_overs,40751,2025.0,No Result,League
+reduced_overs,50136,2026.0,No Result,League
+only_official,31281,2024.0,Match Abandoned,League
+only_official,31284,2024.0,Match Abandoned,League
+only_official,31288,2024.0,Match Abandoned,League
+only_official,40761,2025.0,Match Abandoned,League

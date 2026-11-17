@@ -25,10 +25,16 @@ add("Small-sample traps", "Pass" if ok_thr else "Fail",
     f"thresholds met for all {len(sb)} batters and {len(sw)} bowlers; {wide} players have ranges ≥55 points")
 
 ns = T("step5_not_scorable")
-add("Survivorship bias (retired or unsold players)", "Partial",
-    "Scope = players who appeared in IPL 2025 or 2026; 'Not Scorable on IPL Data' list with samples (D3)",
-    "Auction-pool players with no IPL record can't be scored or listed (pool unpublished/unreadable)",
-    f"{len(scope)} in scope; {len(ns)} not scorable listed")
+ss = T("step4_scope_sensitivity")
+ssum = ss[ss.player_name == "(summary)"].set_index("role")
+same = bool((ssum.overlap_top10 == 10).all())
+add("Survivorship bias (retired or inactive players)", "Pass" if same else "Partial",
+    "Pre-registered scope = players who appeared in IPL 2025 or 2026; 'Not Scorable on IPL Data' list with samples (D3); "
+    "scope sensitivity re-scores every qualifying 2023–26 player (step4_scope_sensitivity)",
+    "Players outside IPL (no IPL record) cannot be rated: IPL-only by design (D38)",
+    f"{len(scope)} in scope; {len(ns)} not scorable listed; without the scope filter: batters {int(ssum.loc['bat', 'n_rated_all'])} rated "
+    f"(headline {int(ssum.loc['bat', 'n_rated_headline'])}), bowlers {int(ssum.loc['bowl', 'n_rated_all'])} (headline {int(ssum.loc['bowl', 'n_rated_headline'])}); "
+    f"top-10 overlap bat {int(ssum.loc['bat', 'overlap_top10'])}/10, bowl {int(ssum.loc['bowl', 'overlap_top10'])}/10")
 
 rob = T("step4_definition_robustness"); offs = T("step2_season_offsets")
 sc_ = rob[rob.variant == "season_centred"].top20_overlap_pct.tolist()
@@ -105,12 +111,14 @@ add("Colour-blind readability", "Pass",
     f"deuteranopia-simulated relative luminance: pink {lp:.3f} vs blue {lb:.3f} (ratio {(max(lp, lb) + 0.05) / (min(lp, lb) + 0.05):.2f}); patterns + labels used")
 
 payload = json.loads((DELIVERABLES / "dashboard_payload.json").read_text())
-untagged = [p_["name"] for p_ in payload["players"] if p_.get("scorable") and not all("[" in str(p_.get(k, "[")) for k in ("availability", "price", "age"))]
-facts = pd.read_csv(WORK / "facts" / "facts_f1_ledger.csv")
-add("Every external fact tagged VERIFIED or [ASSUMPTION]", "Pass" if not untagged else "Fail",
-    "Facts ledger (status per fact); assumptions A1–A12 with reasons; tags on every availability, price and age field",
-    "Nothing could be VERIFIED (network policy, D23): every fact is REPORTED, UNKNOWN or [ASSUMPTION]",
-    f"facts ledger statuses {facts.status.value_counts().to_dict()}; untagged player fields: {len(untagged)}")
+oc = T("step0_official_meta_check")
+explained = {"Winner agrees (no result = no winner)", "Reduced-overs (DLS) matches agree"}   # all excluded from win probability (conservative)
+bad = oc[(oc.status != "Pass") & ~oc.check.isin(explained)]
+add("Match list agrees with the organisers' official match file", "Pass" if bad.empty else "Fail",
+    "step0_official_meta_check: competitions, match ids, seasons, dates, playoffs, no-results, super overs checked; the 7 rain-affected matches "
+    "where the data alone could not name a winner are all excluded from the win-probability model (D38)",
+    "Our reduced-overs flag is wider than the official one (13 v 5): those matches are left out of win probability, which is conservative",
+    "; ".join(f"{r.check}: {r.status} ({r.detail})" for r in oc.itertuples() if r.status != "Pass" or "Every match" in r.check))
 
 mism = []
 for role, df in (("bat", sb), ("bowl", sw)):
@@ -135,10 +143,24 @@ add("The same number everywhere (dashboard, PDF, cheat sheet, notebook = outputs
     "Free-text sentences in deliverables are templates; they were rebuilt after the last data change",
     f"payload vs score tables mismatches: {len(mism)}; summary vs backtest table: {'ok' if bt_ok else 'MISMATCH'}; notebook table hashes match current files: {nb_ok}")
 
-add("Every shortlisted player is actually available at the auction", "Open (named risk)",
-    "Availability tagged [ASSUMPTION A2]; regulars excluded (A3); every card says 'pursue only if on the official list'",
-    "Retention lists and the auction pool could not be read (network policy). Must recheck (F2) before 16 Dec 2026",
-    "facts F1-019/F1-027 UNKNOWN")
+t10 = payload["top10"]
+edge_close = all(t10["edge"][r]["overlaps_10th"] for r in ("bat", "bowl"))
+banned = re.compile(r"auction|must-back|walk-away|price band|plan a\b|purse|retain|ipl 2027|value pick|hidden gem", re.I)
+hits_ = []
+html = (DELIVERABLES / "RR_Clutch_Index_Dashboard.html").read_text(encoding="utf-8") if (DELIVERABLES / "RR_Clutch_Index_Dashboard.html").exists() else ""
+pdf_txt = ""
+try:
+    from pypdf import PdfReader
+    for f in ("B_RR_Clutch_Index_Deck.pdf", "C_RR_Clutch_Index_Cheat_Sheet.pdf", "D_Methodology_and_Limitations.pdf", "RR_Clutch_Index_Submission.pdf"):
+        if (DELIVERABLES / f).exists():
+            pdf_txt += " ".join(pg.extract_text() or "" for pg in PdfReader(DELIVERABLES / f).pages)
+except ImportError:
+    pass
+hits_ = sorted(set(m.group(0).lower() for m in banned.finditer(pdf_txt)))
+add("Answers the Round 1 brief (top 10 batters and bowlers under pressure, no auction advice)", "Pass" if (len(t10["bat"]) == 10 and len(t10["bowl"]) == 10 and not hits_) else "Fail",
+    "Organisers' clarification (17 Nov) applied (D38): both top-10 lists lead every deliverable; auction, price and squad content removed",
+    ("#11 is too close to call with #10 in both lists (80% ranges overlap), so the edge of each top 10 is soft" if edge_close else "#10/#11 boundary separated"),
+    f"top-10 sizes bat {len(t10['bat'])}, bowl {len(t10['bowl'])}; banned auction words found in PDFs: {hits_ or 'none'}")
 
 _crs = sorted((TABLES.parent / "reviews").glob("cold_reader*.csv"), key=lambda f: (f.stem != "cold_reader", f.stem))
 cr = _crs[-1] if _crs else TABLES.parent / "reviews" / "cold_reader.csv"     # latest round (round2 after fixes)

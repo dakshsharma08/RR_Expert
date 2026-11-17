@@ -3,6 +3,10 @@
 Outputs: outputs/deliverables/dashboard_payload.json   (pre-aggregated; only showcase matches carry ball-level data)
          outputs/tables/summary_numbers.json             (every headline number used by the PDF, cheat sheet, notes)
 Run: python3 -I src/step7_payload.py
+
+Round 1 brief (organisers' clarification, 17 Nov; D38): the deliverable is the Top 10 batters and the Top 10
+bowlers under pressure, with the method. It is NOT an auction recommendation, so no availability, price,
+squad-fit or auction content is written to the payload. Step 5 tables stay in the repo but are not used here.
 """
 import json, sys, datetime, hashlib
 from pathlib import Path
@@ -30,14 +34,9 @@ bt = T("step4_backtest_summary"); comp = T("step4_component_info"); sens = T("st
 rob = T("step4_definition_robustness"); wpe = T("step1a_wp_eval"); cal = T("step1a_calibration")
 shares = T("step1b_bucket_shares"); bcorr = T("step1b_boost_correlation"); ovb = T("step1b_definition_overlap_balls")
 ex = T("step1c_example_balls"); show = T("step1c_showcase_matches"); pmap_ = T("step1b_pressure_map"); dist = T("step1b_distribution")
-gaps = T("step5_gaps"); short = T("step5_shortlist", dtype={"player_id": str}); plans = T("step5_plans", dtype={"player_id": str})
-planb = T("step5_plan_b"); xi = T("step5_xi", dtype={"player_id": str}); bench = T("step5_bench", dtype={"player_id": str})
-xmeta = T("step5_xi_meta"); bplan = T("step5_bowling_plan"); contr = T("step5_contrarian", dtype={"player_id": str})
-uns = T("step5_unsung", dtype={"player_id": str}); avoid = T("step5_not_to_chase", dtype={"player_id": str})
-ns = T("step5_not_scorable", dtype={"player_id": str}); assum = T("step5_assumptions"); rrg = T("step5_rr_group", dtype={"player_id": str})
+ns = T("step5_not_scorable", dtype={"player_id": str})   # descriptive list of in-scope players below the sample minimum
 cov = T("step0_coverage"); notes0 = T("step0_data_notes"); offs = T("step2_season_offsets")
 matches = pd.read_csv(WORK / "matches_ipl.csv"); elig = pd.read_csv(WORK / "wp_eligibility.csv")
-facts = pd.read_csv(WORK / "facts" / "facts_f1_ledger.csv").fillna("")
 
 # ------------------------------------------------ ball frames for receipts, aggregates, showcase
 b = P.load_ball_frames("pi_bucket")
@@ -106,13 +105,8 @@ for pid in sorted(inscope, key=lambda p: str(nm.get(p, p))):
     rec = dict(id=pid, name=str(srow.player_name) if isinstance(srow.player_name, str) else f'id {pid}', role=srow.role, scorable=c is not None,
                hi_faced=int(srow.hi_balls_faced), hi_bowled=int(srow.hi_legal_bowled))
     if c is not None:
-        rec.update(sub_role=c.sub_role, nationality=c.nationality, overseas=None if pd.isna(c.overseas) else bool(c.overseas),
-                   nat_evidence=c.nationality_evidence if isinstance(c.nationality_evidence, str) else "",
-                   age="UNKNOWN [A8]", team=c.latest_team, team_season=int(c.latest_season), availability=c.availability,
-                   price=c.price_band, price_mid=r1((c.price_lo_cr + c.price_hi_cr) / 2, 2), walk_away=r1(c.walk_away_cr, 1),
-                   risk=c.risk_tags, fills=c.fills_gaps if isinstance(c.fills_gaps, str) else "",
-                   similar=[s for s in str(c.similar_players).split("|") if s and s != "nan"], in_rr=bool(c.in_rr_2026),
-                   core=bool(c.likely_retained_core))
+        rec.update(sub_role=c.sub_role, team=c.latest_team, team_season=int(c.latest_season),
+                   similar=[s for s in str(c.similar_players).split("|") if s and s != "nan"])
         rec["bat"] = score_block(sb, pid); rec["bowl"] = score_block(sw, pid)
         rec["ar"] = score_block(sa, pid) if pid in set(sa.player_id) else None
         main = rec["ar"] or rec["bat"] or rec["bowl"]
@@ -122,7 +116,7 @@ for pid in sorted(inscope, key=lambda p: str(nm.get(p, p))):
         certainty = "a fairly tight range" if width < 35 else ("a wide range: treat with caution" if width >= 55 else "a moderate range")
         rec["verdict"] = (f"Ranked {main['rank']} of {main['of']} {role_word} on historical pressure performance "
                           f"(score {main['score']:.0f}, 80% range {main['lo']:.0f}–{main['hi']:.0f}: {certainty}). "
-                          f"Past record only; not a forecast for 2027.")
+                          f"Past record (IPL 2023–26), not a forecast.")
         if pid in bm.index:
             m_ = bm.loc[pid]
             rec["bat_hl"] = {k: r1(m_.get(k)) for k in ["High_balls", "High_runs", "High_outs", "High_sr", "High_avg", "High_balls_per_out",
@@ -142,11 +136,9 @@ for pid in sorted(inscope, key=lambda p: str(nm.get(p, p))):
         caveats = []
         if width >= 55: caveats.append("wide 80% range")
         if (main.get("seasons_assessed") or 0) <= 1: caveats.append("one assessed season or fewer")
-        caveats.append("age, injuries and availability not verifiable here")
         rec["caveats"] = caveats
     else:
         rec["reason"] = "Not scorable on IPL data: below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
-        rec["nationality"] = "UNKNOWN"
     players.append(rec)
 
 # ------------------------------------------------ pressure tab: showcase matches (ball level)
@@ -191,80 +183,64 @@ def lb_rows(df, role):
                 nv = r1(6 * ((q.High_runs or 0) + (q.Low_runs or 0)) / tl, 2) if tl else None
         out.append(dict(id=r.player_id, score=r1(r.score, 3), lo=r1(r.score_lo80, 3), hi=r1(r.score_hi80, 3), rank=int(r.rank) if hasattr(r, "rank") else None,
                         S=r1(r.S * 100, 1), C=r1(r.C * 100, 0), n=int(r.hi_qual_n), naive=nv,
-                        avail=c.availability if c is not None else "", risk=c.risk_tags if c is not None else ""))
+                        caveat=("wide 80% range" if (r.score_hi80 - r.score_lo80) >= 55 else "")))
     return out
 
 lb = {"bat": lb_rows(sb, "bat"), "bowl": lb_rows(sw, "bowl"),
       "ar": [dict(id=r.player_id, score=r1(r.score), lo=r1(r.score_lo80), hi=r1(r.score_hi80), bat=r1(r.bat_score), bowl=r1(r.bowl_score),
                   combined_wpa_per_match=r1(100 * r.combined_wpa_per_match, 2)) for r in sa.itertuples()]}
 
-# ------------------------------------------------ squad fit
-xi_names = list(xi.player_name)
-gap_rows = [dict(area=r.area, rr=r1(r.rr_group_per100), league=r1(r.league_per100), gap=r1(r.gap_vs_league_per100), balls=int(r.rr_balls),
-                 se=r1(r.se_per100), lo=r1(r.gap_lo80), hi=r1(r.gap_hi80), verdict=r.verdict)
-            for r in gaps.itertuples()]
-# Plan A phase strength: group per-100 by phase with and without Plan A picks (High pressure, 2025-26)
-hi = b[(b.season >= 2025) & (b.bucket == "High")]
-def phase_strength(ids, min_n=1):
-    """per-100 under High pressure by phase; values with fewer than min_n balls are suppressed (None)."""
-    out = {}
-    f = hi[hi.ball_faced.astype(bool) & hi.striker_id.isin(ids)]
-    w = hi[hi.bowler_id.isin(ids)]
-    for ph in ["Powerplay", "Middle", "Death"]:
-        a = f[f.phase == ph]; c = w[w.phase == ph]
-        out[ph] = dict(bat=r1(100 * a.rae_bat.sum() / len(a), 1) if len(a) >= min_n else None,
-                       bowl=r1(100 * c.rse_bowl.sum() / len(c), 1) if len(c) >= min_n else None,
-                       bat_balls=int(len(a)), bowl_balls=int(len(c)))
-    return out
-rr_ids = set(rrg.player_id)
-planA_ids = set(plans[plans.plan == "A"].player_id); planB_ids = set(plans[plans.plan == "B"].player_id)
-league = phase_strength(set(hi.striker_id) | set(hi.bowler_id))
-squad = dict(group=[dict(id=r.player_id, name=r.player_name, role=r.role, nationality=r.nationality, score=r1(r.score),
-                         involvement=None if pd.isna(r.ipl2026_involvement_balls) else int(r.ipl2026_involvement_balls),
-                         hand=r.main_batting_type if isinstance(r.main_batting_type, str) else "",
-                         bowl=r.main_pace_or_spin if isinstance(r.main_pace_or_spin, str) else "") for r in rrg.itertuples()],
-             gaps=gap_rows, before=phase_strength(rr_ids), planA=phase_strength(rr_ids | planA_ids),
-             planB=phase_strength(rr_ids | planB_ids), league=league,
-             planA_picks_only=phase_strength(planA_ids, min_n=30), planB_picks_only=phase_strength(planB_ids, min_n=30),
-             picks_note="Plan A picks' own High-pressure record (2025–26) in each phase, next to RR's group and the league. Past record, not a projection; the picks were chosen on this record, so agreement is expected. Cells with fewer than 30 balls are not shown.",
-             planA_ids=sorted(planA_ids), planB_ids=sorted(planB_ids),
-             purse=float(T("step5_plans_meta").purse_cr.iloc[0]), purse_tag="[ASSUMPTION A4]",
-             slots=int(T("step5_plans_meta").slots_assumed.iloc[0]), ovs_slots=int(T("step5_plans_meta").overseas_slots_assumed.iloc[0]),
-             purse_used={"A": r1(plans[plans.plan == "A"].mid.sum(), 2), "B": r1(plans[plans.plan == "B"].mid.sum(), 2)},
-             overseas_used={"A": int(plans[plans.plan == "A"].overseas.fillna(False).astype(bool).sum()),
-                            "B": int(plans[plans.plan == "B"].overseas.fillna(False).astype(bool).sum())},
-             xi=[dict(id=r.player_id, name=r.player_name, role=r.role, sub=r.sub_role if isinstance(r.sub_role, str) else "",
-                      overseas=bool(r.overseas_b), order=None if pd.isna(r.bat_order) else r1(r.bat_order, 1), why=r.why) for r in xi.itertuples()],
-             impact_why=str(xmeta.impact_why.iloc[0]),
-             impact=str(xmeta.impact_player.iloc[0]), bench=list(bench.player_name),
-             bowling_plan=[dict(phase=r.phase, overs=int(r.overs), bowlers=r.bowlers) for r in bplan.itertuples()],
-             lhb_in_xi=int(xmeta.lhb_in_xi.iloc[0]),
-             still_lacks="")
+# ------------------------------------------------ Round 1 answer: Top 10 batters and Top 10 bowlers under pressure (D38)
+def top10(df, role):
+    d = df.sort_values("score", ascending=False).reset_index(drop=True)
+    out = []
+    for i, r in d.head(10).iterrows():
+        c = cand[cand.player_id == r.player_id]
+        team = f"{c.latest_team.iloc[0]} ({int(c.latest_season.iloc[0])})" if len(c) else ""
+        sub = c.sub_role.iloc[0] if len(c) else ""
+        if role == "bat":
+            q = bm.loc[r.player_id]
+            stats = dict(balls=int(q.High_balls), runs=int(q.High_runs), sr=r1(q.High_sr, 1), outs=int(q.High_outs),
+                         above_per100=r1(q.High_rae_per100, 1), wpa_per100=r1(q.High_wpa_per100, 2))
+            why = (f"{stats['balls']} High-pressure balls faced (2023–26): {stats['runs']} runs at strike rate {stats['sr']:.0f}, "
+                   f"{stats['above_per100']:+.0f} runs per 100 balls above an average batter in the same situations")
+        else:
+            q = wm.loc[r.player_id]
+            stats = dict(balls=int(q.High_legal), runs=int(q.High_runs), econ=r1(q.High_econ, 2), wkts=int(q.High_wkts),
+                         saved_per100=r1(q.High_rse_per100, 1), wpa_per100=r1(q.High_wpa_per100, 2))
+            why = (f"{stats['balls']} High-pressure balls bowled (2023–26): {stats['wkts']} wickets at economy {stats['econ']:.2f}, "
+                   f"{stats['saved_per100']:+.0f} runs per 100 balls saved against an average bowler in the same situations")
+        sa_, sp_ = int(r.seasons_assessed), int(r.seasons_positive)
+        if sa_:
+            why += f"; above expected in {sp_} of {sa_} assessed seasons"
+        out.append(dict(rank=i + 1, id=r.player_id, name=r.player_name, team=team, sub_role=sub,
+                        score=r1(r.score, 3), lo=r1(r.score_lo80, 3), hi=r1(r.score_hi80, 3), stats=stats, why=why + "."))
+    nxt = d.iloc[10]
+    tenth = d.iloc[9]
+    edge = dict(next_name=nxt.player_name, next_id=nxt.player_id, next_score=r1(nxt.score, 3), next_lo=r1(nxt.score_lo80, 3),
+                next_hi=r1(nxt.score_hi80, 3),
+                overlaps_10th=bool(nxt.score_hi80 >= tenth.score_lo80 and tenth.score_hi80 >= nxt.score_lo80))
+    return out, edge
 
-# ------------------------------------------------ auction board
-tier_cards = [dict(id=r.player_id, tier=r.tier, tier_reason=r.tier_reason, score=r1(r.score, 3), lo=r1(r.score_lo80, 3), hi=r1(r.score_hi80, 3), price=r.price_band,
-                   walk_away=r1(r.walk_away_cr, 1), risk=r.risk_tags, fills=r.fills_gaps if isinstance(r.fills_gaps, str) else "",
-                   sub=r.sub_role, nationality=r.nationality) for r in short.itertuples()]
-auction = dict(tiers=tier_cards, planA=sorted(planA_ids), planB=sorted(planB_ids),
-               planB_rule=dict(if_player=str(planb.if_player.iloc[0]), past_cr=r1(planb.goes_past_cr.iloc[0], 1),
-                               switch_to=str(planb.switch_to.iloc[0]), loses=f"{planb.rr_loses_pct.iloc[0]:.0f}% of Plan A's pressure value"),
-               planB_table=[dict(if_player=r.if_player, past_cr=r1(r.goes_past_cr, 1), switch_to=r.switch_to,
-                                 loses_pct=r1(r.rr_loses_pct, 0), what_changes=r.what_changes) for r in planb.itertuples()],
-               plans_meta=T("step5_plans_meta").to_dict("records"),
-               value_map=[dict(id=r.player_id, score=r1(r.score), price=r1((r.price_lo_cr + r.price_hi_cr) / 2, 2), tier=r.price_tier,
-                               core=bool(r.likely_retained_core), rr=bool(r.in_rr_2026)) for r in cand.itertuples()],
-               contrarian=[dict(id=r.player_id, score=r1(r.score, 3), lo=r1(r.score_lo80, 3), hi=r1(r.score_hi80, 3), reason=r.reason) for r in contr.itertuples()],
-               unsung=[dict(id=r.player_id, score=r1(r.score, 3), lo=r1(r.score_lo80, 3), hi=r1(r.score_hi80, 3), reason=r.reason) for r in uns.itertuples()],
-               avoid=[dict(id=r.player_id, score=r1(r.score, 3), lo=r1(r.score_lo80, 3), hi=r1(r.score_hi80, 3), reason=r.reason) for r in avoid.itertuples()],
-               not_scorable=[dict(id=r.player_id, name=r.player_name, faced=int(r.hi_balls_faced), bowled=int(r.hi_legal_bowled), reason=r.reason)
-                             for r in ns.itertuples()],
-               assumptions=assum.to_dict("records"), limits=dict(squad="18–25 [REPORTED F1-006]", overseas="8 in squad [REPORTED F1-007]",
-                                                                 xi_overseas="4 [REPORTED F1-008]"))
+tc = pd.read_csv(TABLES / "step4_too_close_to_call.csv").set_index("role")
+t10_bat, edge_bat = top10(sb, "bat")
+t10_bowl, edge_bowl = top10(sw, "bowl")
+top10_block = dict(
+    bat=t10_bat, bowl=t10_bowl, edge=dict(bat=edge_bat, bowl=edge_bowl),
+    pairs=dict(bat=dict(total=int(tc.loc["bat", "top10_pairs"]), separated=int(tc.loc["bat", "pairs_separated_by_80pct_ranges"])),
+               bowl=dict(total=int(tc.loc["bowl", "top10_pairs"]), separated=int(tc.loc["bowl", "pairs_separated_by_80pct_ranges"]))),
+    pool=dict(bat=int(len(sb)), bowl=int(len(sw))),
+    eligibility="Rated if the player faced at least 100 High-pressure balls (batters) or bowled at least 60 legal High-pressure balls (bowlers) in IPL 2023–26.",
+    read="Ranked by Clutch Score (0–100 within role). The 80% ranges of top-10 players overlap, so read each list as a group of ten, not a strict order.",
+    not_scorable=[dict(id=r.player_id, name=r.player_name, faced=int(r.hi_balls_faced), bowled=int(r.hi_legal_bowled), reason=r.reason)
+                  for r in ns.itertuples()],
+)
 
 # ------------------------------------------------ method & proof
 btp = bt[bt.fold == "pooled"].set_index("role")
 summary = dict(
     seasons_scored="2023–2026", training_only="2022", ipl_matches=int(len(matches)), ipl_balls=int(len(pd.read_parquet(WORK / "balls_ipl.parquet", columns=["match_id"]))),
+    ipl_matches_span="2022–2026", scored_matches=int((matches.season >= 2023).sum()), scored_balls=int(len(b)),
     wp_eligible=int(elig.wp_eligible.sum()), last_match=str(matches.match_date.max()), in_scope=int(len(scope)),
     scorable_bat=int(len(sb)), scorable_bowl=int(len(sw)), scorable_ar=int(len(sa)), not_scorable=int(len(ns)),
     brier={int(r.season): r1(r.brier, 3) for r in wpe[wpe.innings == "all"].itertuples()},
@@ -281,21 +257,14 @@ summary = dict(
     effective_weights={f"{r.role}_{r.component}": r1(r.effective_weight, 3) for r in comp.itertuples()},
     sens_min_overlap=r1(sens.top10_overlap_pct.min(), 0),
     robustness={f"{r.variant}_{r.role}": r1(r.top20_overlap_pct, 0) for r in rob.itertuples()},
-    planA=[cand.set_index("player_id").player_name[p] for p in sorted(planA_ids)],
-    must_back=[r.player_name for r in short[short.tier == "Must-Back"].itertuples()],
-    top_gaps=[g["area"] for g in gap_rows if g["gap"] is not None and g["gap"] < 0][:2],
+    top10_bat=[x["name"] for x in t10_bat], top10_bowl=[x["name"] for x in t10_bowl],
     season_offsets={int(r.season): r1(r.mean_rae_per_ball, 3) for r in offs.itertuples()},
 )
 verdict_word = ("evidence of persistence" if all("evidence of persistence" in str(btp.loc[r_, "claim"]) for r_ in ("bat", "bowl"))
                 else "persistence not demonstrated")
-summary["claim"] = f"Historical pressure-performance indicator; {verdict_word}. Its ability to predict IPL 2027 is not established (D15)."
-_pmA = T("step5_plans_meta").query('plan == "A"').iloc[0]
-squad["still_lacks"] = ("RR's batting gaps are directional, not proven: each phase gap's 80% range includes zero (only powerplay batting is clearly above league). "
-                        "Plan A's picks were chosen because their own past pressure record is good where RR looks weak, so the overlap is by construction and rests on small samples. "
-                        f"At walk-away prices Plan A costs Rs {_pmA.cost_walkaway_cr:.0f} cr against an assumed Rs {_pmA.purse_cr:g} cr purse, and the Must-Back players' availability is unverified.")
-
+summary["claim"] = f"Historical pressure-performance indicator; {verdict_word}. It describes IPL 2023–26; it is not a forecast (D15)."
 method = dict(
-    flow=["Data: 367 IPL matches 2022–26, ball by ball; 2022 used only to train.",
+    flow=[f"Data: {len(matches)} IPL matches 2022–26 ball by ball, checked against the organisers' match list; 2022 used only to train, {int((matches.season >= 2023).sum())} matches (2023–26) rated.",
           "Win probability: simple logistic model per season, trained only on earlier seasons.",
           "Pressure Index: how much each ball can swing the result (leverage), plus small context boosts, ranked 0–100 against earlier balls only.",
           "Fair comparison: runs above (batters) or saved (bowlers) versus an average player in the same situation, from earlier matches only.",
@@ -315,11 +284,9 @@ method = dict(
     overlap_balls=ovb.to_dict("records"), shares=shares.to_dict("records"), offsets=offs.to_dict("records"),
     data_notes=notes0.fillna("").to_dict("records"),
     too_close=(pd.read_csv(TABLES / "step4_too_close_to_call.csv").to_dict("records") if (TABLES / "step4_too_close_to_call.csv").exists() else []),
-    facts=facts[["id", "topic", "fact", "value", "status", "source1_url", "source1_published", "verified_on"]].to_dict("records"),
-    assumptions=assum.to_dict("records"),
+    official_check=(pd.read_csv(TABLES / "step0_official_meta_check.csv").to_dict("records") if (TABLES / "step0_official_meta_check.csv").exists() else []),
     limitations=[
-        "Venues are UNKNOWN for all matches (source sites blocked), so there is no venue adjustment.",
-        "No external fact could be verified (squads, prices, ages, purse): all are REPORTED, UNKNOWN or [ASSUMPTION].",
+        "No venue adjustment: venue names could not be looked up (source sites blocked). The organisers' venue ids arrived on 17 Nov, after the method was frozen, so they are not used.",
         "First-innings win probabilities have little skill beyond the base rate; second-innings ones are informative.",
         "The 2023 model learned from one season (2022) only.",
         "Expected runs from earlier matches trail scoring jumps: mean RAE per ball +0.02 (2023), +0.04 (2024), +0.00 (2025), +0.02 (2026). Season-centred check: top-20 unchanged 100%.",
@@ -327,8 +294,8 @@ method = dict(
          (", ".join(f"{r_.role} {dict(S='skill', I='match impact (WPA)', H='holds up', C='consistency')[r_.component]}" for r_ in comp[~comp.informative].itertuples()) or "none") + "."),
         "Top-10 rankings are too close to call: no pair of top-10 players is separated by their 80% ranges (step4_too_close_to_call).",
         "Backtest: persistence of the score from one season to the next is not demonstrated (small samples; see Method & Proof for hit rates against naive and random-pick baselines).",
-        "Fielding is not in the data; wicketkeeper and captaincy are not identifiable.",
-        "Ages, injuries and availability are not verifiable here; the shortlist is conditional on the official auction list."],
+        "IPL only (2023–26): T20I and A-team matches in the dataset are left out so every player is measured against the same opposition level and the same playing conditions (D38).",
+        "Fielding is not in the data; wicketkeeper and captaincy are not identifiable."],
     stamp=dict(last_match=str(matches.match_date.max()), build=datetime.date.today().isoformat(), seed=SEED, data_sha256=RAW_SHA256),
     audit=[])
 audit_path = TABLES / "step8_audit.csv"
@@ -348,22 +315,23 @@ glossary = [
     ("Clutch Reliability Score", "0–100 historical pressure-performance indicator within role; roughly a percentile. Not a forecast."),
     ("Backtest", "Score built from earlier seasons only, then checked against the next season's pressure performance."),
     ("Too close to call", "Two players whose 80% ranges overlap: the data can't say who is better."),
-    ("[ASSUMPTION]", "A value the data can't supply and the web couldn't verify here; stated with its reason."),
 ]
 summary["exec_summary"] = [
-    f"We rated {summary['scorable_bat'] + summary['scorable_bowl'] - summary['scorable_ar']} players ({summary['scorable_bat']} batters and {summary['scorable_bowl']} bowlers, {summary['scorable_ar']} of them all-rounders rated both ways) on how they performed when a ball could swing the match (IPL 2023–26).",
-    f"RR's weakest areas under pressure: {', '.join(g.split(': ')[1].lower() + '-overs batting' for g in summary['top_gaps'])}. These gaps are directional (within statistical noise); RR's bowling is at or above league in every phase.",
-    f"Must-Back if available: {', '.join(summary['must_back'])}. Plan A (assumed Rs {T('step5_plans_meta').purse_cr.iloc[0]:g} cr purse; Rs {T('step5_plans_meta').query('plan == \"A\"').cost_mid_cr.iloc[0]:.1f} cr at mid prices, Rs {T('step5_plans_meta').query('plan == \"A\"').cost_walkaway_cr.iloc[0]:.0f} cr at walk-away): {', '.join(summary['planA'])}.",
-    f"Honest test (top 10 still above average next season): batters {summary['backtest']['bat_score']}% v naive {summary['backtest']['bat_naive']}% v random pick {summary['backtest']['bat_base']}%; bowlers {summary['backtest']['bowl_score']}% v {summary['backtest']['bowl_naive']}% v {summary['backtest']['bowl_base']}%. Verdict: {verdict_word}.",
-    "So read it as proof of past pressure performance, not a promise; prices, ages and availability are unverified assumptions to recheck before 16 Dec.",
+    "Pressure, defined ball by ball: how much one ball could swing the match result (win-probability leverage), lifted for chases, being below par, the death overs, playoffs and collapses. The top 20% of balls, ranked only against earlier balls, count as High pressure.",
+    "Performance under pressure: runs above (batters) or saved (bowlers) versus an average player in exactly the same situation, plus win probability added, holding up versus the player's own low-pressure level and consistency across seasons; small samples are pulled toward average.",
+    f"Top 10 batters under pressure (IPL 2023–26): {', '.join(summary['top10_bat'])}.",
+    f"Top 10 bowlers under pressure (IPL 2023–26): {', '.join(summary['top10_bowl'])}.",
+    f"How sure we are: the 80% ranges inside each top 10 overlap, so read each as a group, not a strict order. Tested one season ahead, the score did not beat simple strike-rate/economy rankings (batters {summary['backtest']['bat_score']}% v {summary['backtest']['bat_naive']}%; bowlers {summary['backtest']['bowl_score']}% v {summary['backtest']['bowl_naive']}%): it is a record of past pressure performance, not a forecast.",
 ]
 
 how_to_use = [
-    "What the score is: who has already delivered when a ball could swing the match, how sure we are, and who has not.",
-    "What it is not: a forecast. Tested one season ahead, it did not beat simple stats (strike rate/economy) or a random pick.",
-    "How to use it: build the shortlist and set walk-away prices from it, then decide on form, fitness, role and price.",
+    "What the score is: a 0–100 rating of how well a player did on the balls that could swing the match (IPL 2023–26), compared with an average player in the same situation.",
+    "How to read it: higher is better, and the whisker is how sure we are. When two whiskers overlap the data cannot separate the players, so each top 10 is a group, not a strict order.",
+    "What it is not: a forecast. Tested one season ahead, it did not beat simple strike-rate or economy rankings.",
 ]
-payload = dict(meta=dict(name="RR Clutch Index", how_to_use=how_to_use, thesis="Back players whose quality has held up when the match was on the line, and know how sure we are.",
+payload = dict(meta=dict(name="RR Clutch Index", subtitle="Who performs best under pressure · IPL 2023–26", how_to_use=how_to_use,
+                         thesis="Who delivered when the match was on the line: the top 10 batters and top 10 bowlers under pressure in IPL 2023–26, and how sure we are.",
+                         brief="SupeRR Selector Season 2, Round 1: identify the top 10 batters and top 10 bowlers who perform best under pressure, and show the method.",
                          **summary["stamp"] if "stamp" in summary else {}, **method["stamp"], kpi=summary),
                exec=summary["exec_summary"], glossary=[dict(term=a, meaning=b_) for a, b_ in glossary], players=players,
                agg=dict(bat=agg_bat, bat_cols=agg_bat_cols, bowl=agg_bowl, bowl_cols=agg_bowl_cols),
@@ -376,7 +344,7 @@ payload = dict(meta=dict(name="RR Clutch Index", how_to_use=how_to_use, thesis="
                              shares=shares.to_dict("records"), examples=ex.fillna("").to_dict("records"),
                              wp_eval=wpe.to_dict("records"), calibration=cal.to_dict("records"), boosts=bcorr.to_dict("records"),
                              overlap_balls=ovb.to_dict("records"), robustness=rob.to_dict("records")),
-               leaderboard=lb, squad=squad, auction=auction, method=method)
+               leaderboard=lb, top10=top10_block, method=method)
 
 
 def clean(o):
@@ -396,6 +364,6 @@ def clean(o):
 DELIVERABLES.mkdir(parents=True, exist_ok=True)
 js = json.dumps(clean(payload), separators=(",", ":"), ensure_ascii=False)
 (DELIVERABLES / "dashboard_payload.json").write_text(js)
-(TABLES / "summary_numbers.json").write_text(json.dumps(clean(dict(summary=summary, squad_still_lacks=squad["still_lacks"])), indent=1, ensure_ascii=False))
+(TABLES / "summary_numbers.json").write_text(json.dumps(clean(dict(summary=summary, top10=top10_block)), indent=1, ensure_ascii=False))
 print("payload bytes:", len(js.encode()), "| players:", len(players), "| showcase:", len(showcase), "| agg rows:", len(agg_bat) + len(agg_bowl))
 print(json.dumps(clean(summary), indent=0)[:2500])

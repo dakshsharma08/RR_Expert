@@ -5,7 +5,7 @@
 <title>RR Clutch Index</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<meta name="description" content="Who delivered for the team when the match was on the line: a historical pressure-performance shortlist for the IPL 2027 auction. Independent submission, not an official Rajasthan Royals product.">
+<meta name="description" content="Who delivered for the team when the match was on the line: a historical pressure-performance shortlist for the next season auction. Independent submission, not an official Rajasthan Royals product.">
 <style>
 /*__FONTS__*/
 :root{
@@ -320,9 +320,7 @@ body:not(.detailed) .deepc{display:none !important}
         <div class="fld"><label for="f-phase">Phase</label><select id="f-phase"><option value="all">All phases</option><option value="P">Powerplay (1-6)</option><option value="M">Middle (7-15)</option><option value="D">Death (16-20)</option></select></div>
         <div class="fld"><label for="f-season">Season</label><select id="f-season"></select></div>
         <div class="fld"><label for="f-pressure">Pressure level</label><select id="f-pressure"><option value="all">All levels</option><option value="H">High</option><option value="M">Medium</option><option value="L">Low</option></select></div>
-        <div class="fld"><label for="f-origin">Indian / overseas</label><select id="f-origin"><option value="all">All</option><option value="ind">Indian</option><option value="ovs">Overseas</option><option value="unk">Unknown</option></select></div>
         <div class="fld"><label for="f-q">Search player</label><input id="f-q" type="search" placeholder="Name" autocomplete="off"></div>
-        <label class="chk"><input id="f-avail" type="checkbox"><span>Available at auction only <button type="button" class="i" id="avail-i" aria-label="What this toggle does">i</button></span></label>
         <button type="button" class="btn" id="f-reset">Reset filters</button>
       </div>
       <p class="fnote" id="fnote"></p>
@@ -367,7 +365,7 @@ const ROLE_LABEL = { bat: 'Batters', bowl: 'Bowlers', ar: 'All-rounders' };
 const ROLE_ONE = { bat: 'batter', bowl: 'bowler', ar: 'all-rounder' };
 
 const METRIC_HELP = {
-  score: 'Clutch Score (short for Clutch Reliability Score), 0–100 within role, roughly a percentile. A historical pressure-performance indicator. Not a forecast for 2027.',
+  score: 'Clutch Score (short for Clutch Reliability Score), 0–100 within role, roughly a percentile. A historical pressure-performance indicator. Not a forecast.',
   range: '80% range: we are 80% sure the true score sits between the two ends of the whisker (from resampling the player’s matches). Wide = unsure.',
   hi: 'High-pressure sample: balls faced (batters) or legal balls bowled (bowlers) when the Pressure Index was High. More balls = more reliable.',
   rae: 'Runs Above Expected per 100 balls: runs scored minus what an average batter scores on the same balls in the same situations.',
@@ -407,8 +405,6 @@ const uniq = a => Array.from(new Set(a));
 /* ---- codes: hidden in Simple mode, kept in the tooltip; shown in Detailed ---- */
 function codeInfo(code) {
   const id = (String(code).match(/(A\d+|F\d-\d+)/) || [])[1]; if (!id) return String(code);
-  const a = ((D.method || {}).assumptions || []).find(x => x.id === id); if (a) return `${id}: ${a.item}. ${a.reason}`;
-  const fc = ((D.method || {}).facts || []).find(x => x.id === id); if (fc) return `${id}: ${fc.fact} = ${fc.value} (${fc.status})`;
   return String(code);
 }
 function codeChip(code) {
@@ -475,7 +471,7 @@ function verdict(p) { // rebuilt in the browser so rounding matches the displaye
   const rk = roleKey(p), b = p[rk];
   if (!b) return '';
   const s = b === p.ar ? p.ar : b; // same
-  return `Ranked ${b.rank} of ${b.of} ${ROLE_LABEL[rk].toLowerCase()} on historical pressure performance (score ${f0(s.score)}, 80% range ${f0(s.lo)}–${f0(s.hi)}: ${widthWord(s.hi - s.lo)}). Past record only; not a forecast for 2027.`;
+  return `Ranked ${b.rank} of ${b.of} ${ROLE_LABEL[rk].toLowerCase()} on historical pressure performance (score ${f0(s.score)}, 80% range ${f0(s.lo)}–${f0(s.hi)}: ${widthWord(s.hi - s.lo)}). Past record only; not a forecast.`;
 }
 
 /* ===================== aggregated rows (filters re-slice these) ===================== */
@@ -488,18 +484,16 @@ const AGG = { bat: new Map(), bowl: new Map() };
 
 /* ===================== state ===================== */
 const TABS = [
-  ['summary', 'Summary', 'Summary'], ['pressure', 'Pressure Index', 'Pressure'], ['leaderboard', 'Leaderboard', 'Ranking'], ['compare', 'Player Compare', 'Compare'],
-  ['squad', 'Squad Fit', 'Squad'], ['auction', 'Auction Board', 'Auction'], ['method', 'Method & Proof', 'Method']
+  ['summary', 'Top 10s', 'Top 10s'], ['pressure', 'How we define pressure', 'Pressure'], ['leaderboard', 'Full ranking', 'Ranking'], ['compare', 'Player Compare', 'Compare'],
+  ['method', 'Method & Proof', 'Method']
 ];
-const FDEF = { role: 'all', phase: 'all', season: 'all', pressure: 'all', origin: 'all', avail: false, q: '' };
+const FDEF = { role: 'all', phase: 'all', season: 'all', pressure: 'all', q: '' };
 const S = {
   tab: 'summary', player: null, detail: false, openDeep: new Set(),
   f: Object.assign({}, FDEF), lb: 'bat', sort: { k: 'rank', d: 1 }, cmp: [], basket: [],
   match: 0, ball: null, lbAll: false, mapInn: 1, calSeason: 'all', squadPlan: 'A', cmpInit: false
 };
-function defaultCompare() {
-  return (D.meta.kpi.must_back || []).map(n => (BYNAME.get(n) || {}).id).filter(Boolean).slice(0, CFG.cmpMax);
-}
+function defaultCompare() { return D.top10.bat.slice(0, 3).map(r => r.id); }
 function sliceActive() { return S.f.phase !== 'all' || S.f.season !== 'all' || S.f.pressure !== 'all'; }
 function filtersActive() {
   const f = S.f, a = [];
@@ -507,16 +501,12 @@ function filtersActive() {
   if (f.phase !== 'all') a.push(['phase', 'Phase: ' + PHASE[f.phase]]);
   if (f.season !== 'all') a.push(['season', 'Season: ' + f.season]);
   if (f.pressure !== 'all') a.push(['pressure', 'Pressure: ' + BUCKET[f.pressure]]);
-  if (f.origin !== 'all') a.push(['origin', 'Origin: ' + ({ ind: 'Indian', ovs: 'Overseas', unk: 'Unknown' })[f.origin]]);
-  if (f.avail) a.push(['avail', 'Available at auction only']);
   if (f.q.trim()) a.push(['q', 'Search: ' + f.q.trim()]);
   return a;
 }
 function passPlayer(p) {
   const f = S.f;
   if (f.role !== 'all') { const rk = roleKey(p); if (rk !== f.role) return false; }
-  if (f.origin !== 'all' && originOf(p) !== f.origin) return false;
-  if (f.avail && (p.core || p.in_rr)) return false;
   if (f.q.trim() && !p.name.toLowerCase().includes(f.q.trim().toLowerCase())) return false;
   return true;
 }
@@ -578,13 +568,11 @@ function deep(key, title, html) {
   const open = S.detail || S.openDeep.has(k);
   return `<details class="deep" data-dk="${esc(k)}" ${open ? 'open' : ''}><summary>${S.detail ? 'Detail' : 'Show detail'}: ${esc(title)}</summary><div class="dbody">${html}</div></details>`;
 }
-function sowhat(t) { return `<p class="sowhat"><b>So what for RR:</b> ${t}</p>`; }
+function sowhat(t) { return `<p class="sowhat"><b>Takeaway:</b> ${t}</p>`; }
 function chartCard(o) {
   return `<section class="chart" ${o.id ? `id="${o.id}"` : ''}><h3 class="ct">${o.title}</h3><p class="cs">${o.sub}</p>${o.ctl || ''}<div class="svgw">${o.svg}</div>${o.legend ? `<div class="legend">${o.legend}</div>` : ''}<p class="nline">${o.n}</p>${o.sowhat ? sowhat(o.sowhat) : ''}${o.after || ''}</section>`;
 }
 function emptyBox(msg) { return `<div class="empty" role="status">${msg}</div>`; }
-function tierInfo(t) { return t === 'Must-Back' ? { sh: '●', cls: 't-must', name: 'Must-Back' } : t === 'Value Pick' ? { sh: '◆', cls: 't-value', name: 'Value Pick' } : { sh: '▲', cls: 't-gem', name: 'Hidden Gem' }; }
-function tierBadge(t) { const i = tierInfo(t); return `<span class="${i.cls}"><span class="shape" aria-hidden="true">${i.sh}</span>${i.name}</span>`; }
 const CW = () => Math.max(260, Math.min(980, ($('#view') ? $('#view').clientWidth : 360) - 30));
 function rangeTag(lo, hi) { return isWide(lo, hi) ? tagChip('wide range', 'warn') : ''; }
 function niceList(a) { return a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; }
@@ -786,99 +774,55 @@ function backtestVerdictLine() {
   const anyBeat = bt.beat || bw.beat;
   return `${anyBeat ? 'The score beat the plain ranking in part of the test. ' : 'The score did not beat the plain (naive) ranking at picking next season’s pressure performers. '}Batters: score ${f1(bt.sc)}% vs plain ${f1(bt.nv)}% (${bt.text}). Bowlers: score ${f1(bw.sc)}% vs plain ${f1(bw.nv)}% (${bw.text}).`;
 }
-function tiersSorted() { return D.auction.tiers.slice().sort((a, b) => b.score - a.score); }
-function gapParse(area) { const m = /^(Batting|Bowling) under pressure: (\w+)/.exec(area); return m ? { kind: m[1] === 'Batting' ? 'bat' : 'bowl', phase: m[2] } : null; }
-const KIND_LABEL = { bat: 'Batting', bowl: 'Bowling' };
-
-function mustBackCard(t) {
-  const p = P.get(t.id), r = p;
-  return `<div class="pcard"><div class="pn">${plink(t.id)} ${tierBadge(t.tier)}</div>
-  <div class="small muted">${esc(p.sub_role)} · ${esc(originLabel(p))} · age ${tg(p.age)}</div>
-  <p style="margin:.5em 0 .2em"><span class="sc">${f0(t.score)}</span> <span class="muted">(80% range ${f0(t.lo)}–${f0(t.hi)})</span> ${info('score')} ${rangeTag(t.lo, t.hi)}</p>
-  <dl><dt>Why this tier</dt><dd>${X(t.tier_reason || '')}</dd><dt>Gap it fills</dt><dd>${t.fills ? esc(fillsText(p, t.fills)) : 'No specific RR gap flagged in the data'}. Ranked ${mainBlock(p).rank} of ${mainBlock(p).of} ${ROLE_LABEL[roleKey(p)].toLowerCase()}.</dd>
-  <dt>Price band</dt><dd>${tg(t.price)} ${info('price')}</dd><dt>Risk</dt><dd>${riskTags(t.risk)} ${info('risk')}</dd></dl></div>`;
-}
-
 /* ===================== TAB 1: SUMMARY ===================== */
-function mustCardLine(p, t) { return `Strong pressure record${t.fills ? '; fills the gap in ' + fillsText(p, t.fills) : ''}.`; }
+const shortSpan = s => String(s || '').replace(/(\d{4})–(\d{2})(\d{2})/, '$1–$3');
+function miniWhisker(lo, hi, score, small) {
+  const w = 200, h = 16, sx = lin(0, 100, 6, w - 6);
+  return `<svg class="mw" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Score ${f0(score)}, 80% range ${f0(lo)} to ${f0(hi)}"><title>Score ${f0(score)}, 80% range ${f0(lo)} to ${f0(hi)}</title>`
+    + `<line x1="6" x2="${w - 6}" y1="8" y2="8" stroke="${COL.grid}" stroke-width="3" stroke-linecap="round"/>`
+    + `<line x1="${sx(lo)}" x2="${sx(hi)}" y1="8" y2="8" stroke="${small ? COL.grey : COL.blueL}" stroke-width="6" stroke-linecap="round" opacity=".55"/>`
+    + `<line x1="${sx(lo)}" x2="${sx(lo)}" y1="2" y2="14" stroke="${COL.text}" stroke-width="2"/><line x1="${sx(hi)}" x2="${sx(hi)}" y1="2" y2="14" stroke="${COL.text}" stroke-width="2"/>`
+    + marker('circle', sx(score), 8, 5.5, COL.pink, '#fff') + '</svg>';
+}
+function top10Card(kind) {
+  const rows = D.top10[kind], edge = D.top10.edge[kind], pr = D.top10.pairs[kind];
+  const label = kind === 'bat' ? 'Top 10 batters' : 'Top 10 bowlers';
+  const li = rows.map(r => `<li><details class="t10r"><summary><span class="rk">${r.rank}</span><span class="nm">${plink(r.id, r.name)} <span class="tag info">${esc(r.team)}</span><span class="faint small"> ${esc(r.sub_role)}</span></span><span class="sc2">${f0(r.score)} <small>(${f0(r.lo)}–${f0(r.hi)})</small></span><span class="wk">${miniWhisker(r.lo, r.hi, r.score, isWide(r.lo, r.hi))}</span><span class="chev" aria-hidden="true"></span></summary>
+    <div class="why"><p>${X(r.why)}</p>${isWide(r.lo, r.hi) ? tagChip('wide range', 'warn') : ''}</div></details></li>`).join('');
+  const edgeTxt = edge ? `<p class="edge"><b>#${rows.length + 1}</b> ${plink(edge.next_id, edge.next_name)} (${f0(edge.next_score)}, range ${f0(edge.next_lo)}–${f0(edge.next_hi)}): ${edge.overlaps_10th ? '<b>too close to call</b> with #' + rows.length : 'separated from #' + rows.length}.</p>` : '';
+  return `<section class="card t10" aria-label="${label}"><h2>${label} ${info('score')}</h2>
+    <p class="cs">Clutch Score 0–100 (higher is better). The bar is the 80% range. Tap a row to see why; tap a name for the profile.</p>
+    <ol class="t10l">${li}</ol>${edgeTxt}
+    <p class="nline">${pr.separated} of ${pr.total} pairs in this top 10 are separated by their 80% ranges.</p></section>`;
+}
 function tabSummary() {
-  const k = KPI, bt = btRole('bat'), bw = btRole('bowl'), anyBeat = bt.beat || bw.beat;
-  const nAssume = D.method.assumptions.length;
-  const must = D.auction.tiers.filter(t => t.tier === 'Must-Back').sort((a, b) => b.score - a.score);
-  const hero = tiersSorted().map(t => {
-    const p = P.get(t.id);
-    return { name: plink(t.id) + ' <span class="wm">' + tierBadge(t.tier) + (t.tier_reason ? info('', scrub(t.tier_reason)) : '') + '</span>', meta: `${esc(ROLE_ONE[roleKey(p)])}, ${f0(t.score)} (${f0(t.lo)}–${f0(t.hi)})`, score: t.score, lo: t.lo, hi: t.hi, small: isWide(t.lo, t.hi), shape: TIER_SHAPE[t.tier], fill: TIER_FILL[t.tier], stroke: TIER_STROKE[t.tier], label: p.name };
-  });
-  let tooClose = 0, pairs = 0;
-  const ts = tiersSorted(); for (let i = 0; i < ts.length; i++) for (let j = i + 1; j < ts.length; j++) { pairs++; if (overlap(ts[i], ts[j])) tooClose++; }
-  const gaps = (k.top_gaps || []).map(gapParse).filter(Boolean);
-  const strip = gaps.length ? gaps.map(g => stripRow(g)).join('') : '';
-  const mustCards = must.map(t => { const p = P.get(t.id); return `<div class="pcard mb"><div class="eyebrow" style="margin:0">${ico('star')} Must-Back</div><div class="pn" style="font-size:1.25rem">${plink(t.id)}</div>
-    <div class="small muted">${esc(p.sub_role)} · ${esc(originLabel(p))} · age ${tg(p.age)}</div>
-    <p style="margin:.6em 0 .2em"><span class="sc">${f0(t.score)}</span> <span class="muted small">(80% range ${f0(t.lo)}–${f0(t.hi)})</span> ${info('score')} ${rangeTag(t.lo, t.hi)}</p>
-    <p style="margin:.3em 0"><b>${esc(mustCardLine(p, t))}</b></p>
-    <p class="small" style="margin:.2em 0">Price band: ${tg(t.price)} ${info('price')}</p>
-    <p class="small muted" style="margin:.2em 0">${X(t.tier_reason || '')}</p>
-    <div>${riskTags(t.risk)} ${info('risk')}</div></div>`; }).join('');
+  const k = KPI, bt = btRole('bat'), bw = btRole('bowl'), t = D.top10;
+  const tc = ['bat', 'bowl'].reduce((a, x) => a + (t.pairs[x].total - t.pairs[x].separated), 0), tt = ['bat', 'bowl'].reduce((a, x) => a + t.pairs[x].total, 0);
+  const steps = (D.pressure.explain || []).slice(0, 3);
+  const stepTitles = ['Win chance, ball by ball', 'How much one ball can swing it', 'High = the top 20% of balls'];
   return `
   <section class="sec herogrid">
-    <div class="ha-head hero"><p class="eyebrow">RR Clutch Index · IPL 2027 auction</p>
-    <h1 class="lead">${esc(D.meta.thesis)}</h1>
-    <p class="sub">${must.length} Must-Back ${must.length === 1 ? 'name' : 'names'} if available: ${niceList(must.map(t => nm(t.id)))}. The scores describe the past. They are not a forecast for 2027.</p>
+    <div class="ha-head hero"><p class="eyebrow">RR Clutch Index</p>
+      <h1 class="lead">${esc(D.meta.thesis)}</h1>
+      <p class="sub">${esc(D.meta.brief || '')}</p></div>
+    <div class="kpis ha-kpi">
+      <div class="card tile"><div class="v">${SCORABLE.length}</div><div class="l">players rated (${k.scorable_bat} batters, ${k.scorable_bowl} bowlers; ${k.scorable_ar} rated both ways)</div></div>
+      <div class="card tile"><div class="v">${thou(k.scored_matches)}</div><div class="l">matches rated (IPL ${esc(shortSpan(k.seasons_scored))}, ${thou(k.scored_balls)} balls). <span class="faint">+${esc(k.training_only)} used to train only.</span></div></div>
+      <div class="card tile warn"><div class="v txt">How sure: not very</div><div class="l">${tc} of ${tt} top-10 pairs are too close to call. Next-season test, top-10 hit rate: batters ${f1(bt.sc)}% vs ${f1(bt.nv)}% plain ranking; bowlers ${f1(bw.sc)}% vs ${f1(bw.nv)}% ${info('', 'Hit rate = share of the top 10 who were still above average the next season. Plain ranking = overall strike rate (batters) or economy (bowlers).')}</div></div>
     </div>
-    <div class="ha-must">${mustCards}</div>
+    <div class="ha-lists"><div class="grid g2 t10grid">${top10Card('bat')}${top10Card('bowl')}</div>
+      <p class="small muted" style="margin:10px 0 0">${X(t.eligibility || '')}</p>
+      ${sowhat(X(t.read || ''))}</div>
     <div class="ha-how"><div class="card hl howto"><h3>${ico('bulb')} How to use this score</h3><ul class="clean">${(D.meta.how_to_use || []).map(x => { const i = String(x).indexOf(':'); return `<li>${i > 0 ? `<b>${esc(x.slice(0, i + 1))}</b>${X(x.slice(i + 1))}` : X(x)}</li>`; }).join('')}</ul></div></div>
-  <div class="kpis ha-kpi">
-    <div class="card tile"><div class="v">${SCORABLE.length}</div><div class="l">players rated (${k.scorable_bat} batters, ${k.scorable_bowl} bowlers; ${k.scorable_ar} rated both ways)</div></div>
-    <div class="card tile"><div class="v">${thou(k.ipl_matches)}</div><div class="l">IPL matches, ${esc(k.seasons_scored)} (${thou(k.ipl_balls)} balls)</div></div>
-    <div class="card tile warn"><div class="v txt">${anyBeat ? 'Beat the plain ranking in part of the test' : 'Did not beat the plain ranking'}</div><div class="l">Next-season test, top-10 hit rate. Batters ${f1(bt.sc)}% vs ${f1(bt.nv)}%; bowlers ${f1(bw.sc)}% vs ${f1(bw.nv)}% ${info('', 'Hit rate = share of the top 10 who were still above average the next season. Plain ranking = overall strike rate (batters) or economy (bowlers).')}</div></div>
-  </div>
   </section>
-  <section class="sec">${deep('kpis', 'more numbers', `<div class="kpis"><div class="card tile"><div class="v">${esc(k.seasons_scored)}</div><div class="l">Seasons scored (${esc(k.training_only)} used only to train)</div></div><div class="card tile"><div class="v">${esc(k.last_match)}</div><div class="l">Last match in the data</div></div><div class="card tile"><div class="v">${k.not_scorable}</div><div class="l">players with too few High-pressure balls to rate (of ${k.in_scope} in scope)</div></div></div>`)}
-  <div class="note"><b>Honest read of the test.</b> ${esc(backtestVerdictLine())} ${X(k.claim)} <button class="plink" data-goto="method">See the proof</button></div></section>
+  <section class="sec"><h2>How we define pressure</h2>
+    <div class="flow">${steps.map((l, i) => `<div><b>${esc(stepTitles[i] || '')}</b><br>${X(l)}</div>`).join('')}</div>
+    <p style="margin-top:12px"><button class="btn pri" data-goto="pressure">See pressure in a real match</button></p></section>
+  <section class="sec"><div class="note"><b>Honest read of the test.</b> ${esc(backtestVerdictLine())} ${X(k.claim)} <button class="plink" data-goto="method">See the proof</button></div>
+    ${termsStrip(['clutch', 'range', 'naive', 'persist'])}</section>
   <section class="sec"><h2>The 5-line summary</h2>
-    <div class="card"><ol style="margin:.2em 0 0;padding-left:1.2em">${D.exec.map(l => `<li style="margin:.4em 0">${X(l)}</li>`).join('')}</ol></div>
-    <div style="margin-top:12px">${termsStrip(['clutch', 'range', 'naive', 'persist'])}</div></section>
-  <section class="sec">${chartCard({
-    title: `Shortlist ranked by Clutch Score: the top of the list is ${tooClose ? 'not cleanly separated' : 'separated'}`,
-    sub: `Clutch Score (0–100, within role) for the ${hero.length} shortlisted players. Bar = score, whisker = 80% range. Marker shape = tier.`,
-    svg: whiskerChart(hero, {}), n: `n = ${hero.length} shortlisted players. Wide-range players are greyed (range wider than ${CFG.wideRange} points). Score does not change with filters.`,
-    legend: legendMark('circle', TIER_FILL['Must-Back'], COL.pinkL, 'Must-Back') + legendMark('diamond', TIER_FILL['Value Pick'], COL.blueL, 'Value Pick') + legendMark('triangle', TIER_FILL['Hidden Gem'], COL.amber, 'Hidden Gem') + `<span>│─│ 80% range</span><span>▨ grey hatch = wide range</span>`,
-    sowhat: `${tooClose} of ${pairs} pairs on this list have overlapping ranges. ${tooClose === pairs ? 'The data cannot rank any of these players above another, so treat the list as a pool to pursue and decide on role fit, price and availability.' : 'Read the overlapping pairs as a group to pursue, not a strict order.'}`
-  })}</section>
-  <section class="sec"><h2>Do the Plan A picks have a strong record where RR is weak?</h2>
-    <p class="muted small">RR’s biggest measured gaps under High pressure (${CFG.recent}). For each, the Plan A picks’ own past record (${niceList(k.planA)}) next to RR’s group and the league. ${X(D.squad.picks_note || '')}</p>
-    ${strip || emptyBox('No gaps below league average were flagged.')}
-    ${sowhat(X(D.squad.still_lacks))}</section>
-  <section class="sec grid g2">
-    <div class="card"><h3>How to read this dashboard</h3><ul class="clean"><li>1. Each tab opens with one plain sentence, then one or two charts. Tap “Show detail” (or switch to Detailed) for the tables and the internal codes.</li><li>2. A bar is a score; the whisker is how sure we are. If two whiskers overlap, we say “too close to call”.</li><li>3. Filters change the descriptive numbers only. The Clutch Score never changes with filters.</li></ul></div>
-    <div class="card"><h3>Assumptions and unknowns</h3><p><span class="numf" style="font-size:1.5rem">${nAssume}</span> assumptions are logged. Ages, prices, availability and nationality are assumptions or UNKNOWN; none is VERIFIED.</p><button class="btn" data-goto="method" data-anchor="assumptions">Open the assumptions ledger</button></div>
-  </section>`;
+    <div class="card"><ol style="margin:.2em 0 0;padding-left:1.2em">${D.exec.map(l => `<li style="margin:.4em 0">${X(l)}</li>`).join('')}</ol></div></section>`;
 }
-/* diverging bars around zero (strength / gaps): label row above, bar below, shared axis */
-function divAxis(w, max, caption) {
-  const x0 = 46, x1 = w - 46, sx = lin(-max, max, x0, x1);
-  return svgOpen(w, 24, 'Axis: ' + (caption || 'runs per 100 balls')) + niceTicks(-max, max, 4).map(v => `<line class="gl" x1="${sx(v)}" x2="${sx(v)}" y1="14" y2="20"/>` + T(sx(v), 11, (v > 0 ? '+' : '') + v, 'ax', 'middle')).join('') + `<line class="gl" x1="${x0}" x2="${x1}" y1="20" y2="20"/></svg>` + (caption ? `<div class="axcap">${caption}</div>` : '');
-}
-function divBar(w, max, v, fill, league, ghost, label) {
-  const x0 = 46, x1 = w - 46, sx = lin(-max, max, x0, x1), z = sx(0);
-  let s = svgOpen(w, 26, label || 'bar') + `<line x1="${z}" x2="${z}" y1="0" y2="26" stroke="${COL.muted}"/>`;
-  if (isN(ghost)) s += `<rect x="${Math.min(z, sx(ghost))}" y="2" width="${Math.abs(sx(ghost) - z)}" height="22" fill="none" stroke="${COL.grey}" stroke-dasharray="3 2"/>`;
-  if (isN(v)) s += `<rect x="${Math.min(z, sx(v))}" y="5" width="${Math.max(1, Math.abs(sx(v) - z))}" height="16" fill="${fill}" stroke="#fff" stroke-width="1"/>` + T(sx(v) + (v >= 0 ? 4 : -4), 18, sg(v, f1), 'ax', v >= 0 ? 'start' : 'end');
-  if (isN(league)) s += `<line x1="${sx(league)}" x2="${sx(league)}" y1="0" y2="26" stroke="${COL.amber}" stroke-width="3" stroke-dasharray="4 2"/>`;
-  return s + '</svg>';
-}
-const STRENGTH_CAP = 'Runs above expected (batting) or saved (bowling) per 100 High-pressure balls. Higher is better.';
-function picksGroup(w, ph, kind, planK, noCap) {
-  const sq = D.squad, key = planK === 'B' ? 'planB_picks_only' : 'planA_picks_only';
-  const pk = (sq[key] || {})[ph] || {}, rr = sq.before[ph] || {}, lg = sq.league[ph] || {};
-  const vals = [pk[kind], rr[kind], lg[kind]];
-  const max = Math.max(10, ...vals.map(x => Math.abs(x || 0))) * 1.15;
-  const row = (lbl, v, n, fill) => { const small = isN(n) && n < CFG.smallSlice; return `<div class="wrow ${small ? 'small-s' : ''}"><div class="wh"><span>${lbl}</span><span class="wm">n = ${thou(n)} balls${small ? ' ' + tagChip('small sample', 'warn') : ''}</span></div>${divBar(w, max, v, small ? 'url(#p-grey)' : fill, null, null, lbl)}</div>`; };
-  return `<div class="card" style="margin:0 0 10px"><b>${KIND_LABEL[kind]} under pressure: ${ph}</b> <span class="faint small">${PHASE_OVERS[ph[0]]}</span> ${info('strength')}
-  ${divAxis(w, max, noCap ? '' : STRENGTH_CAP)}${row('The picks’ own past record', pk[kind], pk[kind + '_balls'], 'url(#p-pink)')}${row('RR group today', rr[kind], rr[kind + '_balls'], 'url(#p-hatch)')}${row('League average', lg[kind], lg[kind + '_balls'], 'url(#p-dots)')}</div>`;
-}
-function stripRow(g) { return picksGroup(CW() - 12, g.phase, g.kind, 'A'); }
 
 /* ===================== TAB 2: PRESSURE INDEX ===================== */
 function pressureCuts() {
@@ -1078,7 +1022,7 @@ function tabLeaderboard() {
       ${hdr('rank', '#', 'num')}${hdr('name', 'Player')}<th>Clutch Score (bar) with 80% range ${info('range')}</th>${hdr('hi', 'High-pressure balls', 'num', 'hi')}${hdr('sln', 'In this slice')}
       ${role !== 'ar' ? `${hdr('slrae', kind + '/100 in slice', 'deepc num', role === 'bat' ? 'rae' : 'rse')}<th class="deepc num">${kind}/100 High ${info(role === 'bat' ? 'rae' : 'rse')}</th>` : '<th class="deepc num">Bat score</th><th class="deepc num">Bowl score</th>'}
       <th class="deepc num">${role === 'ar' ? 'WPA / match (pp)' : 'WPA per ball (pp)'} ${info('wpa')}</th>${role !== 'ar' ? `${hdr('gap', 'Pressure gap', 'deepc num', 'gap')}${hdr('cons', 'Consistency', 'deepc num', 'cons')}<th class="deepc num">Naive rank ${info('naive')}</th>` : ''}
-      <th>Availability ${info('avail')}</th><th>Risk ${info('risk')}</th><th class="deepc">Can’t separate from ${info('tooclose')}</th></tr></thead><tbody>
+      <th class="deepc">Can’t separate from ${info('tooclose')}</th></tr></thead><tbody>
     ${shown.map(r => lbRow(r, role, all)).join('')}</tbody></table></div>
     <p id="lbcount" data-n="${rows.length}" data-shown="${shown.length}" class="small muted">Showing ${shown.length} of ${rows.length} ${ROLE_LABEL[role].toLowerCase()}. ${rows.length > LB_TOP && !S.detail && !S.f.q.trim() ? `<button type="button" class="btn sm" data-act="lbshowall">${S.lbAll ? 'Show top ' + LB_TOP + ' only' : 'Show all ' + rows.length}</button>` : ''}</p>`;
   }
@@ -1097,7 +1041,7 @@ function tabLeaderboard() {
 function lbRow(r, role, all) {
   const p = r.p, small = isWide(r.lo, r.hi);
   const nOv = all.filter(o => o.id !== r.id && overlap(o, r)).length;
-  const sub = `${esc(p.sub_role)} · ${esc(originLabel(p))} ${tg(p.nationality.includes('[') ? '' : '')}· age ${tg(p.age)}`;
+  const sub = `${esc(p.sub_role)} \u00b7 <span class="tag info">${esc(p.team)}</span>${r.caveat ? '<br><span class="faint">' + esc(r.caveat) + '</span>' : ''}`;
   const bar = whiskerRowSvg(200, { score: r.score, lo: r.lo, hi: r.hi, small, label: p.name, fill: 'url(#p-hatch)' });
   const sl = role === 'ar' ? sliceCell(r, role) : sliceCell(r, role);
   const deepCells = role !== 'ar' ? `<td class="num deepc" data-l="${role === 'bat' ? 'RAE' : 'RSE'}/100 in slice">${r.sl && r.sl.n ? sg(r.sl.rae100, f1) : '—'}</td><td class="num deepc" data-l="${role === 'bat' ? 'RAE' : 'RSE'}/100 High">${sg(r.raeH, f1)}</td>` : `<td class="num deepc" data-l="Bat score">${f0(r.bat)}</td><td class="num deepc" data-l="Bowl score">${f0(r.bowl)}</td>`;
@@ -1108,7 +1052,7 @@ function lbRow(r, role, all) {
   <td class="lbbar full" data-l="Clutch Score"><b>${f0(r.score)}</b> <span class="muted">(${f0(r.lo)}–${f0(r.hi)})</span><div class="svgw">${bar}</div></td>
   <td class="num" data-l="High-pressure balls">${thou(r.hiN)}</td><td data-l="In this slice">${sl}</td>${deepCells}
   <td class="num deepc" data-l="WPA">${wpa}</td>${more}
-  <td data-l="Availability">${tg(r.avail || p.availability)}</td><td data-l="Risk">${riskTags(r.risk || p.risk)}</td><td class="deepc" data-l="Can't separate from">${nOv} of ${all.length - 1} players</td></tr>`;
+<td class="deepc" data-l="Can't separate from">${nOv} of ${all.length - 1} players</td></tr>`;
 }
 function methodAdds(all, role) {
   const w = CW();
@@ -1168,12 +1112,10 @@ function cardHtml(p) {
   const hi = (k) => k === 'bat' ? p.bat_hl : p.bowl_hl;
   const hv = kinds.map(k => hlBlock(p, k)).join('');
   const trend = kinds.map(k => (p.trend && p.trend[k]) ? trendBlock(p, k) : '').join('');
-  const inBasket = S.basket.includes(p.id);
   return `<div class="ph"><div><h2 id="card-title">${esc(p.name)}</h2>
-    <div class="small muted">${esc(p.role)} · ${esc(p.sub_role)} · ${esc(originLabel(p))} ${tg(p.nationality.replace(/^(Indian|Overseas)/, '$1').split('(')[1] ? '(' + p.nationality.split('(')[1] : '')}</div></div>${close}</div>
+    <div class="small muted">${esc(p.role)} \u00b7 ${esc(p.sub_role)} \u00b7 <span class="tag info">${esc(p.team)} (${p.team_season})</span></div></div>${close}</div>
   <div class="sec" style="margin-top:12px">
-   <div class="card"><div class="kv"><dt>Age</dt><dd>${tg(p.age)}</dd><dt>Latest team in data</dt><dd>${esc(p.team)} (${p.team_season})</dd><dt>Availability</dt><dd>${tg(p.availability)} ${info('avail')}</dd><dt>Price band</dt><dd>${tg(p.price)} ${info('price')}; walk-away ${f1(p.walk_away)} cr</dd><dt>Risk</dt><dd>${riskTags(p.risk)}</dd></div>
-   <div class="tools" style="margin:10px 0 0"><button type="button" class="btn sm" data-act="basket" data-id="${esc(p.id)}">${inBasket ? 'Remove from basket' : 'Add to auction basket'}</button><button type="button" class="btn sm" data-act="compare-add" data-id="${esc(p.id)}">Compare</button></div></div>
+   <div class="tools" style="margin:0"><button type="button" class="btn sm" data-act="compare-add" data-id="${esc(p.id)}">Compare</button></div>
   </div>
   <div class="sec"><h3>Clutch Score ${info('score')}</h3>
    <div class="dial"><div class="svgw">${dial(best.score, best.lo, best.hi)}</div><div>
@@ -1185,9 +1127,8 @@ function cardHtml(p) {
   </div>
   ${hv}${trend}
   <div class="sec"><h3>Receipts: his three biggest moments</h3>${(p.receipts || []).map(r => `<div class="rcpt"><b>${esc(r.match)}</b> · ${esc(r.date)}${r.playoff ? ' · ' + esc(r.playoff) : ''}<br>${esc(r.what)} · win probability added <b>${sg(r.wpa, f1)} pp</b> ${info('wpa')} · ${esc(r.result)}</div>`).join('') || '<p class="muted">No receipts.</p>'}</div>
-  <div class="sec"><h3>Similar players</h3><p class="small muted">The three closest profiles. These feed Plan B.</p><ul class="clean">${(p.similar || []).map(id => { const q = P.get(id); return q ? `<li>${plink(id)} <span class="muted small">${esc(q.sub_role || '')}${q.scorable ? ', score ' + f0(mainBlock(q).score) + ' (' + f0(mainBlock(q).lo) + '–' + f0(mainBlock(q).hi) + ')' : ''}</span></li>` : ''; }).join('')}</ul></div>
-  <div class="sec"><h3>Fit for RR</h3><p>${p.fills ? 'Gap it fills: <b>' + esc(fillsText(p, p.fills)) + '</b>.' : 'No specific RR gap is flagged for this player in the data.'} ${p.in_rr ? tagChip('In RR 2026 group', 'info') : ''}</p></div>
-  <div class="sec"><h3>Caveats</h3><ul>${(p.caveats || []).map(c => `<li>${esc(c)}</li>`).join('')}<li>80% range width: ${f0(best.hi - best.lo)} points (${esc(widthWord(best.hi - best.lo))}).</li><li>Historical indicator; its ability to predict IPL 2027 is not established.</li></ul></div>`;
+  <div class="sec"><h3>Similar players</h3><p class="small muted">The three closest profiles.</p><ul class="clean">${(p.similar || []).map(id => { const q = P.get(id); return q ? `<li>${plink(id)} <span class="muted small">${esc(q.sub_role || '')}${q.scorable ? ', score ' + f0(mainBlock(q).score) + ' (' + f0(mainBlock(q).lo) + '–' + f0(mainBlock(q).hi) + ')' : ''}</span></li>` : ''; }).join('')}</ul></div>
+  <div class="sec"><h3>Caveats</h3><ul>${(p.caveats || []).map(c => `<li>${esc(c)}</li>`).join('')}<li>80% range width: ${f0(best.hi - best.lo)} points (${esc(widthWord(best.hi - best.lo))}).</li><li>Historical indicator; its ability to predict next season is not established.</li></ul></div>`;
 }
 function hlBlock(p, k) {
   const h = k === 'bat' ? p.bat_hl : p.bowl_hl;
@@ -1252,7 +1193,7 @@ function tabCompare() {
   const cand = SCORABLE.filter(passPlayer).filter(p => !S.cmp.includes(p.id));
   const picker = `<div class="pickers">${ps.map((p, i) => `<span class="ptag"><span class="shape" aria-hidden="true">${({ circle: '●', diamond: '◆', triangle: '▲', square: '■' })[SER_STYLE[i].shape]}</span>${plink(p.id)}<button type="button" class="x" data-act="cmp-remove" data-id="${esc(p.id)}" aria-label="Remove ${esc(p.name)}">✕</button></span>`).join('')}
   ${ps.length < CFG.cmpMax ? `<label class="sr" for="cmpadd">Add a player</label><select id="cmpadd" data-sel="cmpadd"><option value="">+ Add a player (${cand.length} match the filters)</option>${['Batter', 'Bowler', 'All-rounder'].map(r => `<optgroup label="${r}s">${cand.filter(p => p.role === r).map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</optgroup>`).join('')}</select>` : '<span class="muted small">Maximum of 4 players.</span>'}
-  <button type="button" class="btn sm" data-act="cmp-preset" data-v="must">Must-Back picks</button><button type="button" class="btn sm" data-act="cmp-preset" data-v="planA">Plan A picks</button></div>`;
+  <button type="button" class="btn sm" data-act="cmp-preset" data-v="bat">Top 3 batters</button><button type="button" class="btn sm" data-act="cmp-preset" data-v="bowl">Top 3 bowlers</button></div>`;
   if (ps.length < 2) return `<section class="sec"><p class="lead">Pick 2 to 4 players to compare them side by side.</p>${picker}${emptyBox('Choose at least two players. Use a preset or the list above.')}</section>`;
   const set = axisSet(ps);
   const roles = uniq(ps.map(p => p.role));
@@ -1289,7 +1230,7 @@ function cmpVerdict(ps) {
   if (ps.length === 2) lead = tied.length ? `${L.p.name} (${f0(L.b.score)}) and ${rest[0].p.name} (${f0(rest[0].b.score)}): too close to call. Their 80% ranges overlap, so the data cannot say who is better.` : `${L.p.name} (${f0(L.b.score)}, range ${f0(L.b.lo)}–${f0(L.b.hi)}) is clearly ahead of ${rest[0].p.name} (${f0(rest[0].b.score)}): the 80% ranges do not overlap.`;
   else lead = `${L.p.name} has the highest score (${f0(L.b.score)}). ${clear.length ? 'Clearly ahead of ' + niceList(clear.map(o => o.p.name)) + '. ' : ''}${tied.length ? 'Too close to call with ' + niceList(tied.map(o => o.p.name)) + '.' : ''}`;
   if (diffRole) lead += ' Roles differ, so this is not a like-for-like ranking.';
-  return { lead, sow: tied.length ? 'The ranges overlap, so do not pick on score alone: decide on role fit, price and availability, and treat these as interchangeable on pressure record.' : 'The score gap is real on this evidence, but it is a past record, not a forecast for 2027.' };
+  return { lead, sow: tied.length ? 'The ranges overlap, so do not pick on score alone: decide on role fit, price and availability, and treat these as interchangeable on pressure record.' : 'The score gap is real on this evidence, but it is a past record, not a forecast.' };
 }
 function cmpRows(ps, set) {
   const row = (label, f, tipk) => `<tr><td data-l="Metric">${label}${tipk ? info(tipk) : ''}</td>${ps.map(p => `<td data-l="${esc(p.name)}">${f(p)}</td>`).join('')}</tr>`;
@@ -1305,164 +1246,13 @@ function cmpRows(ps, set) {
   if (hasBowl) { t += row('Bowling: High-pressure legal balls', p => p.bowl_hl ? f0(p.bowl_hl.High_legal) : '—', 'hi'); t += row('Bowling: economy High / Low', p => p.bowl_hl ? f2(p.bowl_hl.High_econ) + ' / ' + f2(p.bowl_hl.Low_econ) : '—', 'econ'); t += row('Bowling: RSE per 100 (High)', p => p.bowl_hl ? sg(p.bowl_hl.High_rse_per100, f1) : '—', 'rse'); t += row('Bowling: wickets / dot % (High)', p => p.bowl_hl ? f0(p.bowl_hl.High_wkts) + ' / ' + f1(p.bowl_hl.High_dot_pct) : '—'); }
   t += row('Pressure gap (High − Low)', p => { const h = p.bat_hl && p.role !== 'Bowler' ? p.bat_hl : p.bowl_hl; return h ? sg(h.pressure_drop_per100, f1) : '—'; }, 'gap');
   t += row('Consistency', p => { const b = p[kindOf(p)]; return b ? f0(b.C * 100) : '—'; }, 'cons');
-  t += row('Origin / age', p => esc(originLabel(p)) + ' · ' + tg(p.age));
-  t += row('Availability', p => tg(p.availability), 'avail');
-  t += row('Price band', p => tg(p.price), 'price');
-  t += row('Risk', p => riskTags(p.risk), 'risk');
+  t += row('Latest team in data', p => esc(p.team) + ' (' + p.team_season + ')');
   return t;
-}
-
-/* ===================== TAB 5: SQUAD FIT ===================== */
-function planKey(k) { return k === 'before' ? 'before' : k === 'A' ? 'planA' : 'planB'; }
-function planLabel(k) { return k === 'before' ? 'Before' : k === 'A' ? 'Plan A' : 'Plan B'; }
-function picksSummary(pk) {
-  const w = CW() - 8; let h = '';
-  ['Powerplay', 'Middle', 'Death'].forEach(ph => ['bat', 'bowl'].forEach(kind => { h += picksGroup(w, ph, kind, pk, true); }));
-  return `<div class="axcap">${STRENGTH_CAP}</div>` + h;
-}
-function picksSowhat(pk) {
-  const sq = D.squad, p = (sq[pk === 'B' ? 'planB_picks_only' : 'planA_picks_only']) || {}; let n = 0, tot = 0, small = 0;
-  ['Powerplay', 'Middle', 'Death'].forEach(ph => ['bat', 'bowl'].forEach(kind => { const v = (p[ph] || {})[kind], nb = (p[ph] || {})[kind + '_balls'], rr = (sq.before[ph] || {})[kind]; tot++; if (isN(nb) && nb < CFG.smallSlice) small++; else if (isN(v) && isN(rr) && v > rr) n++; }));
-  return `In ${n} of ${tot} phase areas the picks’ own record (on ${CFG.smallSlice}+ balls) is above RR’s current group${small ? `; ${small} area${small > 1 ? 's rest' : ' rests'} on too few balls to say` : ''}. It is a past record from other teams and other situations, so use it to build the shortlist, not to predict 2027.`;
-}
-function planMeta(k) { return (D.auction.plans_meta || []).find(x => x.plan === k) || null; }
-function planCost(k) { const m = planMeta(k); return m ? { mid: m.cost_mid_cr, walk: m.cost_walkaway_cr, purse: m.purse_cr } : { mid: k === 'A' ? D.squad.purse_used.A : D.squad.purse_used.B, walk: null, purse: D.squad.purse }; }
-function a5Note() { const a = (D.method.assumptions || []).find(x => x.id === 'A5'); return a ? `<div class="note small"><b>Why these plans are illustrative:</b> ${X(a.value_used)}. ${X(a.reason)}</div>` : ''; }
-/* gap chart: bar = RR minus league, whisker = 80% range; the axis is cut if one row would dominate it */
-function gapChart(rows, w) {
-  const ext = r => Math.max(Math.abs(r.gap), Math.abs(r.lo), Math.abs(r.hi));
-  const sorted = rows.map(ext).sort((a, b) => b - a);
-  const cut = sorted.length > 2 && sorted[0] > 1.8 * sorted[1];
-  const max = (cut ? sorted[1] : sorted[0]) * 1.2;
-  const x0 = 46, x1 = w - 46, sx = v => lin(-max, max, x0, x1)(clamp(v, -max, max)), z = sx(0);
-  let h = divAxis(w, max, 'RR minus league, runs per 100 High-pressure balls. Negative = RR behind. Whisker = 80% range.' + (cut ? ' <b>Axis is cut at ±' + f0(max) + ': bars marked » run past the edge.</b>' : ''));
-  rows.forEach(r => {
-    const out = Math.abs(r.gap) > max || Math.abs(r.lo) > max || Math.abs(r.hi) > max;
-    let s = svgOpen(w, 30, r.area + ' gap with 80% range') + `<line x1="${z}" x2="${z}" y1="0" y2="30" stroke="${COL.muted}"/>`;
-    s += `<rect x="${Math.min(z, sx(r.gap))}" y="6" width="${Math.max(1, Math.abs(sx(r.gap) - z))}" height="18" fill="${r.gap < 0 ? 'url(#p-amber)' : 'url(#p-hatch)'}" stroke="#fff"/>`;
-    s += `<line x1="${sx(r.lo)}" x2="${sx(r.hi)}" y1="15" y2="15" stroke="#fff" stroke-width="2.4"/><line x1="${sx(r.lo)}" x2="${sx(r.lo)}" y1="8" y2="22" stroke="#fff" stroke-width="2.4"/><line x1="${sx(r.hi)}" x2="${sx(r.hi)}" y1="8" y2="22" stroke="#fff" stroke-width="2.4"/>`;
-    if (out) s += T(x1 + 4, 19, '»', 'axl', 'start', `style="fill:${COL.amber};font-size:16px"`);
-    const within = /noise/i.test(r.verdict || '');
-    h += `<div class="wrow"><div class="wh"><span><b>${esc(r.area)}</b></span><span class="wm">gap ${sg(r.gap, f1)} (80% range ${sg(r.lo, f1)} to ${sg(r.hi, f1)})${out ? ' · axis cut' : ''}</span></div>${s}</svg><div class="small ${within ? 'muted' : ''}">RR ${sg(r.rr, f1)} vs league ${sg(r.league, f1)} · n = ${thou(r.balls)} balls · ${within ? '○' : '●'} <b>${esc(r.verdict || '')}</b></div></div>`;
-  });
-  return h;
-}
-function tabSquad() {
-  const sq = D.squad, g = sq.group;
-  const ovs = g.filter(x => /^Overseas/.test(x.nationality)).length, ind = g.filter(x => /^Indian/.test(x.nationality)).length, unk = g.length - ovs - ind;
-  const lhb = g.filter(x => x.hand === 'LHB').length, rhb = g.filter(x => x.hand === 'RHB').length, nohand = g.length - lhb - rhb;
-  const pk = S.squadPlan === 'B' ? 'B' : 'A';
-  const gapRows = sq.gaps.slice().sort((a, b) => a.gap - b.gap);
-  const gs = gapChart(gapRows, CW() - 8);
-  const worst = gapRows[0];
-  const xi = sq.xi.slice().sort((a, b) => a.order - b.order);
-  const planIds = pk === 'A' ? sq.planA_ids : pk === 'B' ? sq.planB_ids : [];
-  const used = pk === 'A' ? sq.purse_used.A : pk === 'B' ? sq.purse_used.B : 0, ovsUsed = pk === 'A' ? sq.overseas_used.A : pk === 'B' ? sq.overseas_used.B : 0;
-  const unkPlan = planIds.filter(id => P.get(id) && P.get(id).overseas == null).length;
-  const behind = gapRows.filter(r => r.gap < 0), within = gapRows.filter(r => /noise/i.test(r.verdict || '')).length;
-  return `<section class="sec"><p class="lead">RR’s weakest areas under pressure are <em>${niceList(behind.map(r => { const g = gapParse(r.area); return g ? ({ Powerplay: 'powerplay', Middle: 'middle-overs', Death: 'death-overs' }[g.phase] || g.phase.toLowerCase()) + ' ' + KIND_LABEL[g.kind].toLowerCase() : r.area.toLowerCase(); }))}</em> (directional: ${within} of ${gapRows.length} gaps are within noise). The Plan A picks’ own past records are shown further down; they are a record, not a forecast.</p>
-  <div class="grid g3">
-   <div class="card"><h3>Overseas count ${tagChip('inferred', 'assume')}</h3><div class="tile"><span class="v">${ovs}</span> <span class="muted">of ${g.length} in the 2026 group</span></div><p class="small muted">${ind} Indian, ${unk} unknown. Nationality is inferred from international data in the file: not verified. Limit: ${tg(D.auction.limits.overseas)}.</p></div>
-   <div class="card"><h3>Left / right balance ${tagChip('from data', 'info')}</h3><div class="tile"><span class="v">${lhb} L · ${rhb} R</span></div><p class="small muted">Batting hand in the data; ${nohand} unknown. Left-handers in the best XI: ${sq.lhb_in_xi}.</p></div>
-   <div class="card"><h3>Age profile</h3><div class="tile"><span class="v">${tg('UNKNOWN [A8]')}</span></div><p class="small muted">Ages are not in the data and could not be verified. No age claim is made.</p></div>
-  </div></section>
-  <section class="sec">${chartCard({
-    title: `RR trails the league in ${behind.length} of ${gapRows.length} areas, but ${within} of ${gapRows.length} gaps are within noise`,
-    sub: `RR current group (2026) minus league, by phase and by batting / bowling, High-pressure balls ${CFG.recent}. Negative = RR behind the league. Whisker = 80% range; a whisker that crosses zero means the gap could be chance.`,
-    svg: `<div>${gs}</div>`, n: `n = High-pressure balls shown on each row. Small phase samples can swing a lot.`,
-    legend: `<span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-amber)"/></svg> ▼ behind league</span><span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-hatch)"/></svg> ▲ at or above league</span><span>│─│ 80% range</span>`,
-    sowhat: `${esc(worst.area)} looks weakest, but its 80% range (${sg(worst.lo, f1)} to ${sg(worst.hi, f1)}) ${worst.lo <= 0 && worst.hi >= 0 ? 'includes zero, so treat it as a lead, not a finding' : 'does not include zero'}. Read these gaps as directional only.`
-  })}</section>
-  <section class="sec"><h2>Do the Plan A picks have a strong record where RR is weak?</h2>
-   <div class="seg" role="group" aria-label="Plan" style="margin:0 0 10px">${['A', 'B'].map(k => `<button type="button" data-act="plan" data-v="${k}" aria-pressed="${pk === k}">${planLabel(k)} picks</button>`).join('')}</div>
-   <div class="grid g2">${chartCard({
-    title: `${planLabel(pk)} picks: their own record by phase, next to RR and the league`, sub: `${X(sq.picks_note || '')} Bars grey out under ${CFG.smallSlice} balls.`,
-    svg: `<div>${picksSummary(pk)}</div>`, n: 'n = the picks’ own High-pressure balls on each row. This is past record, not a projection of RR’s 2027 performance.',
-    legend: `<span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-pink)"/></svg> the picks</span><span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-hatch)"/></svg> RR group today</span><span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-dots)"/></svg> league average</span><span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-grey)"/></svg> small sample</span>`,
-    sowhat: picksSowhat(pk)
-  })}
-   <div class="card"><h3>${planLabel(pk)} resources</h3><dl class="kv"><dt>Picks</dt><dd>${planIds.map(id => plink(id)).join(', ')}</dd><dt>Cost ${tagChip('ASSUMPTION A4', 'assume')}</dt><dd>${f1(planCost(pk).mid)} cr at mid prices; ${isN(planCost(pk).walk) ? f1(planCost(pk).walk) + ' cr at walk-away prices' : 'walk-away cost n/a'}, against an assumed ${f1(sq.purse)} cr purse</dd><dt>Overseas slots used</dt><dd>${ovsUsed} of ${sq.ovs_slots}${unkPlan ? ` (${unkPlan} pick${unkPlan > 1 ? 's have' : ' has'} unknown origin and ${unkPlan > 1 ? 'are' : 'is'} counted as not overseas)` : ''}</dd><dt>Open squad slots</dt><dd>${planIds.length} of ${sq.slots}</dd></dl></div></div></section>
-  <section class="sec">${a5Note()}</section>
-  <section class="sec"><h3>Lineup card (Plan A best XI)</h3>
-   <div class="grid g2"><div class="card"><h4>Best XI in batting order</h4><ol style="margin:.2em 0;padding-left:1.4em">${xi.map(x => `<li style="margin:4px 0">${plink(x.id, x.name)} <span class="muted small">${esc(x.sub)}${x.overseas ? ' · overseas' : ''}</span></li>`).join('')}</ol>
-    <p class="small"><b>Impact Player:</b> ${esc(sq.impact)}${sq.impact_why ? ` (${esc(sq.impact_why)})` : ''}</p><p class="small"><b>Bench:</b> ${esc(sq.bench.join(', '))}</p></div>
-   <div class="card"><h4>20-over bowling plan</h4><div class="tw"><table class="rt"><thead><tr><th>Phase</th><th class="num">Overs</th><th>Bowlers</th></tr></thead><tbody>${sq.bowling_plan.map(b => `<tr><td data-l="Phase">${esc(b.phase)}</td><td class="num" data-l="Overs">${b.overs}</td><td data-l="Bowlers">${esc(b.bowlers)}</td></tr>`).join('')}</tbody></table></div><p class="small muted">The plan lists the names the pipeline chose. Check each name against who actually bowls: some are batters with very little bowling in the data.</p></div></div>
-   <div class="note"><b>What RR still lacks:</b> ${X(sq.still_lacks)}</div></section>
-  <section class="sec">${deep('group', 'RR’s current group (2026), with origin and hand', `<div class="tw"><table class="rt"><thead><tr><th>Player</th><th>Role</th><th>Origin (inferred)</th><th>Hand</th><th>Bowls</th><th class="num">Clutch Score</th><th class="num">2026 balls involved</th></tr></thead><tbody>${g.map(x => `<tr><td data-l="Player">${plink(x.id, x.name)}</td><td data-l="Role">${esc(x.role)}</td><td data-l="Origin">${tg(x.nationality)}</td><td data-l="Hand">${esc(x.hand || '—')}</td><td data-l="Bowls">${esc(x.bowl || '—')}</td><td class="num" data-l="Score">${isN(x.score) ? f0(x.score) : '—'}</td><td class="num" data-l="Involvement">${thou(x.involvement)}</td></tr>`).join('')}</tbody></table></div>`)}</section>`;
-}
-
-/* ===================== TAB 6: AUCTION ===================== */
-function basketStats() {
-  const ids = S.basket, ps = ids.map(i => P.get(i)).filter(Boolean), sq = D.squad;
-  const mid = sum(ps, p => p.price_mid || 0), walk = sum(ps, p => p.walk_away || 0);
-  const ovs = ps.filter(p => p.overseas === true).length, unk = ps.filter(p => p.overseas == null).length;
-  const warns = [];
-  if (mid > sq.purse) warns.push(`Over the purse even at mid-band prices: ${f1(mid)} cr against ${f1(sq.purse)} cr.`);
-  else if (walk > sq.purse) warns.push(`At walk-away prices the basket would cost ${f1(walk)} cr, above the ${f1(sq.purse)} cr purse.`);
-  if (ovs > sq.ovs_slots) warns.push(`${ovs} overseas players, but only ${sq.ovs_slots} overseas slots are open.`);
-  if (ps.length > sq.slots) warns.push(`${ps.length} players, but only ${sq.slots} squad slots are open.`);
-  return { ps, mid, walk, ovs, unk, warns, left: sq.purse - mid };
-}
-function basketHtml() {
-  const b = basketStats(), sq = D.squad;
-  return `<div class="card" id="basket"><h3>Budget builder ${tagChip('ASSUMPTION A4', 'assume')}</h3>
-   <div class="tools"><button type="button" class="btn sm" data-act="bk-preset" data-v="A">Plan A</button><button type="button" class="btn sm" data-act="bk-preset" data-v="B">Plan B</button><button type="button" class="btn sm" data-act="bk-clear">Clear</button></div>
-   <div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr))"><div class="card tile"><div class="v" id="bk-left">${f1(b.left)}</div><div class="l">Purse left (cr) of ${f1(sq.purse)}</div></div><div class="card tile"><div class="v">${b.ovs}</div><div class="l">Overseas of ${sq.ovs_slots} slots${b.unk ? ` (+${b.unk} unknown)` : ''}</div></div><div class="card tile"><div class="v">${b.ps.length}</div><div class="l">Squad slots used of ${sq.slots}</div></div></div>
-   ${b.warns.length ? b.warns.map(w => `<div class="warnbox" role="alert">⚠ ${esc(w)}</div>`).join('') : (b.ps.length ? '<div class="okbox">✓ Within the assumed purse, overseas and squad limits.</div>' : '<p class="muted small">Tap “Add” on a card, or pick a preset.</p>')}
-   ${b.ps.map(p => `<div class="mi"><span>${plink(p.id)} <span class="muted small">mid ${f1(p.price_mid)} cr, walk-away ${f1(p.walk_away)} cr</span></span><button type="button" class="btn sm" data-act="basket" data-id="${esc(p.id)}" aria-label="Remove ${esc(p.name)}">Remove</button></div>`).join('')}
-   <p class="small"><b>Basket cost:</b> ${f1(b.mid)} cr at mid prices; ${f1(b.walk)} cr at walk-away prices.</p>${a5Note()}
-   <p class="small muted">Costs use the middle of each assumed price band. Walk-away = top of the band. Both are assumptions, not market facts. Limits: squad ${tg(D.auction.limits.squad)}, overseas ${tg(D.auction.limits.overseas)}.</p></div>`;
-}
-function auctionCard(t) {
-  const p = P.get(t.id), b = mainBlock(p), inB = S.basket.includes(t.id);
-  return `<div class="pcard"><div class="pn">${plink(t.id)}</div><div class="small muted">${esc(t.sub || p.sub_role)} · ${tg(t.nationality)}</div>
-  <p style="margin:.4em 0 0"><span class="numf" style="font-size:1.35rem">${f0(t.score)}</span> <span class="muted">(${f0(t.lo)}–${f0(t.hi)})</span> ${rangeTag(t.lo, t.hi)}</p>
-  <div class="svgw">${whiskerRowSvg(Math.min(260, CW() - 40), { score: t.score, lo: t.lo, hi: t.hi, small: isWide(t.lo, t.hi), label: p.name, shape: TIER_SHAPE[t.tier], fill: TIER_FILL[t.tier], stroke: TIER_STROKE[t.tier] })}</div>
-  <dl><dt>Why this tier</dt><dd>${X(t.tier_reason || '')}</dd><dt>Price band</dt><dd>${tg(t.price)}</dd><dt>Walk-away ${info('walk')}</dt><dd>${f1(t.walk_away)} cr ${tagChip('ASSUMPTION', 'assume')}</dd><dt>Risk</dt><dd>${riskTags(t.risk)}</dd>${t.fills ? `<dt>Gap it fills</dt><dd>${esc(fillsText(p, t.fills))}</dd>` : ''}<dt>Availability</dt><dd>${tg(p.availability)}</dd></dl>
-  <button type="button" class="btn sm" data-act="basket" data-id="${esc(t.id)}" style="margin-top:8px">${inB ? 'Remove from basket' : 'Add to basket'}</button></div>`;
-}
-function oneStat(id) {
-  const p = P.get(id), rk = roleKey(p), r = lbData(rk).find(x => x.id === id);
-  return r ? `Clutch rank ${r.rank} of ${r.p[rk].of}; plain ${rk === 'bat' ? 'strike-rate' : 'economy'} rank ${r.nrank}` : '';
-}
-function tabAuction() {
-  const a = D.auction;
-  const cols = ['Must-Back', 'Value Pick', 'Hidden Gem'].map(t => `<div class="tcol"><h3>${tierBadge(t)}</h3>${a.tiers.filter(x => x.tier === t).sort((x, y) => y.score - x.score).map(auctionCard).join('') || '<p class="muted">None.</p>'}</div>`).join('');
-  const pa = a.planA, pb = a.planB, only = (x, y) => x.filter(i => !y.includes(i));
-  const r = a.planB_rule, who = BYNAME.get(r.if_player), sw = BYNAME.get(r.switch_to);
-  const vm = a.value_map, mS = vm.map(x => x.score).sort((x, y) => x - y), mP = vm.map(x => x.price).sort((x, y) => x - y);
-  const medS = mS[Math.floor(mS.length / 2)], medP = mP[Math.floor(mP.length / 2)];
-  const w = CW();
-  const cardIds = new Set(a.tiers.map(t => t.id));
-  const pts = vm.map(x => { const p = P.get(x.id), tier = (a.tiers.find(t => t.id === x.id) || {}).tier; return { x: x.price, y: x.score, id: x.id, shape: tier ? TIER_SHAPE[tier] : (x.tier === 'Established' ? 'square' : 'circle'), r: tier ? 7 : 4.5, fill: tier ? TIER_STROKE[tier] : (x.tier === 'Established' ? COL.grey : '#7C93D6'), stroke: x.rr ? COL.pink : '#fff', op: tier ? 1 : .75, tip: `${p ? p.name : x.id}: score ${f0(x.score)}, expected price ${f1(x.price)} cr [ASSUMPTION], ${tier || x.tier}${x.core ? ', likely retained' : ''}${x.rr ? ', RR player' : ''}` }; });
-  const maxP = Math.max(...mP), maxS = 100;
-  const vsvg = scatter({ w, h: 340, pts, x: [0, Math.ceil(maxP * 1.05)], y: [0, maxS], xlabel: 'Expected price (Rs crore, assumed mid-band)', ylabel: 'Clutch Score (0–100)', label: 'Value map: score against expected price', zone: { x0: 0, x1: medP, y0: medS, y1: 100, label: 'High score, lower price' }, xfmt: v => v, yfmt: v => v });
-  const inZone = vm.filter(x => x.price <= medP && x.score >= medS && !x.core && !x.rr).length;
-  const sec2 = (title, arr, kind) => `<div class="card"><h3>${title}</h3>${arr.map(t => { const p = P.get(t.id); return `<div class="pcard"><div class="pn">${plink(t.id)} <span class="muted small">${esc(p.sub_role)} · latest team in data (${p.team_season}): ${esc(p.team)}</span></div><div>Score <b>${f0(t.score)}</b> (${f0(t.lo)}–${f0(t.hi)}) ${rangeTag(t.lo, t.hi)}</div><div class="small">${esc(oneStat(t.id))}.</div><div class="small muted">${X(t.reason || kind(p, t))}</div></div>`; }).join('')}</div>`;
-  return `<section class="sec"><p class="lead">Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price runs away. <em>Every availability and price here is an assumption, not a fact.</em></p>
-   ${howToUse()}
-   ${termsStrip(['clutch', 'range', 'walk', 'naive'])}
-   <div class="note" style="margin-top:12px"><b>Read this first.</b> Availability, prices, nationality and age are assumptions or UNKNOWN: ${X(D.method.limitations.find(l => /verif/i.test(l)) || '')} Pursue only players in the official auction list.</div>
-   <div class="tiers">${cols}</div>
-   ${sowhat('Bars with a wide range are drawn grey and tagged: a high score on a wide range is a lead to check, not a certainty.')}</section>
-  <section class="sec grid g2">${basketHtml()}
-   <div class="card"><h3>Plan B: if the price runs away</h3><div class="tw"><table class="rt"><thead><tr><th>If this player</th><th>goes past</th><th>switch to</th><th>What changes</th><th>What RR loses</th></tr></thead><tbody>${(a.planB_table && a.planB_table.length ? a.planB_table : [{ if_player: r.if_player, past_cr: r.past_cr, switch_to: r.switch_to, what_changes: '', loses_text: r.loses }]).map(x => { const w1 = BYNAME.get(x.if_player), w2 = BYNAME.get(x.switch_to); return `<tr><td data-l="If">${w1 ? plink(w1.id) : esc(x.if_player)}</td><td data-l="Past">${f1(x.past_cr)} cr ${tagChip('ASSUMPTION', 'assume')}</td><td data-l="Switch to">${w2 ? plink(w2.id) : esc(x.switch_to)}</td><td data-l="Changes">${esc(x.what_changes || '')}</td><td data-l="Loses">${isN(x.loses_pct) ? f0(x.loses_pct) + '% of Plan A\u2019s pressure value' : esc(x.loses_text || '')}</td></tr>`; }).join('')}</tbody></table></div>
-   <p class="small"><b>Plan A:</b> ${pa.map(i => plink(i)).join(', ')}.<br><b>Plan B:</b> ${pb.map(i => plink(i)).join(', ')}.</p><p class="small muted">Only in Plan A: ${only(pa, pb).map(nm).join(', ') || 'none'}. Only in Plan B: ${only(pb, pa).map(nm).join(', ') || 'none'}. Cost at mid prices / walk-away prices: A ${f1(planCost('A').mid)} / ${f1(planCost('A').walk)} cr, B ${f1(planCost('B').mid)} / ${f1(planCost('B').walk)} cr (assumed purse ${f1(D.squad.purse)} cr).</p></div></section>
-  <section class="sec">${chartCard({
-    title: `Score against assumed price (illustrative): ${inZone} non-RR, not-likely-retained players sit in the high-score, lower-price corner`,
-    sub: `Each point is a scored player. Up = higher Clutch Score; left = cheaper (assumed). Shaded = above-median score at below-median assumed price. Price bands are rule-based assumptions, so this map is illustrative, not a price forecast. Axes: price starts at 0, score 0–100.`,
-    svg: vsvg, n: `n = ${vm.length} players. Median score ${f0(medS)}, median expected price ${f1(medP)} cr. Prices are ${tagChip('ASSUMPTION A6', 'assume')}.`,
-    legend: legendMark('circle', COL.pinkL, '#fff', 'Must-Back') + legendMark('diamond', COL.blueL, '#fff', 'Value Pick') + legendMark('triangle', COL.amber, '#fff', 'Hidden Gem') + legendMark('square', COL.grey, '#fff', 'Established price tier') + legendMark('circle', '#7C93D6', '#fff', 'Emerging price tier') + `<span>pink outline = RR player</span>`,
-    sowhat: `Players in the shaded corner combine a high score with a lower assumed price, so they are worth a closer look. The prices are assumptions, so re-check them once the official list and real prices are known.`
-  })}</section>
-  <section class="sec grid g3">${sec2('Contrarian picks', a.contrarian, (p, t) => 'Where the plain rank and the clutch rank disagree, that gap is the story. A caution, not a verdict.')}${sec2('Unsung hero', a.unsung, (p, t) => 'Judged on the pressure record rather than the headline stat.')}${sec2('Who not to chase', a.avoid, (p, t) => 'Low on the pressure record so far. Past record only; role, price or a better sample could change the case.')}</section>
-  <section class="sec">${deep('assume', 'assumptions behind the board', `<div class="tw"><table class="rt"><thead><tr>${S.detail ? '<th>ID</th>' : ''}<th>Item</th><th>Value used</th><th>Why</th></tr></thead><tbody>${a.assumptions.map(x => `<tr>${S.detail ? `<td data-l="ID">${esc(x.id)}</td>` : ''}<td data-l="Item">${X(x.item)}</td><td data-l="Value used">${X(x.value_used)}</td><td data-l="Why">${X(x.reason)}</td></tr>`).join('')}</tbody></table></div>`)}</section>`;
 }
 
 /* ===================== TAB 7: METHOD & PROOF ===================== */
 function tabMethod() {
   const me = D.method, k = KPI;
-  const nVer = me.facts.filter(f => /^VERIFIED/i.test(f.status)).length;
   const bt = me.backtest || [];
   const hasAnyRate = r => isN(r.base_rate_random_pick);
   const btRows = bt.map(r => `<tr class="${r.fold === 'pooled' ? '' : ''}"><td data-l="Role">${r.role === 'bat' ? 'Batters' : 'Bowlers'}</td><td data-l="Fold (test season)">${esc(r.fold)}</td><td class="num" data-l="Qualified">${thou(r.qualified)}</td><td class="num" data-l="Score top-10 hit rate">${f1(r.score_hit_rate_excl)}% <span class="faint">(n ≈ ${f1(isN(r.score_top10_assessable_exp) ? r.score_top10_assessable_exp : r.score_top10_assessable)})</span></td><td class="num" data-l="Plain-ranking hit rate">${f1(r.naive_hit_rate_excl)}% <span class="faint">(n ≈ ${f1(isN(r.naive_top10_assessable_exp) ? r.naive_top10_assessable_exp : r.naive_top10_assessable)})</span></td>${bt.some(hasAnyRate) ? `<td class="num" data-l="Random-pick rate">${isN(r.base_rate_random_pick) ? f1(r.base_rate_random_pick) + '%' : '—'}</td>` : ''}<td class="num" data-l="Difference (80% range)">${isN(r.hit_diff_lo80) ? sg(r.score_hit_rate_excl - r.naive_hit_rate_excl, f1) + ' (' + sg(r.hit_diff_lo80, f1) + ' to ' + sg(r.hit_diff_hi80, f1) + ')' : 'too few to range'}</td><td class="num" data-l="Rank correlation score / plain">${f2(r.spearman_score_outcome)} / ${f2(r.spearman_naive_outcome)}</td></tr>`).join('');
@@ -1492,7 +1282,7 @@ function tabMethod() {
   const zeroW = me.weights.filter(x => !x.informative || x.effective_weight === 0);
   const zeroTxt = zeroW.length ? zeroW.map(x => `${({ S: 'Skill', I: 'Match impact', H: 'Holds-up', C: 'Consistency' })[x.component] || x.component} for ${x.role === 'bat' ? 'batters' : 'bowlers'}`) : [];
   const robName = { leverage_only: 'Leverage only', rule_based: 'Rule-based', with_close_game: 'Plus close-game boost', d18_strict_buckets: 'Strict buckets', season_centred: 'Season-centred' };
-  return `<section class="sec"><p class="lead">The Clutch Score is a <em>historical pressure-performance indicator</em>. Its ability to predict IPL 2027 is <em>not established</em>.</p>
+  return `<section class="sec"><p class="lead">The Clutch Score is a <em>historical pressure-performance indicator</em>. Its ability to predict next season is <em>not established</em>.</p>
   <div class="note"><b>Backtest, in plain words.</b> ${esc(backtestVerdictLine())} ${X(k.claim)}</div>
   ${howToUse()}
   ${termsStrip(['persist', 'naive', 'brier', 'shrink', 'range'])}
@@ -1520,16 +1310,26 @@ function tabMethod() {
    <h4 style="margin-top:14px">Weight sensitivity (top-10 overlap when one weight moves, and under alternative weightings)</h4><div class="tw"><table><thead><tr><th>Role</th><th>Component</th><th class="num">Change</th><th class="num">Top-10 unchanged</th></tr></thead><tbody>${me.sensitivity.map(s => `<tr><td data-l="Role">${s.role === 'bat' ? 'Batters' : 'Bowlers'}</td><td data-l="Component">${nameC[s.component] || altName[s.component] || s.component}</td><td class="num" data-l="Change">${['S', 'I', 'H', 'C'].includes(s.component) ? sg(s.change * 100, f0) + '%' : 'alternative weighting'}</td><td class="num" data-l="Overlap">${f0(s.top10_overlap_pct)}%</td></tr>`).join('')}</tbody></table></div>
    <h4 style="margin-top:14px">Pressure-definition robustness</h4><div class="tw"><table><thead><tr><th>Variant</th><th>Role</th><th class="num">Scored (main / variant)</th><th class="num">Top-20 overlap</th><th class="num">Rank correlation</th></tr></thead><tbody>${me.robustness.map(x => `<tr><td data-l="Variant">${esc(robName[x.variant] || x.variant)}</td><td data-l="Role">${x.role === 'bat' ? 'Batters' : 'Bowlers'}</td><td class="num" data-l="Scored">${x.scorable_main} / ${x.scorable_variant}</td><td class="num" data-l="Overlap">${f0(x.top20_overlap_pct)}%</td><td class="num" data-l="Spearman">${f2(x.spearman_common)}</td></tr>`).join('')}</tbody></table></div>
    ${me.too_close ? tooCloseTbl(me.too_close) : ''}`)}</section>
-  <section class="sec" id="assumptions">${deep('facts', `data notes, facts ledger (${me.facts.length}), assumptions (${me.assumptions.length}), limitations, glossary, audit`, `
-   <div class="note"><b>${nVer} of ${me.facts.length} external facts are VERIFIED.</b> The network policy blocked verification, so every external fact is REPORTED (search summary only), UNKNOWN or an [ASSUMPTION].</div>
-   <h4>Assumptions ledger</h4><div class="tw"><table class="rt"><thead><tr>${S.detail ? '<th>ID</th>' : ''}<th>Item</th><th>Value used</th><th>Why</th></tr></thead><tbody>${me.assumptions.map(x => `<tr>${S.detail ? `<td data-l="ID">${tagChip(x.id, 'assume')}</td>` : ''}<td data-l="Item">${X(x.item)}</td><td data-l="Value used">${X(x.value_used)}</td><td data-l="Why">${X(x.reason)}</td></tr>`).join('')}</tbody></table></div>
-   <h4 style="margin-top:14px">Facts ledger</h4><div class="tw"><table class="rt"><thead><tr>${S.detail ? '<th>ID</th>' : ''}<th>Fact</th><th>Value</th><th>Status</th><th>Source</th><th>Date checked</th></tr></thead><tbody>${me.facts.map(f => `<tr>${S.detail ? `<td data-l="ID">${esc(f.id)}</td>` : ''}<td data-l="Fact">${X(f.fact)}</td><td data-l="Value">${X(f.value)}</td><td data-l="Status"><span class="tag ${/^VERIFIED/i.test(f.status) ? 'good' : 'assume'}">${esc(f.status)}</span></td><td data-l="Source" class="mono">${esc(f.source1_url || '—')}<div class="faint">${esc(f.source1_published || '')}</div></td><td data-l="Date checked">${esc(f.verified_on || '—')}</td></tr>`).join('')}</tbody></table></div>
+  <section class="sec" id="assumptions">${deep('facts', `data notes, checks against the official match file, limitations, glossary, audit`, `
+   ${officialCheckHtml()}
    <h4 style="margin-top:14px">Data notes</h4><div class="tw"><table class="rt"><thead><tr><th>Issue</th><th>Rows affected</th><th>Action taken</th><th>Why</th></tr></thead><tbody>${me.data_notes.map(d => `<tr><td data-l="Issue">${X(d.Issue)}</td><td data-l="Rows">${X(d['Rows affected'])}</td><td data-l="Action">${X(d['Action taken'])}</td><td data-l="Why">${X(d.Why)}</td></tr>`).join('')}</tbody></table></div>
    <h4 style="margin-top:14px">Season offsets (expected-runs model drift)</h4><div class="tw"><table><thead><tr><th>Season</th><th class="num">Balls</th><th class="num">Actual runs/ball</th><th class="num">Expected runs/ball</th><th class="num">Mean runs above expected per ball</th></tr></thead><tbody>${me.offsets.map(o => `<tr><td data-l="Season">${o.season}</td><td class="num" data-l="Balls">${thou(o.balls)}</td><td class="num" data-l="Actual">${f2(o.actual_rpb)}</td><td class="num" data-l="Expected">${f2(o.expected_rpb)}</td><td class="num" data-l="RAE/ball">${sg(o.mean_rae_per_ball, f2)}</td></tr>`).join('')}</tbody></table></div>
    <h4 style="margin-top:14px">Limitations</h4><ul>${me.limitations.map(l => `<li>${X(l)}</li>`).join('')}</ul>
    <h4 style="margin-top:14px">Glossary</h4><dl class="kv">${D.glossary.map(g => `<dt>${esc(g.term)}</dt><dd>${esc(g.meaning)}</dd>`).join('')}</dl>
-   <h4 style="margin-top:14px">Step 8 audit</h4>${me.audit && me.audit.length ? auditTbl(me.audit) : '<p class="muted"><b>Pending.</b> The audit table is not in the data yet.</p>'}`)}
+   <h4 style="margin-top:14px">Step 8 audit</h4>${auditHtml(me.audit)}`)}
    <div class="card"><h3>Build stamp</h3><dl class="kv"><dt>Last match in data</dt><dd>${esc(me.stamp.last_match)}</dd><dt>Build date</dt><dd>${esc(me.stamp.build)}</dd><dt>Random seed</dt><dd>${esc(me.stamp.seed)}</dd><dt>Data fingerprint</dt><dd class="mono">${esc(me.stamp.data_sha256)}</dd></dl></div></section>`;
+}
+const OUT_OF_SCOPE = /auction|Must-Back|walk-away|price band|Plan [AB]|purse|retain|Squad Fit|IPL 2027|availab|shortlist/i;
+function auditHtml(a) {
+  if (!a || !a.length) return '<p class="muted"><b>Pending.</b> The audit table is not in the data yet.</p>';
+  const keep = a.filter(r => !OUT_OF_SCOPE.test(JSON.stringify(r)));
+  const hid = a.length - keep.length;
+  return auditTbl(keep) + (hid ? `<p class="small muted">${hid} audit row${hid > 1 ? 's' : ''} about topics outside this brief ${hid > 1 ? 'are' : 'is'} not shown here.</p>` : '');
+}
+function officialCheckHtml() {
+  const oc = D.method.official_check || [];
+  if (!oc.length) return '';
+  return `<h4>Our match list checked against the organisers\\u2019 match file</h4><div class="tw"><table class="rt"><thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead><tbody>${oc.map(r => `<tr><td data-l="Check">${X(r.check)}</td><td data-l="Result"><span class="tag ${/pass/i.test(r.status) ? 'good' : 'warn'}">${esc(r.status)}</span></td><td data-l="Detail">${X(r.detail)}</td></tr>`).join('')}</tbody></table></div>`;
 }
 function tooCloseTbl(tc) {
   const rows = Array.isArray(tc) ? tc : [];
@@ -1543,22 +1343,21 @@ function auditTbl(a) {
 }
 
 /* ===================== render + events ===================== */
-const TAB_FN = { summary: tabSummary, pressure: tabPressure, leaderboard: tabLeaderboard, compare: tabCompare, squad: tabSquad, auction: tabAuction, method: tabMethod };
+const TAB_FN = { summary: tabSummary, pressure: tabPressure, leaderboard: tabLeaderboard, compare: tabCompare, method: tabMethod };
 let lastTab = null, lastW = 0, returnFocus = null;
 
 function chromeText() {
   $('#honest').innerHTML = `<b>Read with care:</b> ${X(KPI.claim)} <button type="button" class="plink" data-goto="method">See the backtest</button>`;
-  $('#avail-i').setAttribute('data-tip', scrub('Assumption: hides players tagged likely retained [A3] and players already in RR’s 2026 group [A1]. Real availability is UNKNOWN [A2]: the official lists could not be read.'));
   const url = D.meta.public_url ? `<a href="${esc(D.meta.public_url)}" rel="noopener">${esc(D.meta.public_url)}</a>` : 'pending (placeholder)';
   $('#foot').innerHTML = `<p class="disc2">Independent submission for Rajasthan Royals' SupeRR Selector Season 2. Not an official Rajasthan Royals product.</p>
    <p><b>${esc(D.meta.name)}</b> — ${X(KPI.claim)}</p>
    <p>Last match in data: ${esc(D.meta.last_match)} · Build: ${esc(D.meta.build)} · Seed: ${esc(D.meta.seed)} · Data fingerprint: <span class="mono">${esc(D.meta.data_sha256)}</span></p>
-   <p>No external fact is VERIFIED in this project: ages, prices, availability and nationality are assumptions or UNKNOWN (network policy blocked verification).</p>
+   <p>Everything on this page comes from the IPL ball-by-ball match data supplied for the challenge. No outside facts are used.</p>
    <p>Public URL: ${url}</p>`;
 }
 function buildChrome() {
   $('#brand-name').textContent = D.meta.name;
-  $('#brand-thesis').textContent = 'IPL 2027 auction shortlist';
+  $('#brand-thesis').textContent = D.meta.subtitle || '';
   $('#tabs').innerHTML = TABS.map((t, i) => `<button type="button" role="tab" data-tab="${t[0]}" aria-selected="false">${ico(t[0])}<span class="full">${esc(t[1])}</span><span class="short">${esc(t[2])}</span></button>`).join('');
   $('#f-season').innerHTML = '<option value="all">All seasons</option>' + SEASONS.map(s => `<option value="${s}">${s}</option>`).join('');
   $('#fnote').textContent = 'The Clutch Score does not change with filters. Filters re-slice the descriptive numbers (balls, strike rate, economy, runs vs expected, WPA) and which players are listed.';
@@ -1566,8 +1365,7 @@ function buildChrome() {
 }
 function syncFilterUI() {
   const f = S.f;
-  ['role', 'phase', 'season', 'pressure', 'origin'].forEach(k => { const e = $('#f-' + k); if (e.value !== String(f[k])) e.value = f[k]; });
-  $('#f-avail').checked = f.avail;
+  ['role', 'phase', 'season', 'pressure'].forEach(k => { const e = $('#f-' + k); if (e.value !== String(f[k])) e.value = f[k]; });
   if ($('#f-q') !== document.activeElement) $('#f-q').value = f.q;
   const act = filtersActive();
   $('#fcount').textContent = act.length;
@@ -1647,7 +1445,7 @@ document.addEventListener('click', e => {
     case 'bk-preset': S.basket = (v === 'A' ? D.squad.planA_ids : D.squad.planB_ids).slice(); render(true); break;
     case 'bk-clear': S.basket = []; render(true); break;
     case 'cmp-remove': S.cmp = S.cmp.filter(x => x !== id); S.cmpInit = true; writeHash(); render(true); break;
-    case 'cmp-preset': S.cmp = (v === 'must' ? defaultCompare() : D.auction.planA.slice(0, CFG.cmpMax)); S.cmpInit = true; writeHash(); render(true); break;
+    case 'cmp-preset': S.cmp = D.top10[v === 'bowl' ? 'bowl' : 'bat'].slice(0, 3).map(r => r.id); S.cmpInit = true; writeHash(); render(true); break;
     case 'compare-add': addCompare(id); break;
   }
 });
@@ -1681,8 +1479,7 @@ $('#fbtn').addEventListener('click', () => toggleSheet(!$('#fbar').classList.con
 $('#tabs').addEventListener('scroll', tabsMore, { passive: true });
 $('#fclose').addEventListener('click', () => toggleSheet(false));
 $('#scrim').addEventListener('click', () => toggleSheet(false));
-['role', 'phase', 'season', 'pressure', 'origin'].forEach(k => $('#f-' + k).addEventListener('change', e => setFilter(k, e.target.value)));
-$('#f-avail').addEventListener('change', e => setFilter('avail', e.target.checked));
+['role', 'phase', 'season', 'pressure'].forEach(k => $('#f-' + k).addEventListener('change', e => setFilter(k, e.target.value)));
 $('#f-q').addEventListener('input', e => setFilter('q', e.target.value));
 $('#f-reset').addEventListener('click', resetFilters);
 $('#mode-simple').addEventListener('click', () => { S.detail = false; render(true); });

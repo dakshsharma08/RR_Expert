@@ -1,37 +1,34 @@
 """Step 7F: 60-90 second walkthrough video script with timestamps. Every number is read from outputs/tables.
+Round 1 brief (D38): the top 10 batters and top 10 bowlers under pressure, and the method. No auction advice.
 Output: outputs/deliverables/F_Walkthrough_Video_Script.md
 """
 import json, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import pandas as pd
 from config import TABLES, DELIVERABLES
 
-s = json.load(open(TABLES / "summary_numbers.json"))["summary"]
+j = json.load(open(TABLES / "summary_numbers.json"))
+s, t10 = j["summary"], j["top10"]
 bt = s["backtest"]
-gaps = pd.read_csv(TABLES / "step5_gaps.csv")
-short = pd.read_csv(TABLES / "step5_shortlist.csv")
-tc = pd.read_csv(TABLES / "step4_too_close_to_call.csv")
-must = short[short.tier == "Must-Back"]
-pmA = pd.read_csv(TABLES / "step5_plans_meta.csv").query('plan == "A"').iloc[0]
-g1 = gaps.iloc[0]
 hs = sum(s["high_share"].values()) / len(s["high_share"])
-mb = "; ".join(f"{r.player_name} ({r.sub_role.lower().replace(' (', ', ').replace(')', '')}, score {r.score:.0f}, 80% range {r.score_lo80:.0f}–{r.score_hi80:.0f})" for r in must.itertuples())
+b1, w1 = t10["bat"][0], t10["bowl"][0]
+bat3 = ", ".join(x["name"] for x in t10["bat"][:3])
+bowl3 = ", ".join(x["name"] for x in t10["bowl"][:3])
+eb, ew = t10["edge"]["bat"], t10["edge"]["bowl"]
 text = f"""# RR Clutch Index: 60–90 second walkthrough (video script)
 
 Screen directions are in *italics*. Every number is pulled by `src/step7_video_script.py` from `outputs/tables/`.
 
 | Time | Screen | Voice-over |
 |---|---|---|
-| 0:00–0:08 | *Dashboard, Summary tab, title* | "RR Clutch Index: who has delivered when the match was on the line, and how sure we can be about it." |
-| 0:08–0:20 | *Pressure Index tab: win-probability line of a showcase close match, pressure strip below* | "Every IPL ball from {s['seasons_scored']} gets a pressure score: how much it could swing the result, judged only with information from before that match. On average {hs:.0f}% of balls are High pressure." |
-| 0:20–0:32 | *Leaderboard, batters, intervals visible* | "We compare runs scored, or saved, with what an average player would do in the same situation, then pull small samples toward the average. We scored {s['scorable_bat']} batters, {s['scorable_bowl']} bowlers and {s['scorable_ar']} all-rounders. Every score carries an 80% range." |
-| 0:32–0:45 | *Squad Fit tab, gap meter* | "RR's weakest area under pressure looks like {g1.area.split(': ')[1].lower()}-overs batting: {g1.rr_group_per100:.1f} runs per 100 high-pressure balls against a league {g1.league_per100:.1f}. That gap is within statistical noise, so treat it as a direction, not a proven hole. RR's bowling is at or above league in every phase." |
-| 0:45–1:00 | *Auction Board, Must-Back column* | "If available at the auction, back: {mb}. Plan A, on an assumed fifteen-crore purse: {', '.join(s['planA'])}. That costs {pmA.cost_mid_cr:.1f} crore at mid prices, but {pmA.cost_walkaway_cr:.0f} crore at walk-away prices." |
-| 1:00–1:15 | *Method & Proof tab, backtest chart* | "Honesty first. Checked one season ahead, the top ten were above average {bt['bat_score']:.0f}% of the time for batters and {bt['bowl_score']:.0f}% for bowlers, against {bt['bat_naive']:.0f}% and {bt['bowl_naive']:.0f}% for a naive ranking. That is not a demonstrated edge. And no two top-ten players are separated by their 80% ranges, so the order within the group is too close to call." |
-| 1:15–1:28 | *Summary tab, assumptions badge* | "So treat this as proof of past pressure performance, not a forecast. Prices, ages and availability are unverified assumptions: recheck them against the official list before the sixteenth of December." |
+| 0:00–0:08 | *Dashboard, Summary tab: the two top-10 lists* | "Who performs best when the match is on the line? Here are our top ten batters and top ten bowlers under pressure, from IPL {s['seasons_scored']}." |
+| 0:08–0:22 | *Pressure Index tab: win-probability line of a close match, pressure strip below* | "We define pressure ball by ball. A win-probability model, trained only on earlier seasons, tells us how much each ball could swing the result. Chases, being below par, the death overs, playoffs and collapses add a little more. About {hs:.0f}% of balls count as High pressure." |
+| 0:22–0:36 | *Method & Proof tab: the four components* | "On those balls we compare each player with an average player in exactly the same situation: runs above or saved, win probability added, how well he holds up against his own low-pressure level, and consistency across seasons. Small samples are pulled toward average, and every score has an 80% range." |
+| 0:36–0:50 | *Summary: top-10 batters card, then bowlers card* | "The batters are led by {bat3}; the bowlers by {bowl3}. {b1['name']} scores {b1['score']:.1f} and {w1['name']} {w1['score']:.1f} on the 0-to-100 scale within their role." |
+| 0:50–1:05 | *Leaderboard with ranges visible* | "How sure are we? Inside each top ten the 80% ranges overlap, so treat each list as a group, not a strict order. Number eleven, {eb['next_name']} among batters and {ew['next_name']} among bowlers, is too close to call with number ten." |
+| 1:05–1:20 | *Method & Proof: backtest chart* | "And honestly: checked one season ahead, the score did not beat a simple strike-rate or economy ranking: {bt['bat_score']:.0f}% against {bt['bat_naive']:.0f}% for batters, {bt['bowl_score']:.0f}% against {bt['bowl_naive']:.0f}% for bowlers. So this is a record of who delivered under pressure, which is exactly the question, not a forecast." |
 
-**Word count check:** about 210 words, which fits 85–90 seconds at a measured pace. Cut the Plan A sentence for a 60-second version.
+**Word count check:** about 220 words, which fits 85–90 seconds at a measured pace. Cut the second sentence of the 0:22 line for a 60-second version.
 """
 (DELIVERABLES / "F_Walkthrough_Video_Script.md").write_text(text)
 print(text)

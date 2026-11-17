@@ -1,0 +1,12 @@
+check,status,detail
+One IPL competition per season 2022-2026,Pass,"comp_ids 2022:1358, 2023:1715, 2024:2193, 2025:2725, 2026:3298"
+Every match in our IPL table is in the official IPL list,Pass,0 of 367 not found
+Season agrees,Pass,0 differ
+Date agrees,Pass,0 differ
+Official matches absent from the ball data are all 'Match Abandoned',Pass,"4 absent: 31281 (2024, Match Abandoned); 31284 (2024, Match Abandoned); 31288 (2024, Match Abandoned); 40761 (2025, Match Abandoned)"
+Winner agrees (no result = no winner),Differs,7 of 367 differ
+Playoff flag agrees with official stage,Pass,20 official playoff matches; 0 differ
+Reduced-overs (DLS) matches agree,Differs,"official 5, ours 13; 8 differ"
+No-result matches agree,Pass,"official 5, ours 5; 0 differ"
+Super-over matches agree,Pass,"official 2, ours 2; 0 differ"
+"Venue id present for every match (ids only, no names)",Pass,"18 distinct venue ids, all in India"

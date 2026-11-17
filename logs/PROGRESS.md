@@ -3,6 +3,7 @@
 Newest first. Each line: time (UTC), step, status, what was done, next action.
 
 | When | Step | Status | Done | Next |
+| 2026-11-17 | 7–8 | in progress | D38: Round 1 brief clarified (top 10 batters + top 10 bowlers under pressure, no auction advice). Payload, audit, notebook, video script and handover reframed; official match file cross-check and scope sensitivity added | Dashboard and docs builders reframing; then final build, republish, commit |
 | 2026-11-17 | 7 | done | D37: dashboard redesign (white + pink, embedded fonts), published as an Artifact, QR codes and clickable links in deck/cheat sheet, combined 8-page submission PDF | User must set the Artifact link to shareable before submitting |
 | 2026-11-17 | 8 | done | Final build complete (`src/build_final.py`): notebook re-executed, dashboard re-tested, docs rebuilt, audit and handover generated | Before 16 Dec: recheck facts F2/F3 once sites are reachable; optionally re-run venues |
 | 2026-11-17 | 7–8 | in progress | Deliverables A–F built and generated from tables; Critics 0–3 and the cold reader handled (D31–D35); Step 8 audit and handover scripts written | Apply cold-reader fixes (dashboard and deck builders), final critic across all deliverables, final rebuild (payload → dashboard + tests → docs → notebook → audit → handover), commit |

@@ -4,6 +4,9 @@
   "training_only": "2022",
   "ipl_matches": 367,
   "ipl_balls": 87687,
+  "ipl_matches_span": "2022–2026",
+  "scored_matches": 293,
+  "scored_balls": 67880,
   "wp_eligible": 353,
   "last_match": "2026-05-31",
   "in_scope": 257,
@@ -74,18 +77,29 @@
    "season_centred_bat": 100.0,
    "season_centred_bowl": 100.0
   },
-  "planA": [
+  "top10_bat": [
+   "Vaibhav Sooryavanshi",
+   "Ashutosh Sharma",
+   "Shreyas Iyer",
+   "Heinrich Klaasen",
+   "Virat Kohli",
+   "Prabhsimran Singh",
+   "Marcus Stoinis",
+   "Sameer Rizvi",
+   "Abdul Samad",
+   "Venkatesh Iyer"
+  ],
+  "top10_bowl": [
+   "Kuldeep Yadav",
+   "Jasprit Bumrah",
+   "Matheesha Pathirana",
    "Patrick Cummins",
-   "Ashutosh Sharma",
-   "Sameer Rizvi"
-  ],
-  "must_back": [
-   "Ashutosh Sharma",
-   "Patrick Cummins"
-  ],
-  "top_gaps": [
-   "Batting under pressure: Middle",
-   "Batting under pressure: Death"
+   "Ravindra Jadeja",
+   "Krunal Pandya",
+   "Sunil Narine",
+   "Vyshak Kumar",
+   "Mohsin Khan",
+   "Lungi Ngidi"
   ],
   "season_offsets": {
    "2022": -0.01,
@@ -94,14 +108,1464 @@
    "2025": 0.004,
    "2026": 0.016
   },
-  "claim": "Historical pressure-performance indicator; persistence not demonstrated. Its ability to predict IPL 2027 is not established (D15).",
+  "claim": "Historical pressure-performance indicator; persistence not demonstrated. It describes IPL 2023–26; it is not a forecast (D15).",
   "exec_summary": [
-   "We rated 110 players (47 batters and 71 bowlers, 8 of them all-rounders rated both ways) on how they performed when a ball could swing the match (IPL 2023–26).",
-   "RR's weakest areas under pressure: middle-overs batting, death-overs batting. These gaps are directional (within statistical noise); RR's bowling is at or above league in every phase.",
-   "Must-Back if available: Ashutosh Sharma, Patrick Cummins. Plan A (assumed Rs 15 cr purse; Rs 8.3 cr at mid prices, Rs 13 cr at walk-away): Patrick Cummins, Ashutosh Sharma, Sameer Rizvi.",
-   "Honest test (top 10 still above average next season): batters 42.9% v naive 46.7% v random pick 50.8%; bowlers 72.8% v 75.0% v 59.5%. Verdict: persistence not demonstrated.",
-   "So read it as proof of past pressure performance, not a promise; prices, ages and availability are unverified assumptions to recheck before 16 Dec."
+   "Pressure, defined ball by ball: how much one ball could swing the match result (win-probability leverage), lifted for chases, being below par, the death overs, playoffs and collapses. The top 20% of balls, ranked only against earlier balls, count as High pressure.",
+   "Performance under pressure: runs above (batters) or saved (bowlers) versus an average player in exactly the same situation, plus win probability added, holding up versus the player's own low-pressure level and consistency across seasons; small samples are pulled toward average.",
+   "Top 10 batters under pressure (IPL 2023–26): Vaibhav Sooryavanshi, Ashutosh Sharma, Shreyas Iyer, Heinrich Klaasen, Virat Kohli, Prabhsimran Singh, Marcus Stoinis, Sameer Rizvi, Abdul Samad, Venkatesh Iyer.",
+   "Top 10 bowlers under pressure (IPL 2023–26): Kuldeep Yadav, Jasprit Bumrah, Matheesha Pathirana, Patrick Cummins, Ravindra Jadeja, Krunal Pandya, Sunil Narine, Vyshak Kumar, Mohsin Khan, Lungi Ngidi.",
+   "How sure we are: the 80% ranges inside each top 10 overlap, so read each as a group, not a strict order. Tested one season ahead, the score did not beat simple strike-rate/economy rankings (batters 42.9% v 46.7%; bowlers 72.8% v 75.0%): it is a record of past pressure performance, not a forecast."
   ]
  },
- "squad_still_lacks": "RR's batting gaps are directional, not proven: each phase gap's 80% range includes zero (only powerplay batting is clearly above league). Plan A's picks were chosen because their own past pressure record is good where RR looks weak, so the overlap is by construction and rests on small samples. At walk-away prices Plan A costs Rs 13 cr against an assumed Rs 15 cr purse, and the Must-Back players' availability is unverified."
+ "top10": {
+  "bat": [
+   {
+    "rank": 1,
+    "id": "50284",
+    "name": "Vaibhav Sooryavanshi",
+    "team": "RR (2026)",
+    "sub_role": "Top-order batter",
+    "score": 99.33,
+    "lo": 91.822,
+    "hi": 99.979,
+    "stats": {
+     "balls": 111,
+     "runs": 283,
+     "sr": 255.0,
+     "outs": 4,
+     "above_per100": 96.5,
+     "wpa_per100": 1.13
+    },
+    "why": "111 High-pressure balls faced (2023–26): 283 runs at strike rate 255, +96 runs per 100 balls above an average batter in the same situations; above expected in 2 of 2 assessed seasons."
+   },
+   {
+    "rank": 2,
+    "id": "8101",
+    "name": "Ashutosh Sharma",
+    "team": "DC (2026)",
+    "sub_role": "Finisher",
+    "score": 98.684,
+    "lo": 66.182,
+    "hi": 99.995,
+    "stats": {
+     "balls": 119,
+     "runs": 237,
+     "sr": 199.2,
+     "outs": 8,
+     "above_per100": 44.3,
+     "wpa_per100": 1.89
+    },
+    "why": "119 High-pressure balls faced (2023–26): 237 runs at strike rate 199, +44 runs per 100 balls above an average batter in the same situations; above expected in 2 of 2 assessed seasons."
+   },
+   {
+    "rank": 3,
+    "id": "3647",
+    "name": "Shreyas Iyer",
+    "team": "PBKS (2026)",
+    "sub_role": "Middle-order batter",
+    "score": 96.085,
+    "lo": 73.074,
+    "hi": 99.718,
+    "stats": {
+     "balls": 203,
+     "runs": 351,
+     "sr": 172.9,
+     "outs": 2,
+     "above_per100": 24.6,
+     "wpa_per100": 1.22
+    },
+    "why": "203 High-pressure balls faced (2023–26): 351 runs at strike rate 173, +25 runs per 100 balls above an average batter in the same situations; above expected in 2 of 2 assessed seasons."
+   },
+   {
+    "rank": 4,
+    "id": "4260",
+    "name": "Heinrich Klaasen",
+    "team": "SRH (2026)",
+    "sub_role": "Middle-order batter",
+    "score": 94.287,
+    "lo": 69.178,
+    "hi": 99.257,
+    "stats": {
+     "balls": 205,
+     "runs": 385,
+     "sr": 187.8,
+     "outs": 10,
+     "above_per100": 37.0,
+     "wpa_per100": 0.6
+    },
+    "why": "205 High-pressure balls faced (2023–26): 385 runs at strike rate 188, +37 runs per 100 balls above an average batter in the same situations; above expected in 3 of 3 assessed seasons."
+   },
+   {
+    "rank": 5,
+    "id": "47",
+    "name": "Virat Kohli",
+    "team": "RCB (2026)",
+    "sub_role": "Top-order batter",
+    "score": 88.106,
+    "lo": 57.945,
+    "hi": 98.242,
+    "stats": {
+     "balls": 255,
+     "runs": 423,
+     "sr": 165.9,
+     "outs": 3,
+     "above_per100": 19.6,
+     "wpa_per100": 0.61
+    },
+    "why": "255 High-pressure balls faced (2023–26): 423 runs at strike rate 166, +20 runs per 100 balls above an average batter in the same situations; above expected in 3 of 4 assessed seasons."
+   },
+   {
+    "rank": 6,
+    "id": "7216",
+    "name": "Prabhsimran Singh",
+    "team": "PBKS (2026)",
+    "sub_role": "Top-order batter",
+    "score": 87.884,
+    "lo": 44.707,
+    "hi": 98.047,
+    "stats": {
+     "balls": 276,
+     "runs": 479,
+     "sr": 173.6,
+     "outs": 13,
+     "above_per100": 22.9,
+     "wpa_per100": 0.35
+    },
+    "why": "276 High-pressure balls faced (2023–26): 479 runs at strike rate 174, +23 runs per 100 balls above an average batter in the same situations; above expected in 4 of 4 assessed seasons."
+   },
+   {
+    "rank": 7,
+    "id": "2639",
+    "name": "Marcus Stoinis",
+    "team": "PBKS (2026)",
+    "sub_role": "All-rounder",
+    "score": 85.857,
+    "lo": 37.012,
+    "hi": 99.253,
+    "stats": {
+     "balls": 135,
+     "runs": 261,
+     "sr": 193.3,
+     "outs": 9,
+     "above_per100": 38.2,
+     "wpa_per100": 0.28
+    },
+    "why": "135 High-pressure balls faced (2023–26): 261 runs at strike rate 193, +38 runs per 100 balls above an average batter in the same situations; above expected in 2 of 2 assessed seasons."
+   },
+   {
+    "rank": 8,
+    "id": "8238",
+    "name": "Sameer Rizvi",
+    "team": "DC (2026)",
+    "sub_role": "Middle-order batter",
+    "score": 79.987,
+    "lo": 44.919,
+    "hi": 94.88,
+    "stats": {
+     "balls": 101,
+     "runs": 165,
+     "sr": 163.4,
+     "outs": 3,
+     "above_per100": 19.2,
+     "wpa_per100": 1.06
+    },
+    "why": "101 High-pressure balls faced (2023–26): 165 runs at strike rate 163, +19 runs per 100 balls above an average batter in the same situations; above expected in 1 of 1 assessed seasons."
+   },
+   {
+    "rank": 9,
+    "id": "7446",
+    "name": "Abdul Samad",
+    "team": "LSG (2026)",
+    "sub_role": "Finisher",
+    "score": 79.623,
+    "lo": 37.517,
+    "hi": 96.055,
+    "stats": {
+     "balls": 112,
+     "runs": 200,
+     "sr": 178.6,
+     "outs": 6,
+     "above_per100": 19.6,
+     "wpa_per100": 1.36
+    },
+    "why": "112 High-pressure balls faced (2023–26): 200 runs at strike rate 179, +20 runs per 100 balls above an average batter in the same situations; above expected in 1 of 1 assessed seasons."
+   },
+   {
+    "rank": 10,
+    "id": "7544",
+    "name": "Venkatesh Iyer",
+    "team": "RCB (2026)",
+    "sub_role": "Top-order batter",
+    "score": 79.565,
+    "lo": 31.017,
+    "hi": 96.207,
+    "stats": {
+     "balls": 106,
+     "runs": 193,
+     "sr": 182.1,
+     "outs": 6,
+     "above_per100": 20.6,
+     "wpa_per100": 0.75
+    },
+    "why": "106 High-pressure balls faced (2023–26): 193 runs at strike rate 182, +21 runs per 100 balls above an average batter in the same situations; above expected in 1 of 1 assessed seasons."
+   }
+  ],
+  "bowl": [
+   {
+    "rank": 1,
+    "id": "3644",
+    "name": "Kuldeep Yadav",
+    "team": "DC (2026)",
+    "sub_role": "Spin bowler",
+    "score": 99.65,
+    "lo": 95.521,
+    "hi": 99.962,
+    "stats": {
+     "balls": 226,
+     "runs": 278,
+     "econ": 7.38,
+     "wkts": 16,
+     "saved_per100": 30.8,
+     "wpa_per100": 0.5
+    },
+    "why": "226 High-pressure balls bowled (2023–26): 16 wickets at economy 7.38, +31 runs per 100 balls saved against an average bowler in the same situations; above expected in 3 of 3 assessed seasons."
+   },
+   {
+    "rank": 2,
+    "id": "2933",
+    "name": "Jasprit Bumrah",
+    "team": "MI (2026)",
+    "sub_role": "Pace bowler",
+    "score": 98.674,
+    "lo": 69.41,
+    "hi": 99.979,
+    "stats": {
+     "balls": 209,
+     "runs": 249,
+     "econ": 7.15,
+     "wkts": 10,
+     "saved_per100": 38.4,
+     "wpa_per100": 0.2
+    },
+    "why": "209 High-pressure balls bowled (2023–26): 10 wickets at economy 7.15, +38 runs per 100 balls saved against an average bowler in the same situations; above expected in 3 of 3 assessed seasons."
+   },
+   {
+    "rank": 3,
+    "id": "8661",
+    "name": "Matheesha Pathirana",
+    "team": "KKR (2026)",
+    "sub_role": "Pace bowler, death specialist",
+    "score": 98.442,
+    "lo": 83.828,
+    "hi": 99.959,
+    "stats": {
+     "balls": 180,
+     "runs": 256,
+     "econ": 8.53,
+     "wkts": 16,
+     "saved_per100": 30.6,
+     "wpa_per100": 0.28
+    },
+    "why": "180 High-pressure balls bowled (2023–26): 16 wickets at economy 8.53, +31 runs per 100 balls saved against an average bowler in the same situations; above expected in 2 of 2 assessed seasons."
+   },
+   {
+    "rank": 4,
+    "id": "1758",
+    "name": "Patrick Cummins",
+    "team": "SRH (2026)",
+    "sub_role": "Pace bowler",
+    "score": 96.497,
+    "lo": 60.496,
+    "hi": 99.591,
+    "stats": {
+     "balls": 123,
+     "runs": 155,
+     "econ": 7.56,
+     "wkts": 6,
+     "saved_per100": 27.6,
+     "wpa_per100": 0.46
+    },
+    "why": "123 High-pressure balls bowled (2023–26): 6 wickets at economy 7.56, +28 runs per 100 balls saved against an average bowler in the same situations; above expected in 2 of 2 assessed seasons."
+   },
+   {
+    "rank": 5,
+    "id": "152",
+    "name": "Ravindra Jadeja",
+    "team": "RR (2026)",
+    "sub_role": "All-rounder",
+    "score": 95.646,
+    "lo": 55.597,
+    "hi": 99.489,
+    "stats": {
+     "balls": 198,
+     "runs": 248,
+     "econ": 7.52,
+     "wkts": 10,
+     "saved_per100": 18.5,
+     "wpa_per100": 0.23
+    },
+    "why": "198 High-pressure balls bowled (2023–26): 10 wickets at economy 7.52, +18 runs per 100 balls saved against an average bowler in the same situations; above expected in 4 of 4 assessed seasons."
+   },
+   {
+    "rank": 6,
+    "id": "4219",
+    "name": "Krunal Pandya",
+    "team": "RCB (2026)",
+    "sub_role": "All-rounder",
+    "score": 93.943,
+    "lo": 76.293,
+    "hi": 99.778,
+    "stats": {
+     "balls": 170,
+     "runs": 210,
+     "econ": 7.41,
+     "wkts": 14,
+     "saved_per100": 20.8,
+     "wpa_per100": 0.74
+    },
+    "why": "170 High-pressure balls bowled (2023–26): 14 wickets at economy 7.41, +21 runs per 100 balls saved against an average bowler in the same situations; above expected in 1 of 2 assessed seasons."
+   },
+   {
+    "rank": 7,
+    "id": "781",
+    "name": "Sunil Narine",
+    "team": "KKR (2026)",
+    "sub_role": "Spin bowler",
+    "score": 93.724,
+    "lo": 49.089,
+    "hi": 99.449,
+    "stats": {
+     "balls": 191,
+     "runs": 244,
+     "econ": 7.66,
+     "wkts": 16,
+     "saved_per100": 18.4,
+     "wpa_per100": 0.63
+    },
+    "why": "191 High-pressure balls bowled (2023–26): 16 wickets at economy 7.66, +18 runs per 100 balls saved against an average bowler in the same situations; above expected in 3 of 4 assessed seasons."
+   },
+   {
+    "rank": 8,
+    "id": "4487",
+    "name": "Vyshak Kumar",
+    "team": "PBKS (2026)",
+    "sub_role": "Pace bowler",
+    "score": 91.451,
+    "lo": 36.286,
+    "hi": 98.951,
+    "stats": {
+     "balls": 88,
+     "runs": 145,
+     "econ": 9.89,
+     "wkts": 4,
+     "saved_per100": 9.9,
+     "wpa_per100": -0.33
+    },
+    "why": "88 High-pressure balls bowled (2023–26): 4 wickets at economy 9.89, +10 runs per 100 balls saved against an average bowler in the same situations; above expected in 1 of 1 assessed seasons."
+   },
+   {
+    "rank": 9,
+    "id": "6669",
+    "name": "Mohsin Khan",
+    "team": "LSG (2026)",
+    "sub_role": "Pace bowler",
+    "score": 89.719,
+    "lo": 38.705,
+    "hi": 99.723,
+    "stats": {
+     "balls": 113,
+     "runs": 155,
+     "econ": 8.23,
+     "wkts": 4,
+     "saved_per100": 21.4,
+     "wpa_per100": 0.59
+    },
+    "why": "113 High-pressure balls bowled (2023–26): 4 wickets at economy 8.23, +21 runs per 100 balls saved against an average bowler in the same situations; above expected in 1 of 2 assessed seasons."
+   },
+   {
+    "rank": 10,
+    "id": "4641",
+    "name": "Lungi Ngidi",
+    "team": "DC (2026)",
+    "sub_role": "Pace bowler, death specialist",
+    "score": 87.349,
+    "lo": 67.461,
+    "hi": 95.916,
+    "stats": {
+     "balls": 63,
+     "runs": 77,
+     "econ": 7.33,
+     "wkts": 6,
+     "saved_per100": 31.8,
+     "wpa_per100": 0.5
+    },
+    "why": "63 High-pressure balls bowled (2023–26): 6 wickets at economy 7.33, +32 runs per 100 balls saved against an average bowler in the same situations; above expected in 1 of 1 assessed seasons."
+   }
+  ],
+  "edge": {
+   "bat": {
+    "next_name": "Jos Buttler",
+    "next_id": "813",
+    "next_score": 79.244,
+    "next_lo": 35.719,
+    "next_hi": 92.839,
+    "overlaps_10th": true
+   },
+   "bowl": {
+    "next_name": "Jofra Archer",
+    "next_id": "3298",
+    "next_score": 85.492,
+    "next_lo": 66.868,
+    "next_hi": 98.244,
+    "overlaps_10th": true
+   }
+  },
+  "pairs": {
+   "bat": {
+    "total": 45,
+    "separated": 0
+   },
+   "bowl": {
+    "total": 45,
+    "separated": 0
+   }
+  },
+  "pool": {
+   "bat": 47,
+   "bowl": 71
+  },
+  "eligibility": "Rated if the player faced at least 100 High-pressure balls (batters) or bowled at least 60 legal High-pressure balls (bowlers) in IPL 2023–26.",
+  "read": "Ranked by Clutch Score (0–100 within role). The 80% ranges of top-10 players overlap, so read each list as a group of ten, not a strict order.",
+  "not_scorable": [
+   {
+    "id": "1205",
+    "name": "Jonny Bairstow",
+    "faced": 73,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "1440",
+    "name": "Rahul Tripathi",
+    "faced": 62,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "1487",
+    "name": "Adam Milne",
+    "faced": 2,
+    "bowled": 13,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "1556",
+    "name": "David Payne",
+    "faced": 5,
+    "bowled": 3,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "1596",
+    "name": "Moeen Ali",
+    "faced": 17,
+    "bowled": 57,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "19312",
+    "name": "Nuwan Thushara",
+    "faced": 0,
+    "bowled": 37,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "1941",
+    "name": "Devon Conway",
+    "faced": 94,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "19714",
+    "name": "Abishek Porel",
+    "faced": 59,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "19781",
+    "name": "Mitchell Owen",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "198",
+    "name": "Manish Pandey",
+    "faced": 53,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "20005",
+    "name": "Arshad Khan",
+    "faced": 17,
+    "bowled": 50,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "20006",
+    "name": "Ramandeep Singh",
+    "faced": 35,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2101",
+    "name": "Quinton de Kock",
+    "faced": 36,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "22920",
+    "name": "Jacob Duffy",
+    "faced": 0,
+    "bowled": 6,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2315",
+    "name": "Reece Topley",
+    "faced": 0,
+    "bowled": 9,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "23311",
+    "name": "Jacob Bethell",
+    "faced": 41,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "23467",
+    "name": "Gurjapneet Singh",
+    "faced": 0,
+    "bowled": 11,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2367",
+    "name": "Travis Head",
+    "faced": 58,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2382",
+    "name": "Jamie Overton",
+    "faced": 29,
+    "bowled": 15,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2399",
+    "name": "Dushmantha Chameera",
+    "faced": 1,
+    "bowled": 33,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2417",
+    "name": "Akeal Hosein",
+    "faced": 10,
+    "bowled": 33,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2436",
+    "name": "Dasun Shanaka",
+    "faced": 27,
+    "bowled": 6,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "25132",
+    "name": "Praful Hinge",
+    "faced": 1,
+    "bowled": 27,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "25138",
+    "name": "Harsh Dubey",
+    "faced": 4,
+    "bowled": 20,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "25139",
+    "name": "Shubham Dubey",
+    "faced": 61,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "25213",
+    "name": "Dewald Brevis",
+    "faced": 42,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "25669",
+    "name": "Priyansh Arya",
+    "faced": 92,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "25679",
+    "name": "Salil Arora",
+    "faced": 12,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2636",
+    "name": "Adam Zampa",
+    "faced": 1,
+    "bowled": 47,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "26663",
+    "name": "Kwena Maphaka",
+    "faced": 0,
+    "bowled": 1,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "26830",
+    "name": "Nishant Kumar Sindhu",
+    "faced": 9,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "26834",
+    "name": "Raj Bawa",
+    "faced": 13,
+    "bowled": 18,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "26906",
+    "name": "Angkrish Raghuvanshi",
+    "faced": 56,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "26913",
+    "name": "Shaik Rasheed",
+    "faced": 6,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2756",
+    "name": "Shashank Singh",
+    "faced": 97,
+    "bowled": 11,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2790",
+    "name": "Praveen Dubey",
+    "faced": 3,
+    "bowled": 1,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "27960",
+    "name": "Mayank Yadav",
+    "faced": 1,
+    "bowled": 30,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "28018",
+    "name": "Ashok Sharma",
+    "faced": 1,
+    "bowled": 36,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "28021",
+    "name": "Saurabh Dubey",
+    "faced": 0,
+    "bowled": 21,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "2877",
+    "name": "Vijay Shankar",
+    "faced": 91,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "31518",
+    "name": "Akshat Raghuwanshi",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "31529",
+    "name": "Robin Minz",
+    "faced": 6,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3174",
+    "name": "Matt Henry",
+    "faced": 0,
+    "bowled": 35,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "32244",
+    "name": "Tripurana Vijay",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "32862",
+    "name": "Allah Ghazanfar",
+    "faced": 0,
+    "bowled": 56,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "33067",
+    "name": "Ravichandran Smaran",
+    "faced": 4,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "34969",
+    "name": "Manav Suthar",
+    "faced": 0,
+    "bowled": 11,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "35071",
+    "name": "Kunal Rathore",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "35072",
+    "name": "Ramakrishna Ghosh",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "35318",
+    "name": "Sakib Hussain",
+    "faced": 0,
+    "bowled": 46,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3605",
+    "name": "Aiden Markram",
+    "faced": 97,
+    "bowled": 29,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3629",
+    "name": "Corbin Bosch",
+    "faced": 5,
+    "bowled": 59,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3641",
+    "name": "Ben Dwarshuis",
+    "faced": 0,
+    "bowled": 6,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3645",
+    "name": "Sarfaraz Khan",
+    "faced": 45,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3648",
+    "name": "Deepak Hooda",
+    "faced": 19,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3672",
+    "name": "Kusal Mendis",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3697",
+    "name": "Kyle Jamieson",
+    "faced": 0,
+    "bowled": 27,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3700",
+    "name": "Tim Seifert",
+    "faced": 6,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "37052",
+    "name": "Naman Dhir",
+    "faced": 69,
+    "bowled": 12,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3727",
+    "name": "Matthew Short",
+    "faced": 65,
+    "bowled": 1,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "37731",
+    "name": "Musheer Khan",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3782",
+    "name": "M Shahrukh Khan",
+    "faced": 85,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "3926",
+    "name": "Rahul Tewatia",
+    "faced": 84,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "395",
+    "name": "Karn Sharma",
+    "faced": 15,
+    "bowled": 58,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4007",
+    "name": "Ryan Rickelton",
+    "faced": 55,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "41503",
+    "name": "Yash Punja",
+    "faced": 0,
+    "bowled": 32,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4211",
+    "name": "Vishnu Vinod",
+    "faced": 10,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4229",
+    "name": "George Linde",
+    "faced": 4,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "42845",
+    "name": "Arshin Kulkarni",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4288",
+    "name": "Navdeep Saini",
+    "faced": 0,
+    "bowled": 21,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "43798",
+    "name": "Lhuan Pretorius",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4391",
+    "name": "Liam Livingstone",
+    "faced": 52,
+    "bowled": 31,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "43917",
+    "name": "Krish Bhagat",
+    "faced": 1,
+    "bowled": 5,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4494",
+    "name": "Abhinav Manohar",
+    "faced": 58,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "45381",
+    "name": "PV Satyanarayan Raju",
+    "faced": 1,
+    "bowled": 11,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "45749",
+    "name": "Mukul Choudhary",
+    "faced": 37,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "45966",
+    "name": "Prashant Veer",
+    "faced": 31,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "46066",
+    "name": "Vipraj Nigam",
+    "faced": 30,
+    "bowled": 44,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "46137",
+    "name": "Kartik Sharma",
+    "faced": 19,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4692",
+    "name": "Lockie Ferguson",
+    "faced": 1,
+    "bowled": 55,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4736",
+    "name": "Josh Inglis",
+    "faced": 68,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "47370",
+    "name": "Aniket Verma",
+    "faced": 44,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4779",
+    "name": "Pieter Willem Mulder",
+    "faced": 9,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4823",
+    "name": "Washington Sundar",
+    "faced": 80,
+    "bowled": 22,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4824",
+    "name": "Zeeshan Ansari",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4847",
+    "name": "Finn Allen",
+    "faced": 16,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "48504",
+    "name": "Ayush Mhatre",
+    "faced": 40,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4853",
+    "name": "Glenn Phillips",
+    "faced": 17,
+    "bowled": 2,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4854",
+    "name": "Rachin Ravindra",
+    "faced": 41,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "48557",
+    "name": "Vignesh Puthur",
+    "faced": 0,
+    "bowled": 8,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "48575",
+    "name": "Sahil Parakh",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "48953",
+    "name": "Danish Malewar",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4904",
+    "name": "Kamindu Mendis",
+    "faced": 24,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "4986",
+    "name": "Rovman Powell",
+    "faced": 82,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "5039",
+    "name": "Rajat Patidar",
+    "faced": 77,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "5553",
+    "name": "Phil Salt",
+    "faced": 92,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "5562",
+    "name": "Richard Gleeson",
+    "faced": 2,
+    "bowled": 24,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "5577",
+    "name": "Sai Kishore",
+    "faced": 5,
+    "bowled": 45,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "56817",
+    "name": "Shivang Kumar",
+    "faced": 11,
+    "bowled": 36,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "56830",
+    "name": "Madhav Tiwari",
+    "faced": 8,
+    "bowled": 9,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "5808",
+    "name": "Karim Janat",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "58135",
+    "name": "Tejasvi Dahiya",
+    "faced": 2,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "58727",
+    "name": "Abhinandan Singh",
+    "faced": 0,
+    "bowled": 7,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "60700",
+    "name": "Ravi Singh",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6162",
+    "name": "Kulwant Khejroliya",
+    "faced": 0,
+    "bowled": 1,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6237",
+    "name": "Manimaran Siddharth",
+    "faced": 0,
+    "bowled": 17,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6272",
+    "name": "William Jacks",
+    "faced": 42,
+    "bowled": 25,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6284",
+    "name": "Anukul Roy",
+    "faced": 22,
+    "bowled": 56,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6342",
+    "name": "Matthew Breetzke",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6354",
+    "name": "Spencer Johnson",
+    "faced": 1,
+    "bowled": 41,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6359",
+    "name": "Raghu Sharma",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6450",
+    "name": "Mujeeb Ur Rahman",
+    "faced": 0,
+    "bowled": 1,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6457",
+    "name": "Urvil Patel",
+    "faced": 22,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6461",
+    "name": "Mayank Rawat",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6466",
+    "name": "Atharwa Taide",
+    "faced": 18,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6523",
+    "name": "Blessing Muzarabani",
+    "faced": 0,
+    "bowled": 4,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6526",
+    "name": "Himmat Singh",
+    "faced": 30,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6628",
+    "name": "Gerald Coetzee",
+    "faced": 10,
+    "bowled": 36,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6674",
+    "name": "Rahmanullah Gurbaz",
+    "faced": 59,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6683",
+    "name": "Mayank Markande",
+    "faced": 2,
+    "bowled": 50,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6726",
+    "name": "Romario Shepherd",
+    "faced": 35,
+    "bowled": 50,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "6931",
+    "name": "Pathum Nissanka",
+    "faced": 80,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7060",
+    "name": "Arjun Tendulkar",
+    "faced": 5,
+    "bowled": 13,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7240",
+    "name": "FazalHaq Farooqi",
+    "faced": 0,
+    "bowled": 4,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7250",
+    "name": "Mukesh Choudhary",
+    "faced": 0,
+    "bowled": 54,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7269",
+    "name": "Sushant Mishra",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7327",
+    "name": "Rasikh Salam",
+    "faced": 3,
+    "bowled": 59,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7341",
+    "name": "Jake McGurk",
+    "faced": 35,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7473",
+    "name": "Akash Deep",
+    "faced": 4,
+    "bowled": 30,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7533",
+    "name": "Simarjeet Singh",
+    "faced": 4,
+    "bowled": 16,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7574",
+    "name": "Kumar Kartikeya Singh",
+    "faced": 1,
+    "bowled": 6,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7625",
+    "name": "Suryansh Shedge",
+    "faced": 1,
+    "bowled": 2,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7689",
+    "name": "Dilshan Madushanka",
+    "faced": 0,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "7896",
+    "name": "Akash Singh",
+    "faced": 0,
+    "bowled": 25,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "8141",
+    "name": "Auqib Nabi",
+    "faced": 2,
+    "bowled": 6,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "818",
+    "name": "Mitchell Marsh",
+    "faced": 79,
+    "bowled": 41,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "8182",
+    "name": "Donovan Ferreira",
+    "faced": 41,
+    "bowled": 6,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "8221",
+    "name": "Nitish Reddy",
+    "faced": 76,
+    "bowled": 59,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "8251",
+    "name": "Kumar Kushagra",
+    "faced": 10,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "838",
+    "name": "Glenn Maxwell",
+    "faced": 34,
+    "bowled": 40,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "8580",
+    "name": "Yudhvir Singh",
+    "faced": 3,
+    "bowled": 23,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "8614",
+    "name": "William ORourke",
+    "faced": 0,
+    "bowled": 18,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "8634",
+    "name": "Ashwani Kumar",
+    "faced": 0,
+    "bowled": 53,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "8647",
+    "name": "Sediqullah Atal",
+    "faced": 3,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "8654",
+    "name": "Cooper Connolly",
+    "faced": 63,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "930",
+    "name": "Karun Nair",
+    "faced": 47,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   },
+   {
+    "id": "992",
+    "name": "Mayank Agarwal",
+    "faced": 38,
+    "bowled": 0,
+    "reason": "Below minimum High-pressure sample (bat ≥100 faced / bowl ≥60 legal)"
+   }
+  ]
+ }
 }
