@@ -1,14 +1,14 @@
 # RR Clutch Index: framework review and execution plan
 
-**Status: revision 2, waiting for approval of the revised plan. No analysis has been run.** The master prompt (`docs/master_prompt/MASTER_PROMPT.md`) is unchanged. Approved decisions D1–D9 are in `logs/DECISIONS.md` and summarised in section 0. Every other fix below is still a proposal until the revised plan is approved.
+**Status: revision 3, the final plan, waiting for your explicit approval. No setup or Step 0 work has started and no analysis has been run.** The master prompt (`docs/master_prompt/MASTER_PROMPT.md`) is unchanged. Approved decisions D1–D17 are in `logs/DECISIONS.md` and summarised in section 0. Three clarifications (U4–U6) and every other fix below are still proposals until you approve this plan.
 
 The review was done on 2026-11-17, against dataset v2: 200,999 balls in 867 matches. Of these, 367 matches (87,687 balls) are IPL.
 
 ---
 
-## 0. Revision 2: approved decisions (2026-11-17)
+## 0. Approved decisions (2026-11-17)
 
-Decisions D1–D9 are recorded in `logs/DECISIONS.md`. This is what they change in the plan:
+Decisions D1–D17 are recorded in `logs/DECISIONS.md`. This is what they change in the plan:
 
 | Decision | Change to the plan |
 |---|---|
@@ -19,7 +19,14 @@ Decisions D1–D9 are recorded in `logs/DECISIONS.md`. This is what they change 
 | D5–D6 Freeze | New **gate P (pre-registration)** after Step 2. These rules are written to `logs/PREREGISTRATION.md`, with its sha256 logged, and you approve them before any player-level performance number is computed: metric list, weights, scaling, shrinkage, recency, interval method, minimum samples, all-rounder weighting, backtest protocol and pass criteria. Before the freeze, only sample counts may be looked at, never performance values. Weights are never tuned on backtest seasons |
 | D7 Uncertainty | Step 1 reports the Brier score and calibration for each season fold, with intervals from resampling whole matches and the number of matches behind each. The same is shown in the method note, Tab 7 and the limitations |
 | D8 Hindsight | The main score uses the pressure index **without** the close-game boost. The with-boost ranking is a separate comparison table and is never blended in |
-| D9 Prompt intact | The master prompt is not edited. Every change goes into DECISIONS.md |
+| D9, D17 Prompt intact | The master prompt is not edited. Every change goes into DECISIONS.md |
+| D10 IPL 2022 | 2022 is training data only, for the 2023 model. The Pressure Index, WPA and pressure metrics cover **2023–2026**. Every output discloses that the 2023 model has only one earlier season of training data |
+| D11 Earlier data only | Everything used to judge a historical ball comes only from matches before it: win probability, leverage outcome frequencies, expected runs, venue and season par, opposition strength, and every other benchmark. Early in a season, the previous season is used as a documented fallback, with shrinkage. Every benchmark table records the cut-off it was built to |
+| D12 Venue sources | Official IPL/BCCI sources first. Otherwise two independent reputable secondary sources must agree, recording both sources, the matching evidence and the status. Without agreement the venue is UNKNOWN |
+| D13 Simple model | Logistic regression first. A more complex model only if out-of-sample results justify it (rule: U5) |
+| D14 Per-season calibration | Calibration and uncertainty are reported for each season separately |
+| D15 Framing | The Clutch Reliability Score is a **historical pressure-performance indicator**. Every deliverable states that its ability to predict IPL 2027 performance is not established |
+| D16 Backtest separation | The backtest runs only after the freeze (gate P). Its results never change weights or metrics. If it is weak, it is reported as weak |
 
 ---
 
@@ -52,19 +59,19 @@ The dataset has 33 columns. **It does not have** a venue, the toss, a result or 
 ### Data limitations by component
 
 **Pressure Index**
-- Venue par is missing (Question 1).
+- The data has no venue. It will be mapped externally (D1, D12), and any venue that can't be verified is UNKNOWN.
 - DLS and no-result matches lack labels and must be left out of the win-probability model.
-- Under D4, each season is scored by a model trained only on earlier seasons. **2022 is the first season, so its balls get no out-of-sample win probability (U1).** Early in each season, pars rely on the previous season.
+- **Resolved by D10:** 2022 is used only for training, so the historical index covers 2023–2026. The 2023 model has only one season (74 matches) behind it. Early in each season, pars fall back to the previous season, with shrinkage (D11).
 - The models learn from few matches: 74 (to score 2023) up to about 290 (to score 2026), and fewer once DLS and no-result matches are left out. Each scored season has only 74 matches, so calibration is judged on matches, not balls, and will be noisy (D7).
 
 **Clutch score**
-- There are only 5 IPL seasons.
+- Only 4 seasons can be scored (2023–26, per D10), from 5 IPL seasons in the data.
 - In-scope players (those who played in 2025–26) may have only 1–2 seasons. That makes "% of seasons above benchmark" coarse.
 - Within one season, a player has few high-pressure balls and very few dismissals.
 
 **Backtest**
-- At most 3 test seasons: 2024 (trained on 2022–23), 2025 (2022–24) and 2026 (2022–25).
-- 2024 is trained on just 2 seasons.
+- Three test seasons. 2024's win-probability model is trained on 2022–23, 2025's on 2022–24 and 2026's on 2022–25.
+- The player scores behind each test rest on 2023 only (2024 test), 2023–24 (2025 test) and 2023–25 (2026 test).
 - The top-10 hit rate rests on about 30 player-seasons per role, so its sampling error is about ±15 points.
 - 3 league fixtures are absent from the 2024 source, including 1 RR game.
 
@@ -149,14 +156,14 @@ Every sub-agent runs on **Sonnet** at **high** effort, both set explicitly at ea
 | S Setup | Me | — | Folders, DEFINITIONS.md (Part 5 word for word + data encodings), DECISIONS.md, empty facts ledger | Self-check |
 | 0A Data audit | Data Auditor | 0B | `src/step0_audit.py`. IPL ball table with match facts (target, result, margin, NR/DLS flag, playoffs, super overs). Player and team maps. Data Notes table | Part 2 gate + short critic (C14) → **Checkpoint 0** |
 | 0B Facts | Facts Researcher | 0A, and through Step 5 | FACTS.md: auction type, date and rules; purse; squad and overseas limits; team names for IDs; DLS/NR list; 2025 replay status; 3–5 official season totals; **venues for all 367 matches from official IPL/BCCI lists, UNKNOWN if unverified (D1)**; RR retained and released players, trades, purse, squad and overseas limits, auction rules, each with source, publication date and date verified (D2). This is fact check **F1** | Spot-check 10% of venue mappings and every auction fact's source |
-| 1A Win probability | WP Modeller | — | **Season-by-season models (D4):** 2023 ← 2022 … 2026 ← 2022–25, giving an out-of-sample prediction for every ball from 2023 to 2026. Brier score and calibration for each fold, with intervals from resampling whole matches and match counts (D7). The all-season model is saved for future use only | Part 2 gate + script check that no historical ball uses an in-sample prediction |
-| 1B Pressure | Pressure Builder | — | Leverage, boosts, correlation check, buckets, WPA, 2 alternative definitions with top-20 overlap, 5+ example balls. **The main index has no close-game boost; the with-boost version is kept separately (D8)** | Gate + **Critic 1** (2 rounds) → **Checkpoint 1** |
+| 1A Win probability | WP Modeller | — | **Logistic regression (D13)**, one model per season trained only on earlier eligible matches: 2023 ← 2022, 2024 ← 2022–23, 2025 ← 2022–24, 2026 ← 2022–25 (D4, D10). Gives an out-of-sample prediction for every ball from 2023 to 2026. **Brier score and calibration for each season separately**, with intervals from resampling whole matches and the number of matches behind each (D7, D14). States the 2023 model's one-season limit. Uses the model-switch rule (U5). The all-season model is saved for future use only | Part 2 gate + script check that no historical ball uses an in-sample prediction |
+| 1B Pressure | Pressure Builder | — | Leverage (outcome frequencies from earlier matches only, D11), boosts, correlation check, Low/Medium/High buckets and the 0–100 scale against an earlier-season yardstick (U4), WPA, 2 alternative definitions with top-20 overlap, 5+ example balls. **The main index has no close-game boost; the with-boost version is kept separately (D8)** | Gate + **Critic 1** (2 rounds) → **Checkpoint 1** |
 | 2 Fair comparison | Fair-Comparison Modeller | — | Expected-runs models; Runs Above Expected and Runs Saved per ball (how benchmarks are timed: U2) | Gate → **Checkpoint 2** |
-| **P Pre-registration** | Me, with the Score Statistician drafting | — | `logs/PREREGISTRATION.md`: metric list, weights, 0–100 scaling, shrinkage, recency decay, interval method, minimum samples (with pass counts only), all-rounder weighting, backtest protocol and pass criteria. Its sha256 goes in DECISIONS.md (D5, D6) | Critic reviews the spec → **your approval** |
+| **P Pre-registration** | Me, with the Score Statistician drafting | — | `logs/PREREGISTRATION.md`: metric list, weights, 0–100 scaling, shrinkage, recency decay, interval method, minimum samples (with pass counts only), all-rounder weighting, the summary cut-off rule (U6), backtest protocol and pass criteria. Its sha256 goes in DECISIONS.md. **Frozen before any ranking or backtest result exists (D5, D6, D16)** | Critic reviews the spec → **your approval** |
 | 3 Metrics | Batting Analyst, Bowling Analyst | each other | Computed only after P is approved, exactly as pre-registered: metrics, shrinkage, 80% intervals, recency, consistency | Gate + check against the pre-registration → **Checkpoint 3** |
-| 4 Score | Score Statistician | — | Formula and weights as pre-registered, **never tuned on backtest seasons (D6)**; ±10% sensitivity; backtest on 2024–26 vs a naive baseline built from the same seasons, with rank correlation and a bootstrap interval | Gate + **Critic 2** → **Checkpoint 4** |
+| 4 Score | Score Statistician | — | Formula and weights exactly as pre-registered. The **backtest is run only after the freeze and never feeds back into weights or metrics (D6, D16)**. ±10% sensitivity. Backtest on 2024–26 against a naive baseline built from the same seasons, with rank correlation and a bootstrap interval. The result is described as evidence about history only (D15) | Gate + **Critic 2** → **Checkpoint 4** |
 | 5 Auction | Auction Strategist (+ facts) | — | Fact check **F2** first. Then availability tags, squad gaps, shortlist from scorable players only, the **Not Scorable on IPL Data** list (D3), optimiser (Plans A/B), XI, contrarian picks, unsung hero, who not to chase | Gate + **Critic 3** → **Checkpoint 5** |
-| 6 Story | Me | — | Name, thesis, 5-line summary, glossary | → **Checkpoint 6** |
+| 6 Story | Me | — | Name, thesis, 5-line summary, glossary. Wording follows D15: a historical pressure-performance indicator whose ability to predict 2027 is not established | → **Checkpoint 6** |
 | 7A Dashboard | Dashboard Builders: payload → design system → tabs in parallel → integration | — | One offline HTML file under 5 MB; Playwright screenshots at 380px and desktop, network off | Gate + **Critic** + **Cold Reader** per tab → **Checkpoint 7A** |
 | 7B–F | Deliverable Writers | each other, after A is approved | PDF + QR code, cheat sheet, method note + data dictionary, notebook, video script | Critic each; Cold Reader on B and C → checkpoints |
 | 8 Final audit | Me + Critic | — | Fact check **F3**, 15-item audit table, final critic pass, list of uncertainties, handover | → **Final checkpoint** |
@@ -166,7 +173,7 @@ Every sub-agent runs on **Sonnet** at **high** effort, both set explicitly at ea
 2. Recompute 3 or more of its numbers from the raw data myself.
 3. Reconcile its totals with the previous step: 200,999 → 87,687 IPL balls → the subset in each step.
 4. Resolve every oddity it lists.
-5. Decision checks by script: no historical number uses an in-sample win probability (D4), and the main score never uses the close-game boost (D8).
+5. Decision checks by script. No historical number uses an in-sample win probability (D4). Every benchmark table's cut-off comes before the matches it judges (D11). The main score never uses the close-game boost (D8). Weights and metrics match the frozen pre-registration (D5, D16).
 
 A failure goes back to the sub-agent with the specific problem.
 
@@ -174,10 +181,10 @@ A failure goes back to the sub-agent with the specific problem.
 
 1. Setup: folders, definitions, facts ledger, pinned libraries. Decisions are already logged.
 2. Step 0: Data Auditor and Facts Researcher in parallel (venues D1, fact check F1). Short critic, then Checkpoint 0.
-3. Step 1: season-by-season win-probability models (D4), then pressure index and WPA, with hindsight kept separate (D8). Critic 1, then Checkpoint 1.
+3. Step 1: logistic regression for each season on earlier matches only (D4, D10, D13), calibrated per season (D14). Then pressure index and WPA, with hindsight kept separate (D8). Critic 1, then Checkpoint 1.
 4. Step 2: expected-runs benchmarks. Checkpoint 2.
 5. Gate P: freeze metrics, weights, scaling and backtest rules (D5–D6). Your approval.
-6. Step 3: batting and bowling metrics in parallel, then Checkpoint 3. Step 4: score, sensitivity and backtest. Critic 2, then Checkpoint 4.
+6. Step 3: batting and bowling metrics in parallel, then Checkpoint 3. Step 4: score, sensitivity, then the backtest, kept separate from tuning (D16). Critic 2, then Checkpoint 4.
 7. Step 5: fact check F2, then the auction lens and the Not Scorable list (D3). Critic 3, then Checkpoint 5.
 8. Step 6: the story. Checkpoint 6.
 9. Step 7: dashboard first (critic + cold reader on each tab), then B–F in parallel. A checkpoint after each.
@@ -193,30 +200,23 @@ A failure goes back to the sub-agent with the specific problem.
 
 ## 7. Open questions
 
-**U1. What to do with 2022.**
-- Under D4, there is no earlier IPL season to train a model for 2022.
-- **Recommended:** use 2022 only as training data. The pressure index, WPA and every pressure-based metric then cover 2023–2026, all in the Impact Player era.
-- The backtest keeps its three test seasons (2024–26). But the 2024 fold has only one season (2023) of pressure history behind it.
-- Alternative: score 2022 with models trained on earlier 2022 matches only. The first matches would get no prediction, and the models would be very weak.
-- Alternative: train on non-IPL T20 matches from before IPL 2022. This conflicts with the IPL-only rule.
+U1–U3 are answered by D10, D11 and D12.
 
-**U2. Should D4's timing rule also cover Step 2 benchmarks and the leverage outcome frequencies?**
-- **Recommended:** yes. One rule for every model: a ball is judged only with information from before its match.
-- The cost: early in a season where scoring jumps, everyone looks slightly "above expected". That offset is measured and reported for each season.
-- Alternative: benchmarks from the same season. This is the usual way to define "an average player this season", but it uses matches played after the ball.
+**Three clarifications that need your OK** (they follow from D4 and D11):
 
-**U3. Fallback if official IPL/BCCI fixture pages can't be read.**
-- These sites load their content with scripts, so our tools may not be able to read some seasons.
-- **Recommended:** try the official pages first. If they can't be read, accept a venue only when two independent reputable sources agree (for example ESPNcricinfo and Cricbuzz), and tag it "VERIFIED (secondary, 2 sources)". Otherwise mark it UNKNOWN.
-- Alternative: official sources only. Anything else is UNKNOWN.
+| ID | Proposal | Why it is needed |
+|---|---|---|
+| U4 | The 0–100 Pressure Index scale and the Low/Medium/High cut-offs use **earlier seasons only** as the yardstick. A 2024 ball is ranked against 2023 balls, 2025 against 2023–24, and 2026 against 2023–25. 2023 is ranked against 2022 balls; those 2022 balls are scored by models trained on other 2022 matches, so no ball is scored by a model trained on its own match. They serve only as this yardstick, never to evaluate players. In plain words: **"High pressure = among the top 20% most pressured balls seen in earlier seasons."** As a result, the share of High balls can differ a little from season to season, and that share is reported | Cut-offs taken from the same season would use matches played after the ball, which breaks D11 |
+| U5 | Logistic regression scores every season. A more complex model may replace it from season *s* onward **only if it beat logistic regression on the seasons before *s***. Otherwise it is reported only as a comparison | Choosing a model on later seasons' results, then using it to score earlier seasons, would leak future information |
+| U6 | Player summaries (shrinkage, intervals, recency, consistency, 0–100 score) are computed **as of a cut-off date**, using only balls up to it. For the final leaderboard the cut-off is the end of IPL 2026. For each backtest fold it is the end of season N-1 | Makes D11 precise for summaries that pool many matches |
 
 ## 8. Risk register
 
 | # | Risk | Effect | Mitigation | When |
 |---|---|---|---|---|
-| R1 | Few training matches: 2023 is scored by a model trained on 74 matches | Weak win probabilities early in the history | Keep the model simple; report each fold separately; say so if calibration is poor (D7) | Step 1 |
+| R1 | The 2023 model has one season of training data (74 matches, fewer after DLS and no-result exclusions) | Weak win probabilities and pressure scores for 2023 | Logistic regression (D13); report each season separately (D14); disclose the limit in every output (D10); say so plainly if calibration is poor | Step 1 |
 | R2 | Calibration uncertainty: 74 scored matches per season, and balls within a match are not independent | Over-confident accuracy claims | Resample whole matches for intervals; always state the number of matches | Step 1 |
-| R3 | Low backtest power: about 10 players per role per fold, 3 folds; the 2024 fold rests on one season of history (if U1 is approved as recommended) | The edge over baseline may be within noise | Intervals, rank correlation, honest framing as Step 4 requires | Step 4 |
+| R3 | Low backtest power: about 10 players per role per fold and 3 folds. The 2024 fold rests on one season (2023) of pressure history | The edge over baseline may be within noise | Intervals, rank correlation, honest framing (D15) | Step 4 |
 | R4 | Clutch may not be a lasting skill | Weak predictive claim | Reframe as "quality that holds up under pressure" | Step 4 |
 | R5 | Venue coverage: many UNKNOWN venues would weaken the venue adjustment | Less fair comparison | Report coverage %, and show results with and without the venue effect | Step 0, 2 |
 | R6 | Auction facts keep changing: trades stay open until about 9 Dec, the auction is 16 Dec, and the pool list comes out later | Recommendations go stale | Fact checks F2 and F3; every fact dated | Step 5, 8 |
@@ -226,4 +226,8 @@ A failure goes back to the sub-agent with the specific problem.
 | R10 | No fielding data | Fielders can't be credited; run-outs need a rule | Assign by the logged rule (G5); state the limit | Step 1, 3 |
 | R11 | Gaps in the source: 3 league fixtures absent in 2024 (one of them RR's), and a 2025 match abandoned then replayed | Small bias | Log both; decide on the replayed match after verifying it | Step 0 |
 | R12 | Sub-agent errors | Wrong numbers | The Part 2 gate plus script checks on every work package | All |
-| R13 | Websites unreadable, or search limits | Facts unverified | Tell you instead of working around it (Rule 3); mark as UNKNOWN or [ASSUMPTION] | Step 0, 5 |
+| R13 | Websites unreadable, or search limits | Facts and venues unverified | Tell you instead of working around it (Rule 3); mark as UNKNOWN or [ASSUMPTION] (D12) | Step 0, 5 |
+| R14 | Early-season benchmarks rely on the previous season, but squads change at every auction and scoring levels jump (for example in 2024) | Early-season matches are judged against a yardstick that is out of date | Fall back to the prior season with shrinkage (D11). Measure the average "above expected" offset in each season and report it | Step 1–3 |
+| R15 | Opposition strength comes from earlier matches, while squads turn over between seasons | Opposition adjustment is noisy early in each season | Shrink toward the league average; keep the adjustment small and show results with and without it | Step 2 |
+| R16 | The mission asks "who to back", while D15 says predictive power for 2027 is not established | A selector may read the shortlist as a forecast | Every page states what the score is and what it is not; the backtest result is shown next to each recommendation; the cold reader tests this wording | Step 6–7 |
+| R17 | The history has only four scored seasons (2023–26) | Consistency across seasons is coarse, and players with 1–2 seasons have wide intervals | Show "too close to call" and grey out small samples (Part 7); never rank thin samples as if they were solid | Step 3–4 |
