@@ -62,10 +62,10 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
   /* ---------- screenshots + layout checks ---------- */
   for (const [w, h] of [[380, 800], [1280, 900]]) {
     const { ctx, page } = await newPage(w, h);
-    await page.goto(url('#tab=summary'));
+    await page.goto(url('#summary'));
     await page.waitForSelector('#view h2, #view .lead');
     for (const tab of TABS) {
-      await page.evaluate(t => { location.hash = '#tab=' + t; }, tab);
+      await page.evaluate(t => { location.hash = '#' + t; }, tab);
       await page.waitForTimeout(250);
       const active = await page.$eval('#tabs button[aria-selected=true]', b => b.dataset.tab);
       check(`[${w}] tab ${tab} opens via URL hash`, active === tab, active);
@@ -85,7 +85,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     if (w === 1280) {
       await page.click('#mode-detail');
       for (const tab of ['leaderboard', 'method', 'pressure']) {
-        await page.evaluate(t => { location.hash = '#tab=' + t; }, tab); await page.waitForTimeout(250);
+        await page.evaluate(t => { location.hash = '#' + t; }, tab); await page.waitForTimeout(250);
         await page.screenshot({ path: path.join(SHOTS, `${tab}_detailed_${w}.png`), fullPage: true });
       }
       await page.click('#mode-simple');
@@ -96,7 +96,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
   /* ---------- Simple / Detailed switch ---------- */
   {
     const { ctx, page } = await newPage(1280, 900);
-    await page.goto(url('#tab=leaderboard')); await page.waitForSelector('#lbtable');
+    await page.goto(url('#leaderboard')); await page.waitForSelector('#lbtable');
     const vis = () => page.evaluate(() => { const e = document.querySelector('#lbtable th.deepc'); return !!e && getComputedStyle(e).display !== 'none'; });
     check('Simple mode is the default and hides deep columns', (await vis()) === false);
     const openDeep0 = await page.evaluate(() => document.querySelectorAll('#view details.deep[open]').length);
@@ -116,9 +116,9 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
       const txt = await page.evaluate(() => (document.querySelector('#view .howto') || {}).innerText || '');
       check(`[380] how_to_use shown on ${tab} under the title "How to use this score"`, /How to use this score/.test(txt) && hw.length === 3 && hw.every(l => txt.replace(/\s+/g, ' ').includes(l.split(':').slice(1).join(':').trim().slice(0, 40))), txt.slice(0, 60).replace(/\s+/g, ' '));
     }
-    await page.goto(url('#tab=summary')); await page.waitForSelector('#view .howto');
-    const order = await page.evaluate(() => { const a = [...document.querySelectorAll('#view .card')]; const i5 = a.findIndex(c => /5-line summary/.test(c.innerText)); const ih = a.findIndex(c => c.classList.contains('howto')); return [i5, ih]; });
-    check('[380] How to use this score sits directly under the 5-line summary', order[0] >= 0 && order[1] === order[0] + 1, order.join(','));
+    await page.goto(url('#summary')); await page.waitForSelector('#view .howto');
+    const order = await page.evaluate(() => { const y = el => el ? el.getBoundingClientRect().top + scrollY : -1; const mb = document.querySelectorAll('#view .mb'); const h = document.querySelector('#view .howto'); const kp = document.querySelector('#view .kpis'); const five = [...document.querySelectorAll('#view h2')].find(e => /5-line summary/.test(e.textContent)); return { mb: mb.length, mbY: y(mb[0]), howY: y(h), kpiY: y(kp), fiveY: y(five), tiles: kp ? kp.querySelectorAll(':scope > .tile').length : 0, h1: (document.querySelector('#view h1') || {}).textContent }; });
+    check('Summary first screen: headline, Must-Back cards, How to use this score, then <=3 KPI tiles, then the 5-line summary', order.mb >= 1 && order.mbY < order.howY && order.howY < order.kpiY && order.kpiY < order.fiveY && order.tiles <= 3 && order.h1 === payload.meta.thesis, JSON.stringify(order));
     // tab labels not clipped on a phone
     const tabs = await page.evaluate(() => { const c = document.documentElement.clientWidth; return [...document.querySelectorAll('#tabs button')].map(b => { const r = b.getBoundingClientRect(); const lab = b.querySelector('.short'); const lr = lab.getBoundingClientRect(); return { t: b.dataset.tab, l: Math.round(r.left), r: Math.round(r.right), ok: r.left >= 0 && r.right <= c + 0.5 && lr.right <= r.right + 0.5 && lab.scrollWidth <= lab.clientWidth + 1 && lr.width > 0, label: lab.textContent }; }); });
     check('[380] all 7 phone tab labels are fully visible (no clipping)', tabs.length === 7 && tabs.every(x => x.ok), JSON.stringify(tabs.filter(x => !x.ok)));
@@ -131,7 +131,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
       check(`[380] Simple mode shows no internal codes on ${tab}`, !codes, codes ? uniqS(codes) : '');
     }
     // leaderboard top 15 + Show all
-    await page.goto(url('#tab=leaderboard')); await page.waitForSelector('#lbtable');
+    await page.goto(url('#leaderboard')); await page.waitForSelector('#lbtable');
     const c1 = await page.evaluate(() => ({ shown: document.querySelectorAll('#lbtable tbody tr').length, n: +document.querySelector('#lbcount').dataset.n }));
     check('Simple mode lists the top 15 per role with a Show-all button', c1.shown === 15 && c1.n > 15, JSON.stringify(c1));
     await page.click('[data-act=lbshowall]'); await page.waitForTimeout(100);
@@ -142,26 +142,26 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     check('Detailed mode still shows codes (e.g. A8)', /\bA8\b/.test(dcodes));
     // picks chart on squad
     await page.click('#mode-simple');
-    await page.goto(url('#tab=squad')); await page.waitForSelector('#view .chart');
+    await page.goto(url('#squad')); await page.waitForSelector('#view .chart');
     const sq = await page.evaluate(() => document.querySelector('#view').innerText);
     check('Squad tab asks "Do the Plan A picks have a strong record where RR is weak?" and shows picks_note', /Do the Plan A picks have a strong record where RR is weak\?/.test(sq) && sq.replace(/\s+/g, ' ').includes(payload.squad.picks_note.slice(0, 40)));
     check('no "lifts" / "after" wording in Plan A sections', !/\blifts?\b/i.test(sq) && !/Before .{0,3} after/i.test(sq));
-    await page.goto(url('#tab=squad')); await page.waitForSelector('#view .chart');
+    await page.goto(url('#squad')); await page.waitForSelector('#view .chart');
     const sq2 = await page.evaluate(() => document.querySelector('#view').innerText.replace(/\s+/g, ' '));
     check('squad: every gap shows its 80% range and verdict from the payload', payload.squad.gaps.every(g => sq2.includes(g.verdict)) && /80% range/.test(sq2));
     check('squad: headline says directional / within noise, not "first thing to fix"', /directional: \d+ of \d+ gaps are within noise/.test(sq2) && !/first thing to fix|measured weakness/i.test(sq2));
     check('squad: cut axis is labelled', /Axis is cut at/.test(sq2));
     check('squad: Plan A cost shows mid and walk-away', /at mid prices; [\d.]+ cr at walk-away prices/.test(sq2));
     check('squad: A5 reason shown next to the plans', /Why these plans are illustrative/.test(sq2));
-    await page.goto(url('#tab=auction')); await page.waitForSelector('#basket');
+    await page.goto(url('#auction')); await page.waitForSelector('#basket');
     const au2 = await page.evaluate(() => document.querySelector('#view').innerText.replace(/\s+/g, ' '));
     check('auction: no "bargain" / "pressure-proven" / "without spending" claims', !/bargain|pressure-proven|without spending/i.test(au2));
     check('auction: value map says prices are assumptions / illustrative', /illustrative/i.test(au2));
     check('auction: A5 reason beside the budget builder', /Why these plans are illustrative/.test(au2));
-    await page.goto(url('#tab=method')); await page.waitForSelector('#view .lead');
+    await page.goto(url('#method')); await page.waitForSelector('#view .lead');
     const me2 = await page.evaluate(() => document.querySelector('#view').innerText.replace(/\s+/g, ' '));
     check('method: alternative weightings reported separately from +/-10% nudges', /Alternative weightings/.test(me2) && /Equal weights/.test(me2));
-    await page.goto(url('#tab=auction')); await page.waitForSelector('.pcard');
+    await page.goto(url('#auction')); await page.waitForSelector('.pcard');
     const au = await page.evaluate(() => document.querySelector('#view').innerText.replace(/\s+/g, ' '));
     check('every auction card shows its tier reason', payload.auction.tiers.every(t => au.includes(t.tier_reason.slice(0, 40).replace(/\s+/g, ' '))));
     check('contrarian / unsung / avoid reasons are shown', ['contrarian', 'unsung', 'avoid'].every(k => payload.auction[k].every(x => !x.reason || au.includes(x.reason.slice(0, 40)))));
@@ -169,10 +169,37 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     await ctx.close();
   }
 
+  /* ---------- redesign checks: light theme, fonts, hosting, disclaimer ---------- */
+  {
+    const { ctx, page } = await newPage(380, 800);
+    await page.goto(url('#summary')); await page.waitForSelector('#view h1');
+    await page.waitForTimeout(300);
+    const d = await page.evaluate(() => ({ title: document.title, bg: getComputedStyle(document.body).backgroundColor, scheme: getComputedStyle(document.documentElement).colorScheme, fontOk: document.fonts.check('16px "Plus Jakarta Sans"') && document.fonts.check('700 16px "Space Grotesk"'), loaded: [...document.fonts].filter(f => f.status === 'loaded').map(f => f.family + f.weight).length, wrapL: parseFloat(getComputedStyle(document.querySelector('#view')).paddingLeft), wrapR: parseFloat(getComputedStyle(document.querySelector('#view')).paddingRight), disc: document.querySelector('header').innerText, foot: document.querySelector('footer').innerText, bodyFont: getComputedStyle(document.body).fontFamily, numFont: getComputedStyle(document.querySelector('.sc')).fontFamily, minBody: parseFloat(getComputedStyle(document.body).fontSize) }));
+    check('<title> is "RR Clutch Index"', d.title === 'RR Clutch Index', d.title);
+    check('single light theme: white body background, color-scheme light', d.bg === 'rgb(255, 255, 255)' && d.scheme === 'light', d.bg + ' ' + d.scheme);
+    check('embedded fonts load offline (Plus Jakarta Sans, Space Grotesk)', d.fontOk && d.loaded >= 3 && /Plus Jakarta Sans/.test(d.bodyFont) && /Space Grotesk/.test(d.numFont), `${d.loaded} loaded; ${d.bodyFont.slice(0, 40)}`);
+    check('side gutters are at least 16px', d.wrapL >= 16 && d.wrapR >= 16, d.wrapL + '/' + d.wrapR);
+    check('disclaimer visible in header and footer', /Independent submission for Rajasthan Royals' SupeRR Selector Season 2\. Not an official Rajasthan Royals product\./.test(d.disc) && /Not an official Rajasthan Royals product/.test(d.foot));
+    check('footer shows Public URL pending (placeholder) when meta.public_url is absent', payload.meta.public_url || /Public URL: pending \(placeholder\)/.test(d.foot));
+    check('body text is 16px or larger', d.minBody >= 16, d.minBody);
+    // hosting: plain #tab hashes; reduced hashes still work
+    for (const tab of TABS) { await page.goto(url('#' + tab)); await page.waitForSelector('#tabs'); const a = await page.$eval('#tabs button[aria-selected=true]', b => b.dataset.tab); const hh = await page.evaluate(() => location.hash); check(`hash #${tab} opens that tab and stays plain`, a === tab && hh === '#' + tab, hh); }
+    const someId = payload.players.find(p => p.scorable).id;
+    await page.goto(url(`#leaderboard&p=${someId}`)); await page.waitForSelector('#card.on');
+    await page.evaluate(() => { location.hash = '#leaderboard'; }); await page.waitForTimeout(150);
+    check('reducing the hash to #leaderboard closes the card and keeps the tab', !(await page.$('#card.on')) && (await page.$eval('#tabs button[aria-selected=true]', b => b.dataset.tab)) === 'leaderboard');
+    await page.goto(url('#nonsense')); await page.waitForSelector('#view h1');
+    check('unknown hash falls back to the Summary', (await page.$eval('#tabs button[aria-selected=true]', b => b.dataset.tab)) === 'summary');
+    const src = fs.readFileSync(HTML, 'utf8');
+    check('no window.print / alert / confirm in the page script', !/window\.print|\balert\(|\bconfirm\(/.test(src.slice(src.indexOf('<script>'))));
+    check('no dark-mode blocks (prefers-color-scheme) in the file', !/prefers-color-scheme/.test(src));
+    await ctx.close();
+  }
+
   /* ---------- filters change output ---------- */
   {
     const { ctx, page } = await newPage(1280, 900);
-    await page.goto(url('#tab=leaderboard')); await page.waitForSelector('#lbtable');
+    await page.goto(url('#leaderboard')); await page.waitForSelector('#lbtable');
     const snap = () => page.evaluate(() => ({ rows: +((document.querySelector('#lbcount') || { dataset: { n: 0 } }).dataset.n), shown: document.querySelectorAll('#lbtable tbody tr').length, text: document.querySelector('#lbtable tbody').innerText.replace(/\s+/g, ' '), first: (document.querySelector('#lbtable tbody tr .plink') || {}).textContent }));
     const base = await snap();
     await page.selectOption('#f-season', '2024'); await page.waitForTimeout(100);
@@ -206,15 +233,15 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     log('      (info) narrow slice text: ' + note.replace(/\s+/g, ' ').slice(0, 160));
     await page.click('#f-reset');
     // hash keeps tab and player
-    await page.evaluate(() => { location.hash = '#tab=auction'; }); await page.waitForTimeout(150);
+    await page.evaluate(() => { location.hash = '#auction'; }); await page.waitForTimeout(150);
     await page.click('#view .plink'); await page.waitForSelector('#card.on');
     const h = await page.evaluate(() => location.hash);
-    check('URL hash keeps the tab and the selected player', /tab=auction/.test(h) && /p=\d+/.test(h), h);
+    check('URL hash keeps the tab and the selected player', /^#auction&p=\d+/.test(h), h);
     await page.keyboard.press('Escape'); await page.waitForTimeout(100);
     check('Escape closes the profile card and clears the hash player', !(await page.$('#card.on')) && !/p=/.test(await page.evaluate(() => location.hash)));
     // deep link to a player
     const someId = payload.players.find(p => p.scorable).id;
-    await page.goto(url(`#tab=summary&p=${someId}`)); await page.waitForSelector('#card.on');
+    await page.goto(url(`#summary&p=${someId}`)); await page.waitForSelector('#card.on');
     check('deep link opens the profile card', true);
     await ctx.close();
   }
@@ -222,7 +249,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
   /* ---------- mobile filter sheet ---------- */
   {
     const { ctx, page } = await newPage(380, 800);
-    await page.goto(url('#tab=leaderboard')); await page.waitForSelector('#lbtable');
+    await page.goto(url('#leaderboard')); await page.waitForSelector('#lbtable');
     check('[380] filter bar hidden until the Filters button is tapped', !(await page.isVisible('#f-role')));
     await page.click('#fbtn'); await page.waitForSelector('#f-role', { state: 'visible' });
     await page.screenshot({ path: path.join(SHOTS, 'filters_sheet_380.png') });
@@ -243,22 +270,22 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     for (const [w, h] of [[380, 800], [1280, 900]]) {
       const { ctx, page } = await newPage(w, h);
       const ar = scorable.find(p => p.role === 'All-rounder'), bt = scorable.find(p => p.name === 'Ashutosh Sharma') || scorable[0];
-      await page.goto(url(`#tab=leaderboard&p=${bt.id}`)); await page.waitForSelector('#card.on');
+      await page.goto(url(`#leaderboard&p=${bt.id}`)); await page.waitForSelector('#card.on');
       await page.waitForTimeout(200);
       await page.screenshot({ path: path.join(SHOTS, `profile_card_${w}.png`) });
       await page.evaluate(() => { document.querySelector('#cardpanel').scrollTop = 900; });
       await page.screenshot({ path: path.join(SHOTS, `profile_card_${w}_scrolled.png`) });
       if (w === 380) { const hs = await hscroll(page); check('[380] no horizontal scroll with profile card open', hs.sw <= hs.cw, `${hs.sw}/${hs.cw}`); const pw = await page.evaluate(() => { const p = document.querySelector('#cardpanel'); return [p.scrollWidth, p.clientWidth]; }); check('[380] profile card panel does not scroll sideways', pw[0] <= pw[1], pw.join('/')); }
-      if (w === 1280) { await page.goto(url(`#tab=leaderboard&p=${ar.id}`)); await page.waitForSelector('#card.on'); await page.waitForTimeout(200); await page.screenshot({ path: path.join(SHOTS, 'profile_card_allrounder_1280.png') }); }
+      if (w === 1280) { await page.goto(url(`#leaderboard&p=${ar.id}`)); await page.waitForSelector('#card.on'); await page.waitForTimeout(200); await page.screenshot({ path: path.join(SHOTS, 'profile_card_allrounder_1280.png') }); }
       await ctx.close();
     }
     // 5 random players: card numbers equal the payload (rounded as displayed)
     const { ctx, page } = await newPage(1280, 900);
-    await page.goto(url('#tab=summary')); await page.waitForSelector('#view .lead');
+    await page.goto(url('#summary')); await page.waitForSelector('#view .lead');
     const pool = scorable.slice(); const pick = [];
     while (pick.length < 5) pick.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
     for (const p of pick) {
-      await page.evaluate(id => { location.hash = '#tab=leaderboard&p=' + id; }, p.id);
+      await page.evaluate(id => { location.hash = '#leaderboard&p=' + id; }, p.id);
       await page.waitForSelector('#card.on .dial-score');
       await page.waitForFunction(id => document.querySelector('#card-title') && true, p.id);
       const got = await page.evaluate(() => ({ title: document.querySelector('#card-title').textContent, score: document.querySelector('.dial-score').textContent, range: document.querySelector('.dial-range').textContent, text: document.querySelector('#cardpanel').innerText }));
@@ -280,7 +307,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
   /* ---------- tab-specific interaction checks ---------- */
   {
     const { ctx, page } = await newPage(1280, 900);
-    await page.goto(url('#tab=pressure')); await page.waitForSelector('#mx');
+    await page.goto(url('#pressure')); await page.waitForSelector('#mx');
     const info0 = await page.textContent('#ballinfo');
     await page.fill('#ballslider', '120'); await page.dispatchEvent('#ballslider', 'input');
     await page.waitForTimeout(100);
@@ -292,7 +319,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     await page.click('[data-act=mapinn][data-v="2"]'); await page.waitForTimeout(100);
     check('pressure map: innings toggle works', (await page.$eval('[data-act=mapinn][data-v="2"]', b => b.getAttribute('aria-pressed'))) === 'true');
     // compare
-    await page.goto(url('#tab=compare')); await page.waitForSelector('#view .ptag');
+    await page.goto(url('#compare')); await page.waitForSelector('#view .ptag');
     const nTags = (await page.$$('#view .ptag')).length;
     await page.click('[data-act=cmp-preset][data-v=planA]'); await page.waitForTimeout(100);
     const v = await page.textContent('#view .lead');
@@ -301,7 +328,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     check('compare: uses "too close to call"/"clearly ahead" wording', hasOverlapWording);
     await page.screenshot({ path: path.join(SHOTS, 'compare_planA_1280.png'), fullPage: true });
     // auction basket
-    await page.goto(url('#tab=auction')); await page.waitForSelector('#basket');
+    await page.goto(url('#auction')); await page.waitForSelector('#basket');
     await page.click('[data-act=bk-preset][data-v=A]'); await page.waitForTimeout(100);
     const left = parseFloat(await page.textContent('#bk-left'));
     const want = payload.squad.purse - payload.squad.planA_ids.reduce((s, id) => s + payload.players.find(p => p.id === id).price_mid, 0);
@@ -313,7 +340,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     check('auction basket: warns when a limit breaks', warn.length > 0, warn.slice(0, 120));
     await page.screenshot({ path: path.join(SHOTS, 'auction_basket_1280.png'), fullPage: true });
     // method: backtest wording
-    await page.goto(url('#tab=method')); await page.waitForSelector('#view .lead');
+    await page.goto(url('#method')); await page.waitForSelector('#view .lead');
     const mt = await page.textContent('#view');
     check('method: states prediction of 2027 is not established', /not established/i.test(mt));
     check('method: backtest shown (score did not beat naive)', /did not beat|plain ranking hit more|no clear difference/i.test(mt));
