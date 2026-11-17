@@ -162,10 +162,11 @@ Expected runs come from earlier matches only and trail scoring jumps (D28). Seas
 3. First-innings win probabilities have little skill beyond the base rate; second-innings ones are informative.
 4. The 2023 model learned from one season (2022) only.
 5. Expected runs from earlier matches trail scoring jumps: mean RAE per ball +0.02 (2023), +0.04 (2024), +0.00 (2025), +0.02 (2026). Season-centred check: top-20 unchanged 100%.
-6. Fielding is not in the data; wicketkeeper and captaincy are not identifiable.
+6. Top-10 rankings are too close to call: no pair of top-10 players is separated by their 80% ranges (step4_too_close_to_call).
 7. Backtest: batters historical indicator; persistence not demonstrated; bowlers historical indicator; persistence not demonstrated. Intervals of the difference: batters −17.1–3.8, bowlers −14.6–4.4 points.
-8. Ages, injuries and availability are not verifiable here; the shortlist is conditional on the official auction list.
-9. Components with no detectable between-player differences at these sample sizes carry no weight: match impact (I) (D30).
+8. Fielding is not in the data; wicketkeeper and captaincy are not identifiable.
+9. Ages, injuries and availability are not verifiable here; the shortlist is conditional on the official auction list.
+10. Components with no detectable between-player differences at these sample sizes carry no weight: match impact (I) (D30).
 
 ## 11. External facts and assumptions
 
@@ -173,17 +174,18 @@ Under Golden Rule 2 every external fact is either VERIFIED or tagged. **None cou
 
 | ID | Item | Value used | Reason |
 | :--- | :--- | :--- | :--- |
-| A1 | RR's current group | RR players who appeared for RR in IPL 2026, from the data | RR's 2027 retention list is UNKNOWN (F1-019: not published or not readable). The 2026 group is the best data-based proxy. Recheck at F2 |
-| A2 | Availability of every non-RR player | UNKNOWN: treated as 'possibly in the auction pool' | Retention and release lists can't be read (network policy, D23). Every shortlist card says 'pursue only if in the official auction list' |
-| A3 | Likely retained (excluded from shortlist) | Each franchise's 6 most-involved players in IPL 2026 (balls faced + legal balls bowled) | Franchises usually keep their core in a mini-auction. A transparent proxy, not a fact. These players still appear on the leaderboard |
-| A4 | RR auction purse | Rs 15.0 crore | UNKNOWN (F1-022). Reported context: Rs 2.65 cr left after the 2026 auction (F1-024), with 2027 releases unknown. Illustrative only; the dashboard budget builder lets the user change it |
-| A5 | RR open slots | 6 slots, of which up to 2 overseas | UNKNOWN (F1-023). Squad limits 18–25 and overseas max 8 are REPORTED (F1-006/007) |
-| A6 | Price bands | Rule-based from data: Established (≥3 of 2023–26 seasons with ≥10 matches) Indian Rs 8–14 cr / overseas Rs 6–12 cr; Regular (2 such seasons) Rs 3–8 / Rs 3–7 cr; Emerging Rs 0.3–3 cr. Walk-away = top of band | No market data could be read. Bands are illustrative assumptions, not predictions |
-| A7 | Overseas / Indian status | Inferred from the dataset: a player who appears for a non-India national side (T20Is in this dataset) is overseas; one who appears for India is Indian (capped). Otherwise UNKNOWN | Evidence-based inference, not verified externally |
+| A1 | RR's current group | The 20 players who appeared for RR in IPL 2026, from the data | RR's 2027 retention list is UNKNOWN (F1-019). Recheck at F2 |
+| A2 | Availability of every other player | UNKNOWN: treated as 'possibly in the auction pool' | Retention and release lists can't be read (D23). Every card says 'pursue only if in the official auction list' |
+| A3 | Likely retained (excluded from shortlist and plans) | Players who appeared in ≥80% of their team's 2026 matches (regulars) | Franchises rarely release regular starters before a mini-auction. A proxy, not a fact; they stay on the leaderboard |
+| A4 | RR auction purse | Rs 15 crore | UNKNOWN (F1-022). Context REPORTED: Rs 2.65 cr left after the 2026 auction (F1-024). Illustrative; adjustable in the dashboard |
+| A5 | RR open slots | 5 slots (25 max − 20 in the 2026 group); 1 overseas (8 max − 7 inferred overseas) | Assumes the whole 2026 group is retained (no releases known). Limits REPORTED (F1-006/007) |
+| A6 | Price bands | Rule-based from data: Established (≥3 of 2023–26 seasons with ≥10 matches) Indian Rs 8–14 cr / overseas Rs 6–12 cr; Regular (2 such seasons) Rs 3–8 / 3–7 cr; Emerging Rs 0.3–3 cr. Walk-away = top of band | No market data could be read. Ignores reputation; illustrative only |
+| A7 | Overseas / Indian status | Inferred from T20Is in this dataset (2022–26); UNKNOWN when a player has none. UNKNOWN players count as Indian in the optimiser and XI, which is flagged | Evidence-based, not verified externally |
 | A8 | Age | UNKNOWN for every player | Not in the data and not verifiable here |
 | A9 | Overseas limit in XI | 4 (REPORTED, F1-008) | One source only |
-| A11 | Wicketkeeper | Dhruv Jurel keeps wicket in the sample XI | The keeper is not recorded in the data (no fielder column). Jurel is RR's most-involved middle-order batter in 2026; keeper status is external and unverified here |
-| A10 | Optimiser value | score/100 x 1.5 if the player fills a measured RR gap (Step 5 gap table), x 0.6 otherwise | Puts the purse on RR's measured weaknesses. RR's bowling is above league in every phase, so extra bowlers add less |
+| A10 | Optimiser value | score/100 × 1.5 if the player fills a measured RR gap (his own High-pressure record in that phase beats the league on ≥30 balls; D33), × 0.6 otherwise; at most one non-gap 'depth' pick; Must-Back picks forced in where feasible | RR's gaps are directional (see gap table: within noise), so this is a judgement weighting, not a proof |
+| A11 | Wicketkeeper | Dhruv Jurel keeps wicket in the sample XI | Keeper not recorded in the data (no fielder column); external, unverified |
+| A12 | Impact Player rule in 2027 | Assumed to continue (REPORTED F1-014: expected to continue, under review) | Affects the XI + Impact Player format only |
 
 ## 12. Data handling
 

@@ -222,7 +222,8 @@ squad = dict(group=[dict(id=r.player_id, name=r.player_name, role=r.role, nation
              gaps=gap_rows, before=phase_strength(rr_ids), planA=phase_strength(rr_ids | planA_ids),
              planB=phase_strength(rr_ids | planB_ids), league=league,
              planA_ids=sorted(planA_ids), planB_ids=sorted(planB_ids),
-             purse=15.0, purse_tag="[ASSUMPTION A4]", slots=6, ovs_slots=2,
+             purse=float(T("step5_plans_meta").purse_cr.iloc[0]), purse_tag="[ASSUMPTION A4]",
+             slots=int(T("step5_plans_meta").slots_assumed.iloc[0]), ovs_slots=int(T("step5_plans_meta").overseas_slots_assumed.iloc[0]),
              purse_used={"A": r1(plans[plans.plan == "A"].mid.sum(), 2), "B": r1(plans[plans.plan == "B"].mid.sum(), 2)},
              overseas_used={"A": int(plans[plans.plan == "A"].overseas.fillna(False).astype(bool).sum()),
                             "B": int(plans[plans.plan == "B"].overseas.fillna(False).astype(bool).sum())},
@@ -284,7 +285,7 @@ verdict_word = ("evidence of persistence" if all("evidence of persistence" in st
 summary["claim"] = f"Historical pressure-performance indicator; {verdict_word}. Its ability to predict IPL 2027 is not established (D15)."
 squad["still_lacks"] = (f"RR's gaps are directional, not proven (every phase gap is within noise except powerplay batting, which is above league). "
                         f"Plan A adds pressure-proven options for {', '.join(g.split(': ')[1].lower() + '-overs batting' for g in summary['top_gaps'])}, "
-                        f"but at walk-away prices it costs Rs {T('step5_plans_meta').query('plan == "A"').cost_walkaway_cr.iloc[0]:.0f} cr against an assumed Rs 15 cr purse, "
+                        f"but at walk-away prices it costs Rs {T('step5_plans_meta').query('plan == "A"').cost_walkaway_cr.iloc[0]:.0f} cr against an assumed Rs {T('step5_plans_meta').purse_cr.iloc[0]:g} cr purse, "
                         f"and Must-Back players' availability is unverified.") if summary["top_gaps"] else ""
 
 method = dict(
@@ -346,7 +347,7 @@ glossary = [
 summary["exec_summary"] = [
     f"We rated {summary['scorable_bat']} batters, {summary['scorable_bowl']} bowlers and {summary['scorable_ar']} all-rounders on how they performed when a ball could swing the match (IPL 2023–26).",
     f"RR's measured gaps: {', '.join(g.split(': ')[1].lower() + '-overs batting' for g in summary['top_gaps'])} under pressure; RR's bowling under pressure is above league in every phase.",
-    f"Must-Back if available: {', '.join(summary['must_back'])}. Plan A in an assumed Rs 15 cr purse: {', '.join(summary['planA'])}.",
+    f"Must-Back if available: {', '.join(summary['must_back'])}. Plan A in an assumed Rs {T('step5_plans_meta').purse_cr.iloc[0]:g} cr purse: {', '.join(summary['planA'])}.",
     f"Honest test (top 10 still above average next season): batters {summary['backtest']['bat_score']}% v naive {summary['backtest']['bat_naive']}% v random pick {summary['backtest']['bat_base']}%; bowlers {summary['backtest']['bowl_score']}% v {summary['backtest']['bowl_naive']}% v {summary['backtest']['bowl_base']}%. Verdict: {verdict_word}.",
     "So read it as proof of past pressure performance, not a promise; prices, ages and availability are unverified assumptions to recheck before 16 Dec.",
 ]

@@ -470,7 +470,7 @@ function tierBadge(t) { const i = tierInfo(t); return `<span class="${i.cls}"><s
 const CW = () => Math.max(260, Math.min(980, ($('#view') ? $('#view').clientWidth : 360) - 30));
 function rangeTag(lo, hi) { return isWide(lo, hi) ? tagChip('wide range', 'warn') : ''; }
 function niceList(a) { return a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; }
-function riskTags(r) { return r ? esc(r).split(';').map(x => x.trim()).filter(Boolean).map(x => `<span class="tag ${/UNKNOWN|unknown/.test(x) ? 'assume' : 'warn'}">${x.replace(/UNKNOWN/g, 'UNKNOWN')}</span>`).join('') : ''; }
+function riskTags(r) { return r ? esc(String(r).replace(/\s*\[([^\]]+)\]/g, ' ($1)')).split(';').map(x => x.trim()).filter(Boolean).map(x => `<span class="tag ${/UNKNOWN|unknown/.test(x) ? 'assume' : 'warn'}">${x.replace(/UNKNOWN/g, 'UNKNOWN')}</span>`).join('') : ''; }
 function pctOf(pool, val) { // percentile of val within pool (mid-rank), 0-100
   const v = pool.filter(isN); if (!v.length || !isN(val)) return null;
   const lo = v.filter(x => x < val).length, eq = v.filter(x => x === val).length;
@@ -717,7 +717,7 @@ function tabSummary() {
     sub: `Clutch score (0–100, within role) for the ${hero.length} shortlisted players. Bar = score, whisker = 80% range. Marker shape = tier.`,
     svg: whiskerChart(hero, {}), n: `n = ${hero.length} shortlisted players. Wide-range players are greyed (range wider than ${CFG.wideRange} points). Score does not change with filters.`,
     legend: legendMark('circle', TIER_FILL['Must-Back'], COL.pinkL, 'Must-Back') + legendMark('diamond', TIER_FILL['Value Pick'], COL.blueL, 'Value Pick') + legendMark('triangle', TIER_FILL['Hidden Gem'], COL.amber, 'Hidden Gem') + `<span>│─│ 80% range</span><span>▨ grey hatch = wide range</span>`,
-    sowhat: `${tooClose} of ${pairs} pairs on this list have overlapping ranges, so read them as a group to pursue, not a strict order. The data separates the top from the bottom, not neighbour from neighbour.`
+    sowhat: `${tooClose} of ${pairs} pairs on this list have overlapping ranges. ${tooClose === pairs ? 'The data cannot rank any of these players above another, so treat the list as a pool to pursue and decide on role fit, price and availability.' : 'Read the overlapping pairs as a group to pursue, not a strict order.'}`
   })}</section>
   <section class="sec"><h2>Before → after: where the Plan A picks help</h2>
     <p class="muted small">RR’s biggest measured gaps under High pressure (${CFG.recent}), and how the Plan A picks (${niceList(k.planA)}) change them.</p>
@@ -1089,16 +1089,16 @@ function trendBlock(p, k) {
 /* ===================== TAB 4: COMPARE ===================== */
 function kindOf(p) { return p.role === 'Bowler' ? 'bowl' : 'bat'; }
 const AXES = {
-  bat: [['Clutch score', p => p.bat && p.bat.score], ['Skill', p => p.bat && p.bat.S], ['Runs vs expected under pressure', p => p.bat_hl && p.bat_hl.High_rae_per100], ['Strike rate under pressure', p => p.bat_hl && p.bat_hl.High_sr], ['Boundary %', p => p.bat_hl && p.bat_hl.High_boundary_pct], ['Dot-ball avoidance', p => p.bat_hl && isN(p.bat_hl.High_dot_pct) ? -p.bat_hl.High_dot_pct : null], ['Consistency', p => p.bat && p.bat.C], ['Win prob. added per ball', p => p.bat_hl && p.bat_hl.High_wpa_per100]],
-  bowl: [['Clutch score', p => p.bowl && p.bowl.score], ['Skill', p => p.bowl && p.bowl.S], ['Runs saved under pressure', p => p.bowl_hl && p.bowl_hl.High_rse_per100], ['Economy control', p => p.bowl_hl && isN(p.bowl_hl.High_econ) ? -p.bowl_hl.High_econ : null], ['Dot-ball %', p => p.bowl_hl && p.bowl_hl.High_dot_pct], ['Wicket-taking', p => p.bowl_hl && isN(p.bowl_hl.High_balls_per_wkt) ? -p.bowl_hl.High_balls_per_wkt : null], ['Consistency', p => p.bowl && p.bowl.C], ['Win prob. added per ball', p => p.bowl_hl && p.bowl_hl.High_wpa_per100]],
-  common: [['Clutch score', p => { const b = p[kindOf(p)]; return b && b.score; }], ['Skill', p => { const b = p[kindOf(p)]; return b && b.S; }], ['Consistency', p => { const b = p[kindOf(p)]; return b && b.C; }], ['Holds up under pressure (gap)', p => { const h = kindOf(p) === 'bowl' ? p.bowl_hl : p.bat_hl; return h && h.pressure_drop_per100; }], ['Win prob. added per ball', p => { const h = kindOf(p) === 'bowl' ? p.bowl_hl : p.bat_hl; return h && h.High_wpa_per100; }], ['High-pressure sample', p => { const b = p[kindOf(p)]; return b && b.hi_qual_n; }]]
+  bat: [['Clutch score', p => p.bat && p.bat.score], ['Skill', p => p.bat && p.bat.S], ['Runs vs expected under pressure', p => p.bat_hl && p.bat_hl.High_rae_per100], ['Strike rate under pressure', p => p.bat_hl && p.bat_hl.High_sr], ['Boundary %', p => p.bat_hl && p.bat_hl.High_boundary_pct], ['Dot-ball avoidance', p => p.bat_hl && isN(p.bat_hl.High_dot_pct) ? -p.bat_hl.High_dot_pct : null], ['Consistency', p => p.bat && p.bat.C], ['WPA per ball', p => p.bat_hl && p.bat_hl.High_wpa_per100]],
+  bowl: [['Clutch score', p => p.bowl && p.bowl.score], ['Skill', p => p.bowl && p.bowl.S], ['Runs saved under pressure', p => p.bowl_hl && p.bowl_hl.High_rse_per100], ['Economy control', p => p.bowl_hl && isN(p.bowl_hl.High_econ) ? -p.bowl_hl.High_econ : null], ['Dot-ball %', p => p.bowl_hl && p.bowl_hl.High_dot_pct], ['Wicket-taking', p => p.bowl_hl && isN(p.bowl_hl.High_balls_per_wkt) ? -p.bowl_hl.High_balls_per_wkt : null], ['Consistency', p => p.bowl && p.bowl.C], ['WPA per ball', p => p.bowl_hl && p.bowl_hl.High_wpa_per100]],
+  common: [['Clutch score', p => { const b = p[kindOf(p)]; return b && b.score; }], ['Skill', p => { const b = p[kindOf(p)]; return b && b.S; }], ['Consistency', p => { const b = p[kindOf(p)]; return b && b.C; }], ['Holds up (gap)', p => { const h = kindOf(p) === 'bowl' ? p.bowl_hl : p.bat_hl; return h && h.pressure_drop_per100; }], ['WPA per ball', p => { const h = kindOf(p) === 'bowl' ? p.bowl_hl : p.bat_hl; return h && h.High_wpa_per100; }], ['High-pressure sample', p => { const b = p[kindOf(p)]; return b && b.hi_qual_n; }]]
 };
 const AXIS_DEF = {
   'Clutch score': 'Clutch Reliability Score, ranked within role.', 'Skill': 'Shrunk runs above / saved vs expected per 100 High-pressure balls.', 'Runs vs expected under pressure': 'Runs Above Expected per 100 High-pressure balls.',
   'Strike rate under pressure': 'Runs per 100 balls when pressure is High.', 'Boundary %': 'Share of High-pressure balls hit for four or six.', 'Dot-ball avoidance': 'Fewer dot balls under High pressure scores higher.',
-  'Consistency': 'Steadiness across seasons.', 'Win prob. added per ball': 'Win probability added per High-pressure ball.', 'Runs saved under pressure': 'Runs Saved vs Expected per 100 High-pressure balls.',
+  'Consistency': 'Steadiness across seasons.', 'WPA per ball': 'Win probability added per High-pressure ball.', 'Runs saved under pressure': 'Runs Saved vs Expected per 100 High-pressure balls.',
   'Economy control': 'Lower High-pressure economy scores higher.', 'Dot-ball %': 'Share of High-pressure balls that were dots.', 'Wicket-taking': 'Fewer balls per wicket under High pressure scores higher.',
-  'Holds up under pressure (gap)': 'High-pressure value minus Low-pressure value.', 'High-pressure sample': 'Weighted number of High-pressure balls (how much evidence).'
+  'Holds up (gap)': 'High-pressure value minus Low-pressure value (does he hold up when it matters).', 'High-pressure sample': 'Weighted number of High-pressure balls (how much evidence).'
 };
 function axisSet(ps) {
   const ks = uniq(ps.map(p => p.role === 'Bowler' ? 'bowl' : p.role === 'Batter' ? 'bat' : 'ar'));

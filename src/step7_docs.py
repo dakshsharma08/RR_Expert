@@ -540,7 +540,7 @@ def deck_html():
             + f"<p class='small' style='margin-top:4px'>RR now = RR's IPL 2026 group [A1]. Plan A or B = that group plus the picks. League = all players. Higher is better. {esc(fit_sentences)}</p></div>"
             f"<div class='col' style='flex:1'><h2>The two budget plans (assumed Rs {purse:g} cr [A4], {slots} slots, up to {ovs_slots} overseas [A5])</h2>"
             f"<div class='card' style='border-left:6px solid var(--pink)'><b>Plan A</b> (assumed cost Rs {purse_used_A:.1f} cr): {esc(pa_names)}.</div>"
-            f"<div class='card' style='border-left:6px solid var(--blue)'><b>Plan B</b> (assumed cost Rs {purse_used_B:.1f} cr): {esc(pb_names)}.<br><span class='small'>Switch rule: if {esc(pbr.if_player)} goes past Rs {pbr.goes_past_cr:g} cr, take {esc(pbr.switch_to)}; RR loses {esc(str(pbr.rr_loses))}.</span></div>"
+            f"<div class='card' style='border-left:6px solid var(--blue)'><b>Plan B</b> (assumed cost Rs {purse_used_B:.1f} cr): {esc(pb_names)}.<br><span class='small'>Switch rule: if {esc(pbr.if_player)} goes past Rs {pbr.goes_past_cr:g} cr, take {esc(pbr.switch_to)}; RR loses about {pbr.rr_loses_pct:.0f}% of Plan A's pressure value ({esc(pbr.what_changes)}).</span></div>"
             f"<p class='small'>Prices are rule-based bands, not market data [A6]. The \"gap it fills\" tag comes from a player's batting role, not from his own record in that phase, so it is not proof he fixes the gap. Sample XI and bowling plan: dashboard (placeholder below).</p>"
             f"{placeholder_box(True)}</div></div>")
     worse = [f for f in FIT if not f["better"]]
@@ -606,7 +606,7 @@ def cheat_html():
 <div class="sw"><b>So what for RR:</b> the ranges are wide{" and the Must-Back ranges overlap" if mb_sep == 0 else ""}, so use the score to build a shortlist and set walk-away prices, not to rank them to the decimal.</div>
 <div class="two"><div><h2>Budget plans (assumed Rs {purse:g} cr [A4], {slots} slots)</h2>
 <p><b>Plan A</b> (assumed Rs {purse_used_A:.1f} cr): {esc(names(list(PA.player_name)))}.<br><b>Plan B</b> (assumed Rs {purse_used_B:.1f} cr): {esc(names(list(PB.player_name)))}.<br>
-<span class='small'>Switch rule: if {esc(pbr.if_player)} goes past Rs {pbr.goes_past_cr:g} cr, take {esc(pbr.switch_to)}; RR loses {esc(str(pbr.rr_loses))}. {esc(fit_note)}{esc(OPEN_GAP)}</span></p></div>
+<span class='small'>Switch rule: if {esc(pbr.if_player)} goes past Rs {pbr.goes_past_cr:g} cr, take {esc(pbr.switch_to)}; RR loses about {pbr.rr_loses_pct:.0f}% of Plan A's pressure value ({esc(pbr.what_changes)}). {esc(fit_note)}{esc(OPEN_GAP)}</span></p></div>
 <div><h2>Do not chase</h2><p class='small' style='color:var(--ink)'><b>Lowest scores in the assumed pool [A2, A3]:</b> {av_txt}.<br><b>Popular but low score:</b> {ct_txt}.</p></div></div>
 {placeholder_box(True)}
 <div class="foot"><b>How to read it.</b> Score = how well a player did on balls that could swing the match (Pressure Index {PARAM['high_cut']}+), IPL {esc(seasons_scored)}, against an average player in the same spot, pulled toward average for small samples. Effective weights: {esc(eff_phrase())}. 80% range = where we are 80% sure the true value sits. Price bands are rule-based assumptions [A6], not market data; walk-away = top of band. Purse, slots and overseas limit are assumptions [A4, A5]. Nationality (shown for overseas players only) is inferred from the data [A7]. None of the external facts could be VERIFIED (network blocked): recheck before the auction. Source: outputs/tables/*.csv; build {esc(META['build'])}.</div>
