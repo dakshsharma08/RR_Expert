@@ -677,7 +677,7 @@ CS_CSS = BASE_CSS + """
 .page{width:794px;height:1123px;padding:26px 30px 18px 30px;position:relative;overflow:hidden;font-size:10.4px;line-height:1.3}
 .top{border-bottom:3px solid var(--pink);padding-bottom:6px;margin-bottom:7px}
 .top .k{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);font-weight:700}
-.top h1{font-size:17px;line-height:1.15;margin-top:2px}
+.top h1{font-size:15.5px;line-height:1.15;margin-top:2px}
 .honest{background:#FFF4D6;border:1.5px solid #E0B100;border-radius:6px;padding:5px 8px;font-size:9.6px;line-height:1.28;margin-bottom:5px}
 h2{font-size:11.5px;font-weight:800;margin:7px 0 3px 0}
 .tbl{font-size:9.2px}.tbl td,.tbl th{padding:1.8px 4px}
