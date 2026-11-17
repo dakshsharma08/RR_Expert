@@ -229,12 +229,12 @@ def qr_uri(url):
 
 PLACEHOLDER = "Dashboard URL and QR code: pending, to be added when the public link exists"
 def dash_box():
-    """No QR code (user decision, D39). With a link in dashboard_url.txt: Drive link text; without: attached-file note."""
+    """QR code + link when dashboard_url.txt exists (public GitHub Pages page); otherwise the attached-file note."""
     if DASH_URL:
-        return ("<div class='ph-real'><div><b>Interactive dashboard: Google Drive link</b><br>"
-                f"<a class='url' href='{esc(DASH_URL)}'>{esc(DASH_URL)}</a><br>"
-                "Click <b>Download</b> and open the file <b>RR_Clutch_Index_Dashboard.html</b> in any web browser "
-                "(phone or laptop). No login and no internet needed once downloaded.</div></div>")
+        uri, _ = qr_uri(DASH_URL)
+        return (f"<div class='ph-real'><a href='{esc(DASH_URL)}'><img src='{uri}' width='100' height='100' alt='QR code for the dashboard'></a>"
+                f"<div><b>Scan to open the interactive dashboard</b><br><a class='url' href='{esc(DASH_URL)}'>{esc(DASH_URL)}</a><br>"
+                "Offline copy attached: dashboard .html file</div></div>")
     return ("<div class='ph-real'><div><b>Interactive dashboard (attached file)</b><br>"
             "Open <b>RR_Clutch_Index_Dashboard.html</b> in any web browser. No login and no internet needed; it works on a phone or a laptop.</div></div>")
 
@@ -855,6 +855,13 @@ def main():
         bad += [(f.name, m.group(0)) for m in BANNED.finditer(f.read_text())]
     assert not bad, f"auction or squad wording found: {bad[:10]}"
     print("Round 1 wording check: none of the banned auction/squad terms appear in any PDF or Markdown file")
+    if DASH_URL:
+        from PIL import Image
+        uri, q = qr_uri(DASH_URL)
+        im = Image.open(io.BytesIO(base64.b64decode(uri.split(",", 1)[1]))).convert("L")
+        m = q.get_matrix(); bs = im.width // len(m)
+        ok = all((im.getpixel((x * bs + bs // 2, y * bs + bs // 2)) < 128) == bool(m[y][x]) for y in range(len(m)) for x in range(len(m)))
+        print(f"QR check: {len(m)}x{len(m)} modules, error correction M, pixels match matrix: {ok}; URL {DASH_URL}")
     shutil.rmtree(TMP, ignore_errors=True)
 
 if __name__ == "__main__":

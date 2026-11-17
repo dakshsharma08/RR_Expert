@@ -1,5 +1,5 @@
 Dashboard file: /home/user/RR_Expert/outputs/deliverables/RR_Clutch_Index_Dashboard.html
-File size: 1,183,827 bytes (1.18 MB)
+File size: 1,183,885 bytes (1.18 MB)
 PASS  file under 5 MB
 PASS  [380] tab summary opens via plain #hash  -> summary
 PASS  [380] no horizontal scroll on summary  -> scrollWidth 380 vs clientWidth 380
@@ -92,37 +92,36 @@ PASS  card Kuldeep Yadav: 80% range 96–99.9 matches payload  -> 96–99.9
 PASS  card Kuldeep Yadav: rank 1 of 71 shown
 PASS  card Kuldeep Yadav: High-pressure legal balls 226 shown
 PASS  card Kuldeep Yadav: no age / price / availability / fit fields
-PASS  card Abhishek Sharma: name matches  -> Abhishek Sharma
-PASS  card Abhishek Sharma: score 32.7 (one decimal) matches payload and never reads 100  -> 32.7
-PASS  card Abhishek Sharma: 80% range 7–67 matches payload  -> 7–67
-PASS  card Abhishek Sharma: rank 7 of 8 shown
-PASS  card Abhishek Sharma: High-pressure balls 129 shown
-PASS  card Abhishek Sharma: High-pressure legal balls 64 shown
-PASS  card Abhishek Sharma: no age / price / availability / fit fields
-PASS  card Mustafizur Rahman: name matches  -> Mustafizur Rahman
-PASS  card Mustafizur Rahman: score 14.8 (one decimal) matches payload and never reads 100  -> 14.8
-PASS  card Mustafizur Rahman: 80% range 1–74 matches payload  -> 1–74
-PASS  card Mustafizur Rahman: rank 60 of 71 shown
-PASS  card Mustafizur Rahman: High-pressure legal balls 84 shown
-PASS  card Mustafizur Rahman: no age / price / availability / fit fields
-PASS  card Sai Sudharsan: name matches  -> Sai Sudharsan
-PASS  card Sai Sudharsan: score 14.7 (one decimal) matches payload and never reads 100  -> 14.7
-PASS  card Sai Sudharsan: 80% range 4–42 matches payload  -> 4–42
-PASS  card Sai Sudharsan: rank 40 of 47 shown
-PASS  card Sai Sudharsan: High-pressure balls 285 shown
-PASS  card Sai Sudharsan: no age / price / availability / fit fields
-PASS  card Lokesh Rahul: name matches  -> Lokesh Rahul
-PASS  card Lokesh Rahul: score 26.8 (one decimal) matches payload and never reads 100  -> 26.8
-PASS  card Lokesh Rahul: 80% range 4–67 matches payload  -> 4–67
-PASS  card Lokesh Rahul: rank 35 of 47 shown
-PASS  card Lokesh Rahul: High-pressure balls 265 shown
-PASS  card Lokesh Rahul: no age / price / availability / fit fields
-PASS  card Andre Russell: name matches  -> Andre Russell
-PASS  card Andre Russell: score 20.0 (one decimal) matches payload and never reads 100  -> 20.0
-PASS  card Andre Russell: 80% range 7–62 matches payload  -> 7–62
-PASS  card Andre Russell: rank 57 of 71 shown
-PASS  card Andre Russell: High-pressure legal balls 98 shown
-PASS  card Andre Russell: no age / price / availability / fit fields
+PASS  card Prince Yadav: name matches  -> Prince Yadav
+PASS  card Prince Yadav: score 10.5 (one decimal) matches payload and never reads 100  -> 10.5
+PASS  card Prince Yadav: 80% range 1–61 matches payload  -> 1–61
+PASS  card Prince Yadav: rank 66 of 71 shown
+PASS  card Prince Yadav: High-pressure legal balls 88 shown
+PASS  card Prince Yadav: no age / price / availability / fit fields
+PASS  card Sameer Rizvi: name matches  -> Sameer Rizvi
+PASS  card Sameer Rizvi: score 80.0 (one decimal) matches payload and never reads 100  -> 80.0
+PASS  card Sameer Rizvi: 80% range 45–95 matches payload  -> 45–95
+PASS  card Sameer Rizvi: rank 8 of 47 shown
+PASS  card Sameer Rizvi: High-pressure balls 101 shown
+PASS  card Sameer Rizvi: no age / price / availability / fit fields
+PASS  card Riyan Parag: name matches  -> Riyan Parag
+PASS  card Riyan Parag: score 19.1 (one decimal) matches payload and never reads 100  -> 19.1
+PASS  card Riyan Parag: 80% range 7–63 matches payload  -> 7–63
+PASS  card Riyan Parag: rank 38 of 47 shown
+PASS  card Riyan Parag: High-pressure balls 191 shown
+PASS  card Riyan Parag: no age / price / availability / fit fields
+PASS  card Rahul Chahar: name matches  -> Rahul Chahar
+PASS  card Rahul Chahar: score 59.1 (one decimal) matches payload and never reads 100  -> 59.1
+PASS  card Rahul Chahar: 80% range 9–88 matches payload  -> 9–88
+PASS  card Rahul Chahar: rank 27 of 71 shown
+PASS  card Rahul Chahar: High-pressure legal balls 124 shown
+PASS  card Rahul Chahar: no age / price / availability / fit fields
+PASS  card Heinrich Klaasen: name matches  -> Heinrich Klaasen
+PASS  card Heinrich Klaasen: score 94.3 (one decimal) matches payload and never reads 100  -> 94.3
+PASS  card Heinrich Klaasen: 80% range 69–99 matches payload  -> 69–99
+PASS  card Heinrich Klaasen: rank 4 of 47 shown
+PASS  card Heinrich Klaasen: High-pressure balls 205 shown
+PASS  card Heinrich Klaasen: no age / price / availability / fit fields
 PASS  profile card for the #1 bowler lists receipts and similar players
 PASS  match explorer: choosing a ball shows its situation, pressure and WPA
 PASS  match explorer: switching match redraws
@@ -150,7 +149,7 @@ PASS  single light theme: white body background, color-scheme light  -> rgb(255,
 PASS  embedded fonts load offline (Plus Jakarta Sans, Space Grotesk)  -> 6 loaded
 PASS  side gutters are at least 16px  -> 16/16
 PASS  disclaimer visible in header and footer
-PASS  footer shows the Public URL when set, else the offline-file note  -> This is a single offline file: it opens in any web browser, with no login and no internet.
+PASS  footer shows the Public URL when set, else the offline-file note  -> Public URL: https://dakshsharma08.github.io/RR_Expert/
 PASS  body text is 16px or larger  -> 16
 PASS  hash #summary opens that tab and stays plain  -> #summary
 PASS  hash #pressure opens that tab and stays plain  -> #pressure

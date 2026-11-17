@@ -4,7 +4,7 @@
 > **What the score is:** a historical pressure-performance indicator for IPL 2023–26. **What it is not:** a forecast (D15).
 
 ## Open these first
-1. `outputs/deliverables/RR_Clutch_Index_Dashboard.html` (1.18 MB). Works offline in any modern browser. Start on the Summary tab.
+1. `outputs/deliverables/RR_Clutch_Index_Dashboard.html` (1.18 MB). Works offline in any modern browser. Start on the Summary tab. Online copy: https://dakshsharma08.github.io/RR_Expert/ (private until the owner shares it from the page's Share menu).
 2. `outputs/deliverables/C_RR_Clutch_Index_Cheat_Sheet.pdf`: one page with both top-10 lists, their 80% ranges and the definition of pressure.
 3. `outputs/deliverables/B_RR_Clutch_Index_Deck.pdf`: 7 slides. `RR_Clutch_Index_Submission.pdf` is the deck plus the cheat sheet in one 8-page file, for forms that take one upload.
 4. `outputs/deliverables/D_Methodology_and_Limitations.pdf` and `D_Data_Dictionary.md`: the method, proof and limits.

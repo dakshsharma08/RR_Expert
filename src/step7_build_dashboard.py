@@ -63,6 +63,9 @@ def main() -> int:
     OUT.write_text(html, encoding="utf-8")
     size = OUT.stat().st_size
     print(f"Wrote {OUT} ({size:,} bytes = {size / 1e6:.2f} MB)")
+    pages = ROOT / "docs" / "index.html"          # same file, served by GitHub Pages (docs/ folder)
+    pages.parent.mkdir(exist_ok=True)
+    pages.write_text(html, encoding="utf-8")
     if size >= 5 * 1024 * 1024:
         print("ERROR: file is 5 MB or larger", file=sys.stderr)
         return 1
