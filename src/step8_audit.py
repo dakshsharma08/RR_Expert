@@ -140,14 +140,15 @@ add("Every shortlisted player is actually available at the auction", "Open (name
     "Retention lists and the auction pool could not be read (network policy). Must recheck (F2) before 16 Dec 2026",
     "facts F1-019/F1-027 UNKNOWN")
 
-cr = TABLES.parent / "reviews" / "cold_reader.csv"
+_crs = sorted((TABLES.parent / "reviews").glob("cold_reader*.csv"), key=lambda f: (f.stem != "cold_reader", f.stem))
+cr = _crs[-1] if _crs else TABLES.parent / "reviews" / "cold_reader.csv"     # latest round (round2 after fixes)
 if cr.exists():
     c = pd.read_csv(cr)
     yes = int(c.within_2_min.astype(str).str.lower().str.startswith("yes").sum())
     add("Every selector-facing page passes the cold-reader test", "Pass" if yes == len(c) else "Partial",
         "Cold reader (fresh Sonnet agent, images only) on 7 dashboard tabs, cheat sheet and 7 slides; fixes applied to flagged confusions",
         "Remaining confusions listed in outputs/reviews/cold_reader.csv",
-        f"{yes} of {len(c)} pages understood within 2 minutes")
+        f"{yes} of {len(c)} pages understood within 2 minutes ({cr.name}); partly: {int(c.within_2_min.astype(str).str.lower().str.startswith('partly').sum())}")
 else:
     add("Every selector-facing page passes the cold-reader test", "Pending", "", "", "cold reader not yet run")
 
