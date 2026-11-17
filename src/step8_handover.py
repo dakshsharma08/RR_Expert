@@ -12,6 +12,8 @@ short = pd.read_csv(TABLES / "step5_shortlist.csv")
 pm = pd.read_csv(TABLES / "step5_plans_meta.csv")
 size = lambda f: f"{(DELIVERABLES / f).stat().st_size / 1e6:.2f} MB" if (DELIVERABLES / f).exists() else "missing"
 pa = pm[pm.plan == "A"].iloc[0]
+URL_FILE = TABLES / "dashboard_url.txt"
+URL = (URL_FILE.read_text().strip().splitlines() or [""])[0].strip() if URL_FILE.exists() else ""
 lines = [
     "# RR Clutch Index: handover",
     "",
@@ -19,9 +21,10 @@ lines = [
     "> **What it is not:** a forecast. Its ability to predict 2027 is not established (D15).",
     "",
     "## Open these first",
-    f"1. `outputs/deliverables/RR_Clutch_Index_Dashboard.html` ({size('RR_Clutch_Index_Dashboard.html')}). Works offline in any modern browser. Start on the Summary tab.",
+    f"1. `outputs/deliverables/RR_Clutch_Index_Dashboard.html` ({size('RR_Clutch_Index_Dashboard.html')}). Works offline in any modern browser. Start on the Summary tab."
+    + (f" Online copy: {URL} (private until the owner shares it from the page's Share menu)." if URL else ""),
     f"2. `outputs/deliverables/C_RR_Clutch_Index_Cheat_Sheet.pdf`: one page with the picks and their uncertainty.",
-    f"3. `outputs/deliverables/B_RR_Clutch_Index_Deck.pdf`: 7 slides.",
+    f"3. `outputs/deliverables/B_RR_Clutch_Index_Deck.pdf`: 7 slides. `RR_Clutch_Index_Submission.pdf` is the deck plus the cheat sheet in one 8-page file, for forms that take one upload.",
     "4. `outputs/deliverables/D_Methodology_and_Limitations.pdf` and `D_Data_Dictionary.md`: the method, proof and limits.",
     "5. `outputs/deliverables/E_RR_Clutch_Index_Notebook.ipynb`: re-runs everything from the raw file.",
     "6. `outputs/deliverables/F_Walkthrough_Video_Script.md`: a 60–90 s script.",
@@ -47,7 +50,7 @@ lines = [
     "- `outputs/tables/`: the single source of every number.",
     "- `outputs/deliverables/`: deliverables A–F.",
     "- `outputs/reviews/`: critic and cold-reader findings.",
-    "- `logs/`: DEFINITIONS, DATA_NOTES, FACTS, DECISIONS (D1–D35), PREREGISTRATION (frozen), REVIEWS, CHECKPOINTS, PROGRESS.",
+    "- `logs/`: DEFINITIONS, DATA_NOTES, FACTS, DECISIONS (D1–D37), PREREGISTRATION (frozen), REVIEWS, CHECKPOINTS, PROGRESS.",
     "- `docs/master_prompt/`: the brief, verbatim. `docs/FRAMEWORK_REVIEW.md`: the approved plan.",
     "",
     "## Before 16 Dec 2026 (named risks)",

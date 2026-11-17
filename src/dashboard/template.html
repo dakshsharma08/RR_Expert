@@ -59,33 +59,38 @@ button{cursor:pointer}
 .honest{background:var(--warn-bg);border-top:1px solid var(--warn-bd);border-bottom:1px solid var(--warn-bd);color:#4A3200;font-size:var(--fs-sm)}
 .honest .wrap{padding-top:8px;padding-bottom:8px}
 .sticky{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--border)}
-.tabs{display:flex;gap:4px;overflow-x:auto;padding:8px var(--gutr) 8px var(--gutl);scrollbar-width:thin;max-width:1160px;margin:0 auto}
-.tabs button{flex:0 0 auto;min-height:44px;padding:0 16px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
+.tabswrap{position:relative;max-width:1160px;margin:0 auto}
+.tabs{position:relative;display:flex;gap:4px;overflow-x:auto;padding:8px var(--gutr) 8px var(--gutl);scrollbar-width:none;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{scroll-snap-align:center}
+.tabswrap::after{content:"";position:absolute;right:0;top:0;bottom:0;width:44px;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,0),#fff 85%);opacity:0;transition:opacity .2s}
+.tabswrap.more::after{opacity:1}
+.tabs button{flex:0 0 auto;min-height:44px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
 .tabs button:hover{background:var(--tint);color:var(--pink-ink)}
 .tabs button[aria-selected=true]{background:var(--pink);color:#fff;box-shadow:0 4px 12px rgba(214,0,111,.28)}
 .tabs .short{display:none}
 
-/* filters */
-.fbar{background:var(--tint);border-top:1px solid var(--border)}
+/* filters: collapsed behind the Filters button on every width */
+[hidden]{display:none!important}
+.fbar{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border-top:1px solid var(--border);box-shadow:0 22px 44px rgba(28,27,46,.2);z-index:60;max-height:80vh;overflow:auto}
+.fbar.open{display:block}
+.fhead{display:flex;align-items:center;justify-content:space-between;padding:12px 0 0}
 .fgrid{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end;padding:10px 0 6px}
-.fld{display:flex;flex-direction:column;gap:3px;min-width:120px;flex:1 1 130px}
+.fld{display:flex;flex-direction:column;gap:3px;min-width:120px;flex:1 1 150px}
 .fld label{font-size:.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.07em}
 .fld select,.fld input[type=search]{min-height:44px;background:#fff;border:1.5px solid var(--border-strong);border-radius:12px;padding:0 10px;width:100%}
 .chk{display:flex;align-items:center;gap:8px;min-height:44px;flex:1 1 220px;font-size:.95rem}
 .chk input{width:24px;height:24px;accent-color:var(--pink)}
-.fnote{font-size:var(--fs-sm);color:var(--muted);padding:0 0 10px;margin:0}
+.fnote{font-size:var(--fs-sm);color:var(--muted);padding:0 0 12px;margin:0}
 .chip{display:inline-flex;align-items:center;gap:6px;background:var(--tint2);border:1px solid var(--border-strong);border-radius:999px;padding:4px 12px;font-size:var(--fs-sm);color:var(--pink-ink);font-weight:600}
-.fhead{display:none}
-#fbtn{display:none}
+#fbtn{display:inline-flex;align-items:center;justify-content:center}
+#scrim{position:fixed;inset:0;background:rgba(28,27,46,.4);z-index:55;display:none}
+#scrim.on{display:block}
 @media (max-width:899px){
-  #fbtn{display:inline-flex;align-items:center;justify-content:center}
-  .fbar{display:none;position:fixed;left:0;right:0;bottom:0;top:auto;max-height:86vh;overflow:auto;z-index:60;border-top:0;border-radius:22px 22px 0 0;padding:0 var(--gutr) 16px var(--gutl);box-shadow:0 -12px 40px rgba(28,27,46,.25);background:#fff}
-  .fbar.open{display:block}
-  .fhead{display:flex;align-items:center;justify-content:space-between;padding:14px 0 0}
+  .fbar{position:fixed;left:0;right:0;bottom:0;top:auto;max-height:86vh;border-top:0;border-radius:22px 22px 0 0;padding:0 var(--gutr) 16px var(--gutl);box-shadow:0 -12px 40px rgba(28,27,46,.25)}
   .fgrid{flex-direction:column;align-items:stretch}
   .fld{flex:0 0 auto}
-  #scrim{position:fixed;inset:0;background:rgba(28,27,46,.5);z-index:55;display:none}
-  #scrim.on{display:block}
+  #scrim{background:rgba(28,27,46,.5)}
 }
 .activebar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:6px var(--gutr) 6px var(--gutl);max-width:1160px;margin:0 auto}
 .activebar:empty{padding:0}
@@ -96,6 +101,14 @@ main{padding:20px 0 48px;min-height:60vh}
 .lead{font-size:var(--fs-lg);font-weight:700;line-height:1.35;margin:0 0 14px;max-width:46ch;text-wrap:balance;letter-spacing:-.01em}
 .lead em{color:var(--pink-ink);font-style:normal}
 .hero{padding:8px 0 4px}
+.herogrid{display:grid;gap:14px}
+.ha-must{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}
+.ha-must .pcard{margin:0}
+.ha-kpi{align-content:start}
+@media (min-width:1024px){
+  .herogrid{grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);grid-template-areas:"head kpi" "must kpi" "how how";column-gap:24px}
+  .ha-head{grid-area:head}.ha-must{grid-area:must}.ha-how{grid-area:how}.ha-kpi{grid-area:kpi;grid-template-columns:1fr;padding-top:26px}
+}
 .hero h1{font-size:clamp(1.75rem,6.4vw,var(--fs-2xl));line-height:1.12;font-weight:800;margin:0 0 .35em;max-width:22ch;letter-spacing:-.012em}
 .hero h1 em{color:var(--pink);font-style:normal}
 .hero .sub{font-size:1.0625rem;color:var(--muted);max-width:52ch;margin:0 0 16px}
@@ -262,9 +275,9 @@ body:not(.detailed) .deepc{display:none !important}
   .hero h1{max-width:26ch}
 }
 @media (max-width:759px){
-  .tabs{flex-wrap:wrap;overflow:visible;padding:8px var(--gutr) 8px var(--gutl);gap:4px}
-  .tabs button{flex:1 1 auto;padding:0 10px;justify-content:center}
+  .tabs button{padding:0 12px}
   .tabs .full{display:none}.tabs .short{display:inline}
+}
 }
 @media print{.sticky,#card,#tip{display:none}}
 </style>
@@ -296,7 +309,7 @@ body:not(.detailed) .deepc{display:none !important}
 </header>
 <div class="honest"><div class="wrap" id="honest"></div></div>
 <div class="sticky" id="sticky">
-  <nav class="tabs" id="tabs" role="tablist" aria-label="Dashboard sections"></nav>
+  <div class="tabswrap" id="tabswrap"><nav class="tabs" id="tabs" role="tablist" aria-label="Dashboard sections"></nav></div>
   <div class="activebar" id="activebar" aria-live="polite"></div>
   <div id="scrim"></div>
   <div class="fbar" id="fbar">
@@ -808,19 +821,20 @@ function tabSummary() {
     <p class="small muted" style="margin:.2em 0">${X(t.tier_reason || '')}</p>
     <div>${riskTags(t.risk)} ${info('risk')}</div></div>`; }).join('');
   return `
-  <section class="sec hero">
-    <p class="eyebrow">RR Clutch Index · IPL 2027 auction</p>
+  <section class="sec herogrid">
+    <div class="ha-head hero"><p class="eyebrow">RR Clutch Index · IPL 2027 auction</p>
     <h1 class="lead">${esc(D.meta.thesis)}</h1>
     <p class="sub">${must.length} Must-Back ${must.length === 1 ? 'name' : 'names'} if available: ${niceList(must.map(t => nm(t.id)))}. The scores describe the past. They are not a forecast for 2027.</p>
-    <div class="grid g2">${mustCards}</div>
-    <div style="margin-top:14px"><div class="card hl howto"><h3>${ico('bulb')} How to use this score</h3><ul class="clean">${(D.meta.how_to_use || []).map(x => { const i = String(x).indexOf(':'); return `<li>${i > 0 ? `<b>${esc(x.slice(0, i + 1))}</b>${X(x.slice(i + 1))}` : X(x)}</li>`; }).join('')}</ul></div></div>
-  </section>
-  <section class="sec"><div class="kpis">
+    </div>
+    <div class="ha-must">${mustCards}</div>
+    <div class="ha-how"><div class="card hl howto"><h3>${ico('bulb')} How to use this score</h3><ul class="clean">${(D.meta.how_to_use || []).map(x => { const i = String(x).indexOf(':'); return `<li>${i > 0 ? `<b>${esc(x.slice(0, i + 1))}</b>${X(x.slice(i + 1))}` : X(x)}</li>`; }).join('')}</ul></div></div>
+  <div class="kpis ha-kpi">
     <div class="card tile"><div class="v">${SCORABLE.length}</div><div class="l">players rated (${k.scorable_bat} batters, ${k.scorable_bowl} bowlers; ${k.scorable_ar} rated both ways)</div></div>
     <div class="card tile"><div class="v">${thou(k.ipl_matches)}</div><div class="l">IPL matches, ${esc(k.seasons_scored)} (${thou(k.ipl_balls)} balls)</div></div>
     <div class="card tile warn"><div class="v txt">${anyBeat ? 'Beat the plain ranking in part of the test' : 'Did not beat the plain ranking'}</div><div class="l">Next-season test, top-10 hit rate. Batters ${f1(bt.sc)}% vs ${f1(bt.nv)}%; bowlers ${f1(bw.sc)}% vs ${f1(bw.nv)}% ${info('', 'Hit rate = share of the top 10 who were still above average the next season. Plain ranking = overall strike rate (batters) or economy (bowlers).')}</div></div>
   </div>
-  ${deep('kpis', 'more numbers', `<div class="kpis"><div class="card tile"><div class="v">${esc(k.seasons_scored)}</div><div class="l">Seasons scored (${esc(k.training_only)} used only to train)</div></div><div class="card tile"><div class="v">${esc(k.last_match)}</div><div class="l">Last match in the data</div></div><div class="card tile"><div class="v">${k.not_scorable}</div><div class="l">players with too few High-pressure balls to rate (of ${k.in_scope} in scope)</div></div></div>`)}
+  </section>
+  <section class="sec">${deep('kpis', 'more numbers', `<div class="kpis"><div class="card tile"><div class="v">${esc(k.seasons_scored)}</div><div class="l">Seasons scored (${esc(k.training_only)} used only to train)</div></div><div class="card tile"><div class="v">${esc(k.last_match)}</div><div class="l">Last match in the data</div></div><div class="card tile"><div class="v">${k.not_scorable}</div><div class="l">players with too few High-pressure balls to rate (of ${k.in_scope} in scope)</div></div></div>`)}
   <div class="note"><b>Honest read of the test.</b> ${esc(backtestVerdictLine())} ${X(k.claim)} <button class="plink" data-goto="method">See the proof</button></div></section>
   <section class="sec"><h2>The 5-line summary</h2>
     <div class="card"><ol style="margin:.2em 0 0;padding-left:1.2em">${D.exec.map(l => `<li style="margin:.4em 0">${X(l)}</li>`).join('')}</ol></div>
@@ -1557,16 +1571,21 @@ function syncFilterUI() {
   if ($('#f-q') !== document.activeElement) $('#f-q').value = f.q;
   const act = filtersActive();
   $('#fcount').textContent = act.length;
-  $('#activebar').innerHTML = act.length ? `<span class="muted small">Active filters:</span>${act.map(a => `<span class="chip">${esc(a[1])}</span>`).join('')}<button type="button" class="btn sm" data-act="reset">Reset</button>` : '';
+  $('#activebar').innerHTML = act.length && FILTER_TABS.includes(S.tab) ? `<span class="muted small">Active filters:</span>${act.map(a => `<span class="chip">${esc(a[1])}</span>`).join('')}<button type="button" class="btn sm" data-act="reset">Reset</button>` : '';
 }
+const FILTER_TABS = ['leaderboard', 'compare']; // tabs the filters actually affect
 function setTabsUI() {
   $$('#tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === S.tab)));
-  const act = $('#tabs button[aria-selected=true]'); if (act && act.scrollIntoView) { const c = $('#tabs'); const l = act.offsetLeft - 8; if (Math.abs(c.scrollLeft - l) > c.clientWidth * .6) c.scrollLeft = l; }
+  const c = $('#tabs'), act = $('#tabs button[aria-selected=true]');
+  if (act && c.scrollWidth > c.clientWidth) c.scrollLeft = clamp(act.offsetLeft - (c.clientWidth - act.offsetWidth) / 2, 0, c.scrollWidth - c.clientWidth);
+  tabsMore();
 }
+function tabsMore() { const c = $('#tabs'); $('#tabswrap').classList.toggle('more', c.scrollWidth - c.clientWidth - c.scrollLeft > 6); }
 function render(keepScroll) {
   const y = window.scrollY, same = lastTab === S.tab;
   document.body.classList.toggle('detailed', S.detail);
   $('#mode-simple').setAttribute('aria-pressed', String(!S.detail)); $('#mode-detail').setAttribute('aria-pressed', String(S.detail));
+  const fOn = FILTER_TABS.includes(S.tab); $('#fbtn').hidden = !fOn; if (!fOn) toggleSheet(false);
   syncFilterUI(); setTabsUI(); chromeText();
   let html;
   try { html = TAB_FN[S.tab](); } catch (e) { console.error(e); html = emptyBox('Something went wrong drawing this tab: ' + esc(e.message)); }
@@ -1659,6 +1678,7 @@ document.addEventListener('keydown', e => {
 });
 function toggleSheet(on) { $('#fbar').classList.toggle('open', on); $('#scrim').classList.toggle('on', on); $('#fbtn').setAttribute('aria-expanded', String(on)); }
 $('#fbtn').addEventListener('click', () => toggleSheet(!$('#fbar').classList.contains('open')));
+$('#tabs').addEventListener('scroll', tabsMore, { passive: true });
 $('#fclose').addEventListener('click', () => toggleSheet(false));
 $('#scrim').addEventListener('click', () => toggleSheet(false));
 ['role', 'phase', 'season', 'pressure', 'origin'].forEach(k => $('#f-' + k).addEventListener('change', e => setFilter(k, e.target.value)));

@@ -6,7 +6,8 @@ fonts from src/dashboard/fonts/ as base64 @font-face rules at /*__FONTS__*/,
 and writes outputs/deliverables/RR_Clutch_Index_Dashboard.html.
 No numbers are typed here.
 
-Optional: --public-url URL sets meta.public_url (shown in the footer).
+meta.public_url (shown in the footer) comes from --public-url, else from
+outputs/tables/dashboard_url.txt if that file exists; never invented.
 """
 import argparse
 import base64
@@ -19,6 +20,7 @@ PAYLOAD = ROOT / "outputs" / "deliverables" / "dashboard_payload.json"
 TEMPLATE = ROOT / "src" / "dashboard" / "template.html"
 FONT_DIR = ROOT / "src" / "dashboard" / "fonts"
 OUT = ROOT / "outputs" / "deliverables" / "RR_Clutch_Index_Dashboard.html"
+URL_FILE = ROOT / "outputs" / "tables" / "dashboard_url.txt"
 MARKER = "/*__PAYLOAD__*/{}"
 FONT_MARKER = "/*__FONTS__*/"
 # (family, weight, file)
@@ -43,8 +45,11 @@ def main() -> int:
     ap.add_argument("--public-url", default=None)
     args = ap.parse_args()
     payload = json.loads(PAYLOAD.read_text(encoding="utf-8"))
-    if args.public_url:
-        payload.setdefault("meta", {})["public_url"] = args.public_url
+    url = args.public_url
+    if not url and URL_FILE.exists():
+        url = URL_FILE.read_text(encoding="utf-8").strip().splitlines()[0].strip() or None
+    if url:
+        payload.setdefault("meta", {})["public_url"] = url
     tpl = TEMPLATE.read_text(encoding="utf-8")
     for m in (MARKER, FONT_MARKER):
         if tpl.count(m) != 1:

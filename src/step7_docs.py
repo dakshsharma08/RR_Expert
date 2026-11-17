@@ -482,8 +482,9 @@ def qr_uri(url):
 def placeholder_box(compact=False):
     if DASH_URL:
         uri, _ = qr_uri(DASH_URL)
-        return (f"<div class='ph-real'><img src='{uri}' width='100' height='100' alt='QR code for the dashboard'>"
-                f"<div><b>Scan to open the interactive dashboard</b><br><span class='url'>{esc(DASH_URL)}</span></div></div>")
+        href = esc(DASH_URL)
+        return (f"<div class='ph-real'><a href='{href}'><img src='{uri}' width='100' height='100' alt='QR code for the dashboard'></a>"
+                f"<div><b>Scan to open the interactive dashboard</b><br><a class='url' href='{href}'>{href}</a></div></div>")
     return (f"<div class='ph{' ph-c' if compact else ''}'><div class='ph-sq'>QR<br>pending</div>"
             f"<div><b>{esc(PLACEHOLDER)}</b><br><span>No link has been invented and no QR code was generated.</span></div></div>")
 
@@ -504,7 +505,7 @@ th.r,td.r{{text-align:right;font-variant-numeric:tabular-nums}} th.c,td.c{{text-
 .ph span{{color:var(--muted);font-size:.9em}}
 .ph-real{{display:flex;gap:12px;align-items:center;border:2px solid var(--blue);border-radius:8px;padding:6px 12px;background:#fff}}
 .ph-real img{{flex:none;width:100px;height:100px;image-rendering:pixelated}}
-.ph-real .url{{font-size:.9em;color:var(--blue);word-break:break-all}}
+.ph-real .url{{font-size:.9em;color:var(--blue);word-break:break-all;text-decoration:none}}
 """
 
 # ------------------------------------------------------------------------------------------ B: the deck
@@ -711,7 +712,7 @@ img.chart{display:block;width:100%;height:auto;margin-top:2px}
 .qrrow{display:flex;gap:10px;align-items:flex-start}.qrleft{flex:1;min-width:0}
 .qrside{flex:none;width:118px;border:1.5px solid var(--blue);border-radius:6px;padding:4px;text-align:center;font-size:7.8px;line-height:1.2}
 .qrside img{display:block;margin:0 auto 3px auto;width:100px;height:100px;image-rendering:pixelated}
-.qrside b{display:block}.qrside .url{display:block;color:var(--blue);word-break:break-all;font-size:7px;margin-top:2px}
+.qrside b{display:block}.qrside .url{display:block;color:var(--blue);word-break:break-all;font-size:7px;margin-top:2px;text-decoration:none}
 """
 
 def cheat_html():
@@ -742,8 +743,8 @@ def cheat_html():
     howto = "".join(f"<li>{inline(x)}</li>" for x in HOW_TO_USE)
     if DASH_URL:
         CS_OPEN = "<div class='qrrow'><div class='qrleft'>"
-        CS_CLOSE = (f"</div><div class='qrside'><img src='{qr_uri(DASH_URL)[0]}' width='100' height='100' alt='QR code for the dashboard'>"
-                    f"<b>Scan to open the interactive dashboard</b><span class='url'>{esc(DASH_URL)}</span></div></div>")
+        CS_CLOSE = (f"</div><div class='qrside'><a href='{esc(DASH_URL)}'><img src='{qr_uri(DASH_URL)[0]}' width='100' height='100' alt='QR code for the dashboard'></a>"
+                    f"<b>Scan to open the interactive dashboard</b><a class='url' href='{esc(DASH_URL)}'>{esc(DASH_URL)}</a></div></div>")
     else:
         CS_OPEN = CS_CLOSE = ""
     CS_DASH = '' if DASH_URL else '<div class="small" style="margin-top:4px"><b>Dashboard URL and QR code: pending, to be added when the public link exists.</b> No link has been invented.</div>'

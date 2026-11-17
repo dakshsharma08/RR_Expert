@@ -23,6 +23,11 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
 (async () => {
   fs.mkdirSync(SHOTS, { recursive: true });
   const payload = JSON.parse(fs.readFileSync(PAYLOAD, 'utf8'));
+  // the build adds meta.public_url from outputs/tables/dashboard_url.txt when that file exists
+  const URL_FILE = path.join(ROOT, 'outputs', 'tables', 'dashboard_url.txt');
+  const PUBLIC_URL = fs.existsSync(URL_FILE) ? (fs.readFileSync(URL_FILE, 'utf8').trim().split(/\r?\n/)[0] || '').trim() : '';
+  if (PUBLIC_URL) payload.meta.public_url = PUBLIC_URL;
+  const footerUrlOk = (t) => PUBLIC_URL ? t.includes('Public URL: ' + PUBLIC_URL) : /Public URL: pending \(placeholder\)/.test(t);
   const size = fs.statSync(HTML).size;
   log(`Dashboard file: ${HTML}`);
   log(`File size: ${size.toLocaleString('en-US')} bytes (${(size / 1e6).toFixed(2)} MB)`);
@@ -119,10 +124,26 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     await page.goto(url('#summary')); await page.waitForSelector('#view .howto');
     const order = await page.evaluate(() => { const y = el => el ? el.getBoundingClientRect().top + scrollY : -1; const mb = document.querySelectorAll('#view .mb'); const h = document.querySelector('#view .howto'); const kp = document.querySelector('#view .kpis'); const five = [...document.querySelectorAll('#view h2')].find(e => /5-line summary/.test(e.textContent)); return { mb: mb.length, mbY: y(mb[0]), howY: y(h), kpiY: y(kp), fiveY: y(five), tiles: kp ? kp.querySelectorAll(':scope > .tile').length : 0, h1: (document.querySelector('#view h1') || {}).textContent }; });
     check('Summary first screen: headline, Must-Back cards, How to use this score, then <=3 KPI tiles, then the 5-line summary', order.mb >= 1 && order.mbY < order.howY && order.howY < order.kpiY && order.kpiY < order.fiveY && order.tiles <= 3 && order.h1 === payload.meta.thesis, JSON.stringify(order));
-    // tab labels not clipped on a phone
-    const tabs = await page.evaluate(() => { const c = document.documentElement.clientWidth; return [...document.querySelectorAll('#tabs button')].map(b => { const r = b.getBoundingClientRect(); const lab = b.querySelector('.short'); const lr = lab.getBoundingClientRect(); return { t: b.dataset.tab, l: Math.round(r.left), r: Math.round(r.right), ok: r.left >= 0 && r.right <= c + 0.5 && lr.right <= r.right + 0.5 && lab.scrollWidth <= lab.clientWidth + 1 && lr.width > 0, label: lab.textContent }; }); });
-    check('[380] all 7 phone tab labels are fully visible (no clipping)', tabs.length === 7 && tabs.every(x => x.ok), JSON.stringify(tabs.filter(x => !x.ok)));
-    await page.screenshot({ path: path.join(SHOTS, 'tabs_380.png'), clip: { x: 0, y: 0, width: 380, height: 360 } });
+    // phone tab strip: one swipeable row, only the strip scrolls, active tab scrolled into view
+    const strip = await page.evaluate(() => { const c = document.querySelector('#tabs'), r = c.getBoundingClientRect(), bs = [...c.querySelectorAll('button')]; return { rows: new Set(bs.map(b => Math.round(b.getBoundingClientRect().top))).size, scrolls: c.scrollWidth > c.clientWidth, ox: getComputedStyle(c).overflowX, snap: getComputedStyle(c).scrollSnapType, doc: document.documentElement.scrollWidth <= document.documentElement.clientWidth, n: bs.length, h: Math.round(r.height) }; });
+    check('[380] tabs are one swipeable row (overflow-x on the strip only, scroll-snap, no wrap)', strip.rows === 1 && strip.scrolls && /(auto|scroll)/.test(strip.ox) && /x/.test(strip.snap) && strip.doc && strip.n === 7, JSON.stringify(strip));
+    for (const tab of TABS) {
+      await page.evaluate(t => { location.hash = '#' + t; }, tab); await page.waitForTimeout(150);
+      const vis = await page.evaluate(() => { const c = document.querySelector('#tabs').getBoundingClientRect(), b = document.querySelector('#tabs button[aria-selected=true]'), r = b.getBoundingClientRect(), lab = b.querySelector('.short'); return { ok: r.left >= c.left - 1 && r.right <= c.right + 1 && lab.scrollWidth <= lab.clientWidth + 1, tab: b.dataset.tab }; });
+      check(`[380] active tab "${tab}" is fully in view in the strip`, vis.ok && vis.tab === tab, JSON.stringify(vis));
+    }
+    await page.evaluate(() => { location.hash = '#summary'; }); await page.waitForTimeout(150);
+    const fade = await page.evaluate(() => getComputedStyle(document.querySelector('#tabswrap'), '::after').opacity);
+    check('[380] right-edge fade hint shows while more tabs are off screen', parseFloat(fade) > 0.5, fade);
+    await page.screenshot({ path: path.join(SHOTS, 'tabs_380.png'), clip: { x: 0, y: 0, width: 380, height: 260 } });
+    // Filters button only on tabs the filters affect
+    const fvis = {};
+    for (const tab of TABS) { await page.evaluate(t => { location.hash = '#' + t; }, tab); await page.waitForTimeout(120); fvis[tab] = await page.evaluate(() => !document.querySelector('#fbtn').hidden && getComputedStyle(document.querySelector('#fbtn')).display !== 'none'); }
+    check('Filters button shows only on Leaderboard and Compare', TABS.every(tb => fvis[tb] === (tb === 'leaderboard' || tb === 'compare')), JSON.stringify(fvis));
+    await page.evaluate(() => { location.hash = '#leaderboard'; }); await page.waitForTimeout(150);
+    await page.click('#fbtn'); await page.waitForSelector('#f-role', { state: 'visible' });
+    check('opened Filters panel keeps the note "The Clutch Score does not change with filters"', /Clutch Score does not change with filters/.test(await page.textContent('#fnote')) && await page.isVisible('#fnote'));
+    await page.click('#fclose');
     // Simple mode hides internal codes
     for (const tab of ['summary', 'leaderboard', 'auction', 'squad']) {
       await page.goto(url('#tab=' + tab)); await page.waitForSelector('#view .lead');
@@ -180,7 +201,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     check('embedded fonts load offline (Plus Jakarta Sans, Space Grotesk)', d.fontOk && d.loaded >= 3 && /Plus Jakarta Sans/.test(d.bodyFont) && /Space Grotesk/.test(d.numFont), `${d.loaded} loaded; ${d.bodyFont.slice(0, 40)}`);
     check('side gutters are at least 16px', d.wrapL >= 16 && d.wrapR >= 16, d.wrapL + '/' + d.wrapR);
     check('disclaimer visible in header and footer', /Independent submission for Rajasthan Royals' SupeRR Selector Season 2\. Not an official Rajasthan Royals product\./.test(d.disc) && /Not an official Rajasthan Royals product/.test(d.foot));
-    check('footer shows Public URL pending (placeholder) when meta.public_url is absent', payload.meta.public_url || /Public URL: pending \(placeholder\)/.test(d.foot));
+    check('footer shows the public URL, or "pending (placeholder)" when none is set', footerUrlOk(d.foot));
     check('body text is 16px or larger', d.minBody >= 16, d.minBody);
     // hosting: plain #tab hashes; reduced hashes still work
     for (const tab of TABS) { await page.goto(url('#' + tab)); await page.waitForSelector('#tabs'); const a = await page.$eval('#tabs button[aria-selected=true]', b => b.dataset.tab); const hh = await page.evaluate(() => location.hash); check(`hash #${tab} opens that tab and stays plain`, a === tab && hh === '#' + tab, hh); }
@@ -200,6 +221,8 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
   {
     const { ctx, page } = await newPage(1280, 900);
     await page.goto(url('#leaderboard')); await page.waitForSelector('#lbtable');
+    check('[1280] filters are collapsed until the Filters button is pressed', !(await page.isVisible('#f-role')));
+    await page.click('#fbtn'); await page.waitForSelector('#f-role', { state: 'visible' });
     const snap = () => page.evaluate(() => ({ rows: +((document.querySelector('#lbcount') || { dataset: { n: 0 } }).dataset.n), shown: document.querySelectorAll('#lbtable tbody tr').length, text: document.querySelector('#lbtable tbody').innerText.replace(/\s+/g, ' '), first: (document.querySelector('#lbtable tbody tr .plink') || {}).textContent }));
     const base = await snap();
     await page.selectOption('#f-season', '2024'); await page.waitForTimeout(100);
@@ -346,7 +369,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     check('method: backtest shown (score did not beat naive)', /did not beat|plain ranking hit more|no clear difference/i.test(mt));
     check('method: facts ledger states no fact is VERIFIED', /0 of \d+ external facts are VERIFIED/.test(mt));
     check('method: audit shows pending when empty', payload.method.audit.length > 0 || /Pending/.test(mt));
-    check('footer: public URL placeholder', /Public URL: pending \(placeholder\)/.test(await page.textContent('footer')));
+    check('footer: public URL (or placeholder when unset)', footerUrlOk(await page.textContent('footer')));
     await ctx.close();
   }
 

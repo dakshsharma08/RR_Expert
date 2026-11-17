@@ -1,5 +1,5 @@
 Dashboard file: /home/user/RR_Expert/outputs/deliverables/RR_Clutch_Index_Dashboard.html
-File size: 1,305,714 bytes (1.31 MB)
+File size: 1,307,237 bytes (1.31 MB)
 PASS  file under 5 MB
 PASS  [380] tab summary opens via URL hash  -> summary
 PASS  [380] no horizontal scroll on summary  -> scrollWidth 380 vs clientWidth 380
@@ -28,8 +28,18 @@ PASS  Detailed mode opens deep-dive sections  -> 0 -> 2
 PASS  [380] how_to_use shown on summary under the title "How to use this score"  -> How to use this score What the score is: who has already del
 PASS  [380] how_to_use shown on auction under the title "How to use this score"  -> How to use this score What the score is: who has already del
 PASS  [380] how_to_use shown on method under the title "How to use this score"  -> How to use this score What the score is: who has already del
-PASS  Summary first screen: headline, Must-Back cards, How to use this score, then <=3 KPI tiles, then the 5-line summary  -> {"mb":2,"mbY":808.4375,"howY":1531.765625,"kpiY":1886.125,"fiveY":2644.90625,"tiles":3,"h1":"Back players whose quality has held up when the match was on the line, and know how sure we are."}
-PASS  [380] all 7 phone tab labels are fully visible (no clipping)  -> []
+PASS  Summary first screen: headline, Must-Back cards, How to use this score, then <=3 KPI tiles, then the 5-line summary  -> {"mb":2,"mbY":730.4375,"howY":1429.765625,"kpiY":1758.125,"fiveY":2538.90625,"tiles":3,"h1":"Back players whose quality has held up when the match was on the line, and know how sure we are."}
+PASS  [380] tabs are one swipeable row (overflow-x on the strip only, scroll-snap, no wrap)  -> {"rows":1,"scrolls":true,"ox":"auto","snap":"x","doc":true,"n":7,"h":60}
+PASS  [380] active tab "summary" is fully in view in the strip  -> {"ok":true,"tab":"summary"}
+PASS  [380] active tab "pressure" is fully in view in the strip  -> {"ok":true,"tab":"pressure"}
+PASS  [380] active tab "leaderboard" is fully in view in the strip  -> {"ok":true,"tab":"leaderboard"}
+PASS  [380] active tab "compare" is fully in view in the strip  -> {"ok":true,"tab":"compare"}
+PASS  [380] active tab "squad" is fully in view in the strip  -> {"ok":true,"tab":"squad"}
+PASS  [380] active tab "auction" is fully in view in the strip  -> {"ok":true,"tab":"auction"}
+PASS  [380] active tab "method" is fully in view in the strip  -> {"ok":true,"tab":"method"}
+PASS  [380] right-edge fade hint shows while more tabs are off screen  -> 0.92479
+PASS  Filters button shows only on Leaderboard and Compare  -> {"summary":false,"pressure":false,"leaderboard":true,"compare":true,"squad":false,"auction":false,"method":false}
+PASS  opened Filters panel keeps the note "The Clutch Score does not change with filters"
 PASS  [380] Simple mode shows no internal codes on summary
 PASS  [380] Simple mode shows no internal codes on leaderboard
 PASS  [380] Simple mode shows no internal codes on auction
@@ -56,7 +66,7 @@ PASS  single light theme: white body background, color-scheme light  -> rgb(255,
 PASS  embedded fonts load offline (Plus Jakarta Sans, Space Grotesk)  -> 5 loaded; "Plus Jakarta Sans", system-ui, -apple-s
 PASS  side gutters are at least 16px  -> 16/16
 PASS  disclaimer visible in header and footer
-PASS  footer shows Public URL pending (placeholder) when meta.public_url is absent
+PASS  footer shows the public URL, or "pending (placeholder)" when none is set
 PASS  body text is 16px or larger  -> 16
 PASS  hash #summary opens that tab and stays plain  -> #summary
 PASS  hash #pressure opens that tab and stays plain  -> #pressure
@@ -69,6 +79,7 @@ PASS  reducing the hash to #leaderboard closes the card and keeps the tab
 PASS  unknown hash falls back to the Summary
 PASS  no window.print / alert / confirm in the page script
 PASS  no dark-mode blocks (prefers-color-scheme) in the file
+PASS  [1280] filters are collapsed until the Filters button is pressed
 PASS  season filter changes leaderboard output
 PASS  pressure filter changes leaderboard output
 PASS  phase filter changes leaderboard output
@@ -87,41 +98,41 @@ PASS  [380] active filter chips and reset are shown  -> Active filters: Season: 
 PASS  [380] no horizontal scroll with filters applied  -> 380/380
 PASS  [380] no horizontal scroll with profile card open  -> 380/380
 PASS  [380] profile card panel does not scroll sideways  -> 380/380
-PASS  random card Rinku Singh: name matches  -> Rinku Singh
-PASS  random card Rinku Singh: score 28 matches payload  -> 28
-PASS  random card Rinku Singh: 80% range 10–75 matches payload  -> 10–75
-PASS  random card Rinku Singh: rank 32 of 47 shown
-PASS  random card Rinku Singh: High-pressure balls 158 shown
-PASS  random card Rinku Singh: price band text shown
-PASS  random card Rinku Singh: age tagged UNKNOWN
-PASS  random card Mahendra Singh Dhoni: name matches  -> Mahendra Singh Dhoni
-PASS  random card Mahendra Singh Dhoni: score 22 matches payload  -> 22
-PASS  random card Mahendra Singh Dhoni: 80% range 5–67 matches payload  -> 5–67
-PASS  random card Mahendra Singh Dhoni: rank 37 of 47 shown
-PASS  random card Mahendra Singh Dhoni: High-pressure balls 118 shown
-PASS  random card Mahendra Singh Dhoni: price band text shown
-PASS  random card Mahendra Singh Dhoni: age tagged UNKNOWN
-PASS  random card Azmatullah Omarzai: name matches  -> Azmatullah Omarzai
-PASS  random card Azmatullah Omarzai: score 15 matches payload  -> 15
-PASS  random card Azmatullah Omarzai: 80% range 6–46 matches payload  -> 6–46
-PASS  random card Azmatullah Omarzai: rank 58 of 71 shown
-PASS  random card Azmatullah Omarzai: High-pressure legal balls 80 shown
-PASS  random card Azmatullah Omarzai: price band text shown
-PASS  random card Azmatullah Omarzai: age tagged UNKNOWN
-PASS  random card Harshit Rana: name matches  -> Harshit Rana
-PASS  random card Harshit Rana: score 40 matches payload  -> 40
-PASS  random card Harshit Rana: 80% range 6–86 matches payload  -> 6–86
-PASS  random card Harshit Rana: rank 41 of 71 shown
-PASS  random card Harshit Rana: High-pressure legal balls 125 shown
-PASS  random card Harshit Rana: price band text shown
-PASS  random card Harshit Rana: age tagged UNKNOWN
-PASS  random card Nathan Ellis: name matches  -> Nathan Ellis
-PASS  random card Nathan Ellis: score 38 matches payload  -> 38
-PASS  random card Nathan Ellis: 80% range 20–82 matches payload  -> 20–82
-PASS  random card Nathan Ellis: rank 44 of 71 shown
-PASS  random card Nathan Ellis: High-pressure legal balls 90 shown
-PASS  random card Nathan Ellis: price band text shown
-PASS  random card Nathan Ellis: age tagged UNKNOWN
+PASS  random card Bhuvneshwar Kumar: name matches  -> Bhuvneshwar Kumar
+PASS  random card Bhuvneshwar Kumar: score 85 matches payload  -> 85
+PASS  random card Bhuvneshwar Kumar: 80% range 48–100 matches payload  -> 48–100
+PASS  random card Bhuvneshwar Kumar: rank 12 of 71 shown
+PASS  random card Bhuvneshwar Kumar: High-pressure legal balls 325 shown
+PASS  random card Bhuvneshwar Kumar: price band text shown
+PASS  random card Bhuvneshwar Kumar: age tagged UNKNOWN
+PASS  random card Shahbaz Ahmed: name matches  -> Shahbaz Ahmed
+PASS  random card Shahbaz Ahmed: score 11 matches payload  -> 11
+PASS  random card Shahbaz Ahmed: 80% range 1–42 matches payload  -> 1–42
+PASS  random card Shahbaz Ahmed: rank 64 of 71 shown
+PASS  random card Shahbaz Ahmed: High-pressure legal balls 61 shown
+PASS  random card Shahbaz Ahmed: price band text shown
+PASS  random card Shahbaz Ahmed: age tagged UNKNOWN
+PASS  random card Kuldeep Yadav: name matches  -> Kuldeep Yadav
+PASS  random card Kuldeep Yadav: score 100 matches payload  -> 100
+PASS  random card Kuldeep Yadav: 80% range 96–100 matches payload  -> 96–100
+PASS  random card Kuldeep Yadav: rank 1 of 71 shown
+PASS  random card Kuldeep Yadav: High-pressure legal balls 226 shown
+PASS  random card Kuldeep Yadav: price band text shown
+PASS  random card Kuldeep Yadav: age tagged UNKNOWN
+PASS  random card Andre Russell: name matches  -> Andre Russell
+PASS  random card Andre Russell: score 20 matches payload  -> 20
+PASS  random card Andre Russell: 80% range 7–62 matches payload  -> 7–62
+PASS  random card Andre Russell: rank 57 of 71 shown
+PASS  random card Andre Russell: High-pressure legal balls 98 shown
+PASS  random card Andre Russell: price band text shown
+PASS  random card Andre Russell: age tagged UNKNOWN
+PASS  random card Rishabh Pant: name matches  -> Rishabh Pant
+PASS  random card Rishabh Pant: score 14 matches payload  -> 14
+PASS  random card Rishabh Pant: 80% range 2–46 matches payload  -> 2–46
+PASS  random card Rishabh Pant: rank 41 of 47 shown
+PASS  random card Rishabh Pant: High-pressure balls 112 shown
+PASS  random card Rishabh Pant: price band text shown
+PASS  random card Rishabh Pant: age tagged UNKNOWN
 PASS  match explorer: choosing a ball shows its situation and WPA
 PASS  match explorer: switching match redraws
 PASS  pressure map: innings toggle works
@@ -133,19 +144,19 @@ PASS  method: states prediction of 2027 is not established
 PASS  method: backtest shown (score did not beat naive)
 PASS  method: facts ledger states no fact is VERIFIED
 PASS  method: audit shows pending when empty
-PASS  footer: public URL placeholder
+PASS  footer: public URL (or placeholder when unset)
 PASS  no console errors
 PASS  no external network requests
 Blocked/recorded request attempts: 0
 
 Per-tab notes (measured at 380px, automatic):
-  summary: lead="Back players whose quality has held up when the match was on the line, and know how sure w..." charts=1 svgs=23 tables=0 deep-sections=1 so-what-lines=2 page-height=7240px
-  pressure: lead="Pressure means how much one ball can swing the match. A ball with the match on a knife-edg..." charts=3 svgs=16 tables=5 deep-sections=1 so-what-lines=4 page-height=7083px
-  leaderboard: lead="Top batter on historical pressure performance: Vaibhav Sooryavanshi (99, range 92–100). 45..." charts=2 svgs=29 tables=3 deep-sections=2 so-what-lines=3 page-height=10471px
-  compare: lead="Ashutosh Sharma (99) and Patrick Cummins (96): too close to call. Their 80% ranges overlap..." charts=2 svgs=6 tables=1 deep-sections=0 so-what-lines=2 page-height=6250px
-  squad: lead="RR’s weakest areas under pressure are middle-overs batting and death-overs batting (direct..." charts=2 svgs=37 tables=2 deep-sections=1 so-what-lines=2 page-height=8560px
-  auction: lead="Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price r..." charts=1 svgs=14 tables=2 deep-sections=1 so-what-lines=2 page-height=11433px
-  method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict IP..." charts=1 svgs=4 tables=10 deep-sections=2 so-what-lines=1 page-height=5645px
+  summary: lead="Back players whose quality has held up when the match was on the line, and know how sure w..." charts=1 svgs=23 tables=0 deep-sections=1 so-what-lines=2 page-height=7156px
+  pressure: lead="Pressure means how much one ball can swing the match. A ball with the match on a knife-edg..." charts=3 svgs=16 tables=5 deep-sections=1 so-what-lines=4 page-height=7008px
+  leaderboard: lead="Top batter on historical pressure performance: Vaibhav Sooryavanshi (99, range 92–100). 45..." charts=2 svgs=29 tables=3 deep-sections=2 so-what-lines=3 page-height=10396px
+  compare: lead="Ashutosh Sharma (99) and Patrick Cummins (96): too close to call. Their 80% ranges overlap..." charts=2 svgs=6 tables=1 deep-sections=0 so-what-lines=2 page-height=6176px
+  squad: lead="RR’s weakest areas under pressure are middle-overs batting and death-overs batting (direct..." charts=2 svgs=37 tables=2 deep-sections=1 so-what-lines=2 page-height=8486px
+  auction: lead="Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price r..." charts=1 svgs=14 tables=2 deep-sections=1 so-what-lines=2 page-height=11359px
+  method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict IP..." charts=1 svgs=4 tables=10 deep-sections=2 so-what-lines=1 page-height=5571px
 
 Manual review notes (screenshots read by the builder):
   summary: thesis, 5-line summary, KPI tiles, honest backtest note, Must-Back cards, whisker hero chart, before/after strips; all numbers filled from the payload.

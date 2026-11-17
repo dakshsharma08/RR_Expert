@@ -4,9 +4,9 @@
 > **What it is not:** a forecast. Its ability to predict 2027 is not established (D15).
 
 ## Open these first
-1. `outputs/deliverables/RR_Clutch_Index_Dashboard.html` (1.18 MB). Works offline in any modern browser. Start on the Summary tab.
+1. `outputs/deliverables/RR_Clutch_Index_Dashboard.html` (1.31 MB). Works offline in any modern browser. Start on the Summary tab. Online copy: https://claude.ai/artifact/7BerqF4gqgVDVAb2JXrnmS (private until the owner shares it from the page's Share menu).
 2. `outputs/deliverables/C_RR_Clutch_Index_Cheat_Sheet.pdf`: one page with the picks and their uncertainty.
-3. `outputs/deliverables/B_RR_Clutch_Index_Deck.pdf`: 7 slides.
+3. `outputs/deliverables/B_RR_Clutch_Index_Deck.pdf`: 7 slides. `RR_Clutch_Index_Submission.pdf` is the deck plus the cheat sheet in one 8-page file, for forms that take one upload.
 4. `outputs/deliverables/D_Methodology_and_Limitations.pdf` and `D_Data_Dictionary.md`: the method, proof and limits.
 5. `outputs/deliverables/E_RR_Clutch_Index_Notebook.ipynb`: re-runs everything from the raw file.
 6. `outputs/deliverables/F_Walkthrough_Video_Script.md`: a 60–90 s script.
@@ -32,7 +32,7 @@
 - `outputs/tables/`: the single source of every number.
 - `outputs/deliverables/`: deliverables A–F.
 - `outputs/reviews/`: critic and cold-reader findings.
-- `logs/`: DEFINITIONS, DATA_NOTES, FACTS, DECISIONS (D1–D35), PREREGISTRATION (frozen), REVIEWS, CHECKPOINTS, PROGRESS.
+- `logs/`: DEFINITIONS, DATA_NOTES, FACTS, DECISIONS (D1–D37), PREREGISTRATION (frozen), REVIEWS, CHECKPOINTS, PROGRESS.
 - `docs/master_prompt/`: the brief, verbatim. `docs/FRAMEWORK_REVIEW.md`: the approved plan.
 
 ## Before 16 Dec 2026 (named risks)
