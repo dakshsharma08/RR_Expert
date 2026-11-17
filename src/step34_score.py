@@ -170,10 +170,15 @@ if __name__ == "__main__":
 
     # ------------------------------------------------ robustness across pressure definitions (D25) + close-game comparison (D8)
     rob = []
-    variants = {"leverage_only": "pi_lev_bucket", "rule_based": "pi_rule_bucket", "with_close_game": "pi_close_bucket"}
+    variants = {"leverage_only": "pi_lev_bucket", "rule_based": "pi_rule_bucket", "with_close_game": "pi_close_bucket",
+                "d18_strict_buckets": "pi_d18strict_bucket", "season_centred": "pi_bucket"}
     alt_scores = {}
     for vname, col in variants.items():
         _, vbat, vbowl = frames(col)
+        if vname == "season_centred":   # comparison only: uses each season's league mean (later matches), never the main score
+            for fr in (vbat, vbowl):
+                mean_pb = fr.groupby("season").rae.sum() / fr.groupby("season").balls.sum()
+                fr["rae"] = fr.rae - fr.balls * fr.season.map(mean_pb)
         vbat, vbowl = vbat[vbat.player_id.isin(scope.index)], vbowl[vbowl.player_id.isin(scope.index)]
         vb, _ = role_scores(vbat, "bat", 2026, MIN_HI_BAT, boot=False)
         vw, _ = role_scores(vbowl, "bowl", 2026, MIN_HI_BOWL, boot=False)

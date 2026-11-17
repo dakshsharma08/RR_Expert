@@ -1,6 +1,6 @@
 # PRE-REGISTRATION: Clutch Reliability Score (D5, D6, D16)
 
-**Status: DRAFT. Written 2026-11-17, before any player-level performance metric, ranking or backtest result was computed.**
+**Status: FROZEN at gate P on 2026-11-17, before any player-level performance metric, ranking or backtest result was computed.** The draft was written before Step 1 ran. At the freeze, only sample-size pass counts, the D27/D28 references and two comparison-only sensitivities were added.
 
 This becomes FROZEN at gate P, after Step 2. At that point only sample-size pass counts may be added, and the file's sha256 is logged in DECISIONS.md. After the freeze, nothing below changes because of results. Any later change must be logged as a deviation, with its reason, and its effect reported both ways.
 
@@ -15,8 +15,8 @@ This becomes FROZEN at gate P, after Step 2. At that point only sample-size pass
   - **All-rounder:** passes both thresholds.
   - Players below a threshold are listed "Not scorable on IPL data (sample)" with their counts (D3).
 
-## 2. Pressure buckets (Step 1B, D18)
-- The 0–100 Pressure Index is the percentile of a ball's raw pressure against an earlier-season reference distribution. **High is 80 or more** (the top 20% of the earlier reference), **Medium is 50–80** and **Low is below 50**.
+## 2. Pressure buckets (Step 1B, D18 + D27)
+- The 0–100 Pressure Index is the percentile of a ball's raw pressure against earlier data only: earlier seasons, weighted as one match, plus earlier matches of the same season (D27). **High is 80 or more** (the top 20% of the earlier reference), **Medium is 50–80** and **Low is below 50**.
 - **Main index:** leverage × (1 + context boosts), where the boosts pass the double-counting rule in Step 1B. **There is no close-game boost** (D8).
 
 ## 3. Metric list (frozen at gate P)
@@ -69,10 +69,29 @@ These metrics are descriptive. Only the components in section 4 enter the score.
 - **80% interval:** resample the player's matches (1,000 bootstrap draws, seed 2027), recompute S, I, H and C, then take the 10th–90th percentile of the score.
 - "Too close to call" applies when two players' 80% intervals overlap.
 
+## 1b. Sample-size pass counts (counted at the freeze; no performance values were looked at)
+
+| Threshold | Players |
+|---|---:|
+| In scope (appeared in IPL 2025 or 2026) | 257 |
+| Batters, ≥ 100 High balls faced (pre-registered) | **45** |
+| Bowlers, ≥ 60 High legal balls (pre-registered) | **71** |
+| All-rounders, both thresholds | **8** |
+| For reference only: batters ≥ 60 / 80 / 120 High balls | 73 / 58 / 36 |
+| For reference only: bowlers ≥ 40 / 80 High legal balls | 90 / 59 |
+
+The pre-registered thresholds are kept unchanged.
+
 ## 5. Sensitivity
 Change each weight by ±10% (renormalised so the weights sum to 1). Report the top-10 overlap % with the main ranking, for batters and bowlers separately.
 
 Also report the player top-20 overlap across the three pressure definitions (main, leverage-only, rule-based), computed with this frozen score (D25). Report the with-close-game-boost comparison too, kept separate (D8).
+
+Two comparison-only sensitivities, never the main score:
+- **(a) Strict-D18 buckets:** the pressure scale using earlier seasons only.
+- **(b) Season-centred RAE/RSE:** each ball's RAE/RSE minus that season's league mean. This removes the season offsets in D28 but uses later matches, so it can't be the main score (D11).
+
+Report the top-10 and top-20 overlap for each.
 
 ## 6. Backtest protocol (D6, D16): run only after this file is frozen
 - **Folds:** N = 2024, 2025, 2026.
