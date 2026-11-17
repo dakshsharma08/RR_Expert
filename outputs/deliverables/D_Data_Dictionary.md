@@ -2,6 +2,8 @@
 
 Part A lists every column of the ball table. Part B lists every metric. Part C gives the shared definitions the numbers rely on. Sources: `outputs/tables/step0_ball_columns.csv`, `dashboard_payload.json` (glossary), `logs/DEFINITIONS.md`.
 
+Note: the `step5_*` tables in `outputs/tables/` are not used in Round 1 deliverables.
+
 ## Part A. Ball table columns
 
 69 columns: 34 raw columns (unchanged from the source) and 35 derived columns. One row = one delivery (wides and no-balls included).
@@ -96,7 +98,6 @@ Part A lists every column of the ball table. Part B lists every metric. Part C g
 | **Clutch Reliability Score** | 0–100 historical pressure-performance indicator within role; roughly a percentile. Not a forecast. |
 | **Backtest** | Score built from earlier seasons only, then checked against the next season's pressure performance. |
 | **Too close to call** | Two players whose 80% ranges overlap: the data can't say who is better. |
-| **[ASSUMPTION]** | A value the data can't supply and the web couldn't verify here; stated with its reason. |
 
 ### B2. Score components and score columns (`step4_scores_*.csv`)
 
@@ -107,11 +108,11 @@ Part A lists every column of the ball table. Part B lists every metric. Part C g
 | H | Holds up: shrunk difference between Low- and High-pressure form |
 | C | Consistency: share of seasons (at least 30 High balls) above expected, shrunk toward the role mean |
 | Z | Weighted sum of standardised components (z-scores) before conversion to 0-100 |
-| score | Clutch Reliability Score: 100 x normal CDF of Z / sd(Z), among scorable players of the role |
+| score | Clutch Reliability Score: 100 x normal CDF of Z / sd(Z), among rated players of the role |
 | score_lo80, score_hi80 | 80% range of the score from resampling the player's matches |
 | S_raw, I_raw, H_raw | Components before shrinkage |
 | S_lo80, S_hi80 | 80% range of the skill component |
-| n_hi_w, n_lo_w | Recency-weighted number of High- and Low-pressure balls |
+| n_hi_w, n_lo_w, n_eff_hi | Recency-weighted number of High- and Low-pressure balls; Kish effective number of High balls |
 | hi_qual_n | Number of High-pressure balls (faced or bowled) used for the player |
 | seasons_assessed, seasons_positive | Seasons with enough High balls; seasons where the player was above expected |
 | rank | Rank within role by score |
@@ -144,19 +145,16 @@ These describe a player and are not part of the score unless listed in B2. Prefi
 | `seasons` | Seasons in which the player appears |
 | `player_id`, `player_name` | One player, one ID, from the player map (Step 0) |
 
-### B4. Auction table columns (`step5_*.csv`)
+### B4. Top-10 summary fields (`summary_numbers.json` > `top10`)
 
-| Column | Meaning |
+| Field | Meaning |
 | :--- | :--- |
-| tier | Must-Back (lower end of 80% range at or above 50, best gap fit), Value Pick (score 60+, Regular or Emerging price), Hidden Gem (score 60+, smallest samples) |
-| price_band, walk_away_cr | Rule-based price band in Rs crore and its top, the walk-away price [ASSUMPTION A6] |
-| price_tier | Established, Regular or Emerging, from seasons with 10+ matches [A6] |
-| availability | Whether the player is in the auction pool: UNKNOWN [A2], likely retained [A3] or RR squad [A1] |
-| risk_tags | Plain-language risks: sample size, short record, age or injury UNKNOWN |
-| fills_gaps | A player fills a gap only if his own High-pressure record in that phase beats the league on at least 30 balls. (D33) |
-| fit_weight | 1.5 if the player fills a measured RR gap, else 0.6 [A10] |
-| value | score / 100 x fit_weight, the quantity the budget plan maximises [A10] |
-| rr_group_per100, league_per100, gap_vs_league_per100 | RR and league runs above (batting) or saved (bowling) per 100 High-pressure balls, and the difference |
+| rank, name, team | Rank within role by Clutch Score; the player's 2026 team |
+| score, lo, hi | Clutch Score and its 80% range |
+| stats | High-pressure balls, runs, strike rate or economy, dismissals or wickets, runs above expected (or saved) per 100 balls, win probability added per 100 balls |
+| why | One-sentence plain-language reason built from the stats |
+| edge | The next-ranked player (#11) and whether his 80% range overlaps the 10th-ranked player's |
+| pairs | Top-10 pairs and how many are separated by their 80% ranges |
 
 ## Part C. Shared definitions (from `logs/DEFINITIONS.md`)
 

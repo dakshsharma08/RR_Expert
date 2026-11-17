@@ -1,171 +1,181 @@
 Dashboard file: /home/user/RR_Expert/outputs/deliverables/RR_Clutch_Index_Dashboard.html
-File size: 1,307,237 bytes (1.31 MB)
+File size: 1,182,132 bytes (1.18 MB)
 PASS  file under 5 MB
-PASS  [380] tab summary opens via URL hash  -> summary
+PASS  [380] tab summary opens via plain #hash  -> summary
 PASS  [380] no horizontal scroll on summary  -> scrollWidth 380 vs clientWidth 380
-PASS  [380] tab pressure opens via URL hash  -> pressure
+PASS  [380] tab pressure opens via plain #hash  -> pressure
 PASS  [380] no horizontal scroll on pressure  -> scrollWidth 380 vs clientWidth 380
-PASS  [380] tab leaderboard opens via URL hash  -> leaderboard
+PASS  [380] tab leaderboard opens via plain #hash  -> leaderboard
 PASS  [380] no horizontal scroll on leaderboard  -> scrollWidth 380 vs clientWidth 380
-PASS  [380] tab compare opens via URL hash  -> compare
+PASS  [380] tab compare opens via plain #hash  -> compare
 PASS  [380] no horizontal scroll on compare  -> scrollWidth 380 vs clientWidth 380
-PASS  [380] tab squad opens via URL hash  -> squad
-PASS  [380] no horizontal scroll on squad  -> scrollWidth 380 vs clientWidth 380
-PASS  [380] tab auction opens via URL hash  -> auction
-PASS  [380] no horizontal scroll on auction  -> scrollWidth 380 vs clientWidth 380
-PASS  [380] tab method opens via URL hash  -> method
+PASS  [380] tab method opens via plain #hash  -> method
 PASS  [380] no horizontal scroll on method  -> scrollWidth 380 vs clientWidth 380
-PASS  [1280] tab summary opens via URL hash  -> summary
-PASS  [1280] tab pressure opens via URL hash  -> pressure
-PASS  [1280] tab leaderboard opens via URL hash  -> leaderboard
-PASS  [1280] tab compare opens via URL hash  -> compare
-PASS  [1280] tab squad opens via URL hash  -> squad
-PASS  [1280] tab auction opens via URL hash  -> auction
-PASS  [1280] tab method opens via URL hash  -> method
-PASS  Simple mode is the default and hides deep columns
-PASS  Detailed mode shows deep columns
-PASS  Detailed mode opens deep-dive sections  -> 0 -> 2
-PASS  [380] how_to_use shown on summary under the title "How to use this score"  -> How to use this score What the score is: who has already del
-PASS  [380] how_to_use shown on auction under the title "How to use this score"  -> How to use this score What the score is: who has already del
-PASS  [380] how_to_use shown on method under the title "How to use this score"  -> How to use this score What the score is: who has already del
-PASS  Summary first screen: headline, Must-Back cards, How to use this score, then <=3 KPI tiles, then the 5-line summary  -> {"mb":2,"mbY":730.4375,"howY":1429.765625,"kpiY":1758.125,"fiveY":2538.90625,"tiles":3,"h1":"Back players whose quality has held up when the match was on the line, and know how sure we are."}
-PASS  [380] tabs are one swipeable row (overflow-x on the strip only, scroll-snap, no wrap)  -> {"rows":1,"scrolls":true,"ox":"auto","snap":"x","doc":true,"n":7,"h":60}
-PASS  [380] active tab "summary" is fully in view in the strip  -> {"ok":true,"tab":"summary"}
-PASS  [380] active tab "pressure" is fully in view in the strip  -> {"ok":true,"tab":"pressure"}
-PASS  [380] active tab "leaderboard" is fully in view in the strip  -> {"ok":true,"tab":"leaderboard"}
-PASS  [380] active tab "compare" is fully in view in the strip  -> {"ok":true,"tab":"compare"}
-PASS  [380] active tab "squad" is fully in view in the strip  -> {"ok":true,"tab":"squad"}
-PASS  [380] active tab "auction" is fully in view in the strip  -> {"ok":true,"tab":"auction"}
-PASS  [380] active tab "method" is fully in view in the strip  -> {"ok":true,"tab":"method"}
-PASS  [380] right-edge fade hint shows while more tabs are off screen  -> 0.92479
-PASS  Filters button shows only on Leaderboard and Compare  -> {"summary":false,"pressure":false,"leaderboard":true,"compare":true,"squad":false,"auction":false,"method":false}
-PASS  opened Filters panel keeps the note "The Clutch Score does not change with filters"
+PASS  [1280] tab summary opens via plain #hash  -> summary
+PASS  [1280] tab pressure opens via plain #hash  -> pressure
+PASS  [1280] tab leaderboard opens via plain #hash  -> leaderboard
+PASS  [1280] tab compare opens via plain #hash  -> compare
+PASS  [1280] tab method opens via plain #hash  -> method
+PASS  exactly five tabs: summary, pressure, leaderboard, compare, method  -> summary,pressure,leaderboard,compare,method
+PASS  Squad and Auction tabs are absent
+PASS  #squad falls back to the Summary
+PASS  #auction falls back to the Summary
+PASS  tab names: Top 10s / How we define pressure / Full ranking  -> Top 10s | How we define pressure | Full ranking | Player Compare | Method & Proof
+PASS  no Indian/overseas or "available" filter controls
+PASS  headline is meta.thesis and the small brief line is meta.brief
+PASS  header subtitle is meta.subtitle  -> Who performs best under pressure · IPL 2023–26
+PASS  two list cards: Top 10 batters and Top 10 bowlers
+PASS  bat: 10 rows rendered
+PASS  bat: names, team chips and ranks in payload order  -> Vaibhav Sooryavanshi, Ashutosh Sharma, Shreyas Iyer, Heinrich Klaasen, Virat Koh
+PASS  bat: scores (one decimal) and 80% ranges equal the payload  -> 99.3 (92–99.9) | 98.7 (66–99.9) | 96.1 (73–99.9)
+PASS  bat: "why" text equals the payload
+PASS  bat: #11 edge note names Jos Buttler with score, range and "too close to call"  -> #11 Jos Buttler (79.2, range 36–93): too close to call with #10.
+PASS  bat: pairs line shows 0 of 45
+PASS  bowl: 10 rows rendered
+PASS  bowl: names, team chips and ranks in payload order  -> Kuldeep Yadav, Jasprit Bumrah, Matheesha Pathirana, Patrick Cummins, Ravindra Ja
+PASS  bowl: scores (one decimal) and 80% ranges equal the payload  -> 99.7 (96–99.9) | 98.7 (69–99.9) | 98.4 (84–99.9)
+PASS  bowl: "why" text equals the payload
+PASS  bowl: #11 edge note names Jofra Archer with score, range and "too close to call"  -> #11 Jofra Archer (85.5, range 67–98): too close to call with #10.
+PASS  bowl: pairs line shows 0 of 45
+PASS  no displayed score reads exactly "100" on the Summary
+PASS  KPI shows 293 matches rated, IPL 2023–26, 67,880 balls and "+2022 used to train only"  -> 110 players rated (47 batters, 71 bowlers; 8 rated both ways) || 293 matches rated (IPL 2023–26, 67,880 balls). +2022 used to train only. || How sure: not very 90 of 90 top-10 pairs are too close to c
+PASS  "read" line from the payload is shown
+PASS  3-step "How we define pressure" mini-graphic links to the Pressure tab
+PASS  Summary has the 5-line summary from the payload
+PASS  tapping a row expands its "why"
+PASS  tapping a name opens that player’s profile card
+PASS  [380] how_to_use shown on summary under "How to use this score"  -> How to use this score What the score is: a 0–100 rating of h
+PASS  [380] how_to_use shown on method under "How to use this score"  -> How to use this score What the score is: a 0–100 rating of h
+PASS  [380] Summary order: headline, the two top-10 lists, how to use, then 3 KPI tiles  -> {"h1":446.15625,"lists":783.484375,"how":3645.640625,"kpi":4073.1875,"tiles":3}
+PASS  [380] the two top-10 cards are stacked on a phone
+PASS  [380] tabs are one row inside their own strip with no page sideways scroll  -> {"rows":1,"ox":"auto","snap":"x","doc":true,"n":5,"fits":false}
+PASS  [380] active tab "summary" is fully visible in the strip  -> {"ok":true,"tab":"summary"}
+PASS  [380] active tab "pressure" is fully visible in the strip  -> {"ok":true,"tab":"pressure"}
+PASS  [380] active tab "leaderboard" is fully visible in the strip  -> {"ok":true,"tab":"leaderboard"}
+PASS  [380] active tab "compare" is fully visible in the strip  -> {"ok":true,"tab":"compare"}
+PASS  [380] active tab "method" is fully visible in the strip  -> {"ok":true,"tab":"method"}
+PASS  Filters button shows only on Leaderboard and Compare  -> {"summary":false,"pressure":false,"leaderboard":true,"compare":true,"method":false}
 PASS  [380] Simple mode shows no internal codes on summary
+PASS  [380] Simple mode shows no internal codes on pressure
 PASS  [380] Simple mode shows no internal codes on leaderboard
-PASS  [380] Simple mode shows no internal codes on auction
-PASS  [380] Simple mode shows no internal codes on squad
+PASS  [380] Simple mode shows no internal codes on compare
+PASS  [380] Simple mode shows no internal codes on method
+PASS  Simple mode is the default and hides deep columns
 PASS  Simple mode lists the top 15 per role with a Show-all button  -> {"shown":15,"n":47}
-PASS  Show all N lists every player  -> 47 vs 47
-PASS  Detailed mode still shows codes (e.g. A8)
-PASS  Squad tab asks "Do the Plan A picks have a strong record where RR is weak?" and shows picks_note
-PASS  no "lifts" / "after" wording in Plan A sections
-PASS  squad: every gap shows its 80% range and verdict from the payload
-PASS  squad: headline says directional / within noise, not "first thing to fix"
-PASS  squad: cut axis is labelled
-PASS  squad: Plan A cost shows mid and walk-away
-PASS  squad: A5 reason shown next to the plans
-PASS  auction: no "bargain" / "pressure-proven" / "without spending" claims
-PASS  auction: value map says prices are assumptions / illustrative
-PASS  auction: A5 reason beside the budget builder
-PASS  method: alternative weightings reported separately from +/-10% nudges
-PASS  every auction card shows its tier reason
-PASS  contrarian / unsung / avoid reasons are shown
-PASS  batting gap for a bowler reads "(with the bat)"
+PASS  Show all N lists every rated player
+PASS  Detailed mode shows deep columns
+PASS  Detailed mode opens deep-dive sections
+PASS  Detailed mode lists every player
+PASS  leaderboard top rows match the payload (names and scores)  -> Vaibhav Sooryavanshi 99.3; Ashutosh Sharma 98.7
+PASS  [1280] filters are collapsed until the Filters button is pressed
+PASS  opened panel keeps the note "The Clutch Score does not change with filters"
+PASS  season filter changes leaderboard output
+PASS  pressure filter changes leaderboard output
+PASS  phase filter changes leaderboard output
+PASS  Clutch Score ranking unchanged by season/pressure/phase filters
+PASS  role filter switches the leaderboard to bowlers  -> Vaibhav Sooryavanshi -> Kuldeep Yadav
+PASS  empty result explains itself  -> No bowlers match this slice (Role: Bowlers; Search: zzzqq). Reset the filters or widen the
+PASS  player search narrows the list
+PASS  URL hash keeps the tab and the selected player  -> #leaderboard&p=3644&lb=bowl
+PASS  Escape closes the card and clears the player from the hash
+PASS  deep link #tab&p=ID opens the profile card
+PASS  reducing the hash to #leaderboard closes the card and keeps the tab
+PASS  [380] filter panel hidden until the Filters button is tapped
+PASS  [380] mobile Filters sheet applies a filter
+PASS  [380] active filter chip and reset are shown  -> Active filters: Season: 2025 Reset
+PASS  [380] no horizontal scroll with filters applied  -> 380/380
+PASS  [380] no horizontal scroll with the profile card open  -> 380/380
+PASS  [380] profile card panel does not scroll sideways  -> 380/380
+PASS  card Kuldeep Yadav: name matches  -> Kuldeep Yadav
+PASS  card Kuldeep Yadav: score 99.7 (one decimal) matches payload and never reads 100  -> 99.7
+PASS  card Kuldeep Yadav: 80% range 96–99.9 matches payload  -> 96–99.9
+PASS  card Kuldeep Yadav: rank 1 of 71 shown
+PASS  card Kuldeep Yadav: High-pressure legal balls 226 shown
+PASS  card Kuldeep Yadav: no age / price / availability / fit fields
+PASS  card Josh Hazlewood: name matches  -> Josh Hazlewood
+PASS  card Josh Hazlewood: score 84.2 (one decimal) matches payload and never reads 100  -> 84.2
+PASS  card Josh Hazlewood: 80% range 26–95 matches payload  -> 26–95
+PASS  card Josh Hazlewood: rank 13 of 71 shown
+PASS  card Josh Hazlewood: High-pressure legal balls 177 shown
+PASS  card Josh Hazlewood: no age / price / availability / fit fields
+PASS  card Suryakumar Yadav: name matches  -> Suryakumar Yadav
+PASS  card Suryakumar Yadav: score 50.7 (one decimal) matches payload and never reads 100  -> 50.7
+PASS  card Suryakumar Yadav: 80% range 8–83 matches payload  -> 8–83
+PASS  card Suryakumar Yadav: rank 21 of 47 shown
+PASS  card Suryakumar Yadav: High-pressure balls 191 shown
+PASS  card Suryakumar Yadav: no age / price / availability / fit fields
+PASS  card Anshul Kamboj: name matches  -> Anshul Kamboj
+PASS  card Anshul Kamboj: score 44.3 (one decimal) matches payload and never reads 100  -> 44.3
+PASS  card Anshul Kamboj: 80% range 14–76 matches payload  -> 14–76
+PASS  card Anshul Kamboj: rank 35 of 71 shown
+PASS  card Anshul Kamboj: High-pressure legal balls 126 shown
+PASS  card Anshul Kamboj: no age / price / availability / fit fields
+PASS  card Jofra Archer: name matches  -> Jofra Archer
+PASS  card Jofra Archer: score 85.5 (one decimal) matches payload and never reads 100  -> 85.5
+PASS  card Jofra Archer: 80% range 67–98 matches payload  -> 67–98
+PASS  card Jofra Archer: rank 11 of 71 shown
+PASS  card Jofra Archer: High-pressure legal balls 133 shown
+PASS  card Jofra Archer: no age / price / availability / fit fields
+PASS  card Venkatesh Iyer: name matches  -> Venkatesh Iyer
+PASS  card Venkatesh Iyer: score 79.6 (one decimal) matches payload and never reads 100  -> 79.6
+PASS  card Venkatesh Iyer: 80% range 31–96 matches payload  -> 31–96
+PASS  card Venkatesh Iyer: rank 10 of 47 shown
+PASS  card Venkatesh Iyer: High-pressure balls 106 shown
+PASS  card Venkatesh Iyer: no age / price / availability / fit fields
+PASS  profile card for the #1 bowler lists receipts and similar players
+PASS  match explorer: choosing a ball shows its situation, pressure and WPA
+PASS  match explorer: switching match redraws
+PASS  pressure map: innings toggle works
+PASS  compare: starts with the top three batters
+PASS  compare: shows a verdict sentence with "too close to call" or "clearly ahead"  -> Kuldeep Yadav has the highest score (99.7). Too close to call with Jasprit Bumrah and Matheesha Path
+PASS  compare: the radar and the real-number table are present
+PASS  method: says the score is not a forecast / prediction not established
+PASS  method: backtest shown (score did not beat the plain ranking)
+PASS  method (Detailed): official match-file check table is shown
+PASS  method (Detailed): audit table shows or says Pending
+PASS  Simple mode, summary: none of auction / Must-Back / walk-away / price band / Plan A / purse / retain / Squad Fit / IPL 2027
+PASS  Simple mode, pressure: none of auction / Must-Back / walk-away / price band / Plan A / purse / retain / Squad Fit / IPL 2027
+PASS  Simple mode, leaderboard: none of auction / Must-Back / walk-away / price band / Plan A / purse / retain / Squad Fit / IPL 2027
+PASS  Simple mode, compare: none of auction / Must-Back / walk-away / price band / Plan A / purse / retain / Squad Fit / IPL 2027
+PASS  Simple mode, method: none of auction / Must-Back / walk-away / price band / Plan A / purse / retain / Squad Fit / IPL 2027
+PASS  Detailed mode, summary: none of auction / Must-Back / walk-away / price band / Plan A / purse / retain / Squad Fit / IPL 2027
+PASS  Detailed mode, pressure: none of auction / Must-Back / walk-away / price band / Plan A / purse / retain / Squad Fit / IPL 2027
+PASS  Detailed mode, leaderboard: none of auction / Must-Back / walk-away / price band / Plan A / purse / retain / Squad Fit / IPL 2027
+PASS  Detailed mode, compare: none of auction / Must-Back / walk-away / price band / Plan A / purse / retain / Squad Fit / IPL 2027
+PASS  Detailed mode, method: none of auction / Must-Back / walk-away / price band / Plan A / purse / retain / Squad Fit / IPL 2027
+PASS  profile card text has no out-of-scope words
 PASS  <title> is "RR Clutch Index"  -> RR Clutch Index
 PASS  single light theme: white body background, color-scheme light  -> rgb(255, 255, 255) light
-PASS  embedded fonts load offline (Plus Jakarta Sans, Space Grotesk)  -> 5 loaded; "Plus Jakarta Sans", system-ui, -apple-s
+PASS  embedded fonts load offline (Plus Jakarta Sans, Space Grotesk)  -> 6 loaded
 PASS  side gutters are at least 16px  -> 16/16
 PASS  disclaimer visible in header and footer
-PASS  footer shows the public URL, or "pending (placeholder)" when none is set
+PASS  footer shows the Public URL (from meta.public_url / URL file) or "pending (placeholder)"  -> Public URL: https://claude.ai/artifact/7BerqF4gqgVDVAb2JXrnmS
 PASS  body text is 16px or larger  -> 16
 PASS  hash #summary opens that tab and stays plain  -> #summary
 PASS  hash #pressure opens that tab and stays plain  -> #pressure
 PASS  hash #leaderboard opens that tab and stays plain  -> #leaderboard
 PASS  hash #compare opens that tab and stays plain  -> #compare
-PASS  hash #squad opens that tab and stays plain  -> #squad
-PASS  hash #auction opens that tab and stays plain  -> #auction
 PASS  hash #method opens that tab and stays plain  -> #method
-PASS  reducing the hash to #leaderboard closes the card and keeps the tab
 PASS  unknown hash falls back to the Summary
 PASS  no window.print / alert / confirm in the page script
 PASS  no dark-mode blocks (prefers-color-scheme) in the file
-PASS  [1280] filters are collapsed until the Filters button is pressed
-PASS  season filter changes leaderboard output
-PASS  pressure filter changes leaderboard output
-PASS  phase filter changes leaderboard output
-PASS  Clutch score unchanged by season/pressure/phase filters
-PASS  role filter switches the leaderboard to bowlers  -> Vaibhav Sooryavanshi -> Kuldeep Yadav
-PASS  Indian/overseas filter reduces rows  -> 71 -> 26
-PASS  available-at-auction toggle reduces rows  -> 26 -> 17
-PASS  empty result explains itself  -> No bowlers match this slice (Role: Bowlers; Origin: Overseas; Available at auction only; S
-      (info) narrow slice text: Top batter on historical pressure performance: Vaibhav Sooryavanshi (99, range 92–100). 45 of the 45 pairs in the top 10 have overlapping ranges, so they are to
-PASS  URL hash keeps the tab and the selected player  -> #auction&p=8101
-PASS  Escape closes the profile card and clears the hash player
-PASS  deep link opens the profile card
-PASS  [380] filter bar hidden until the Filters button is tapped
-PASS  [380] mobile Filters sheet applies a filter
-PASS  [380] active filter chips and reset are shown  -> Active filters: Season: 2025 Reset
-PASS  [380] no horizontal scroll with filters applied  -> 380/380
-PASS  [380] no horizontal scroll with profile card open  -> 380/380
-PASS  [380] profile card panel does not scroll sideways  -> 380/380
-PASS  random card Bhuvneshwar Kumar: name matches  -> Bhuvneshwar Kumar
-PASS  random card Bhuvneshwar Kumar: score 85 matches payload  -> 85
-PASS  random card Bhuvneshwar Kumar: 80% range 48–100 matches payload  -> 48–100
-PASS  random card Bhuvneshwar Kumar: rank 12 of 71 shown
-PASS  random card Bhuvneshwar Kumar: High-pressure legal balls 325 shown
-PASS  random card Bhuvneshwar Kumar: price band text shown
-PASS  random card Bhuvneshwar Kumar: age tagged UNKNOWN
-PASS  random card Shahbaz Ahmed: name matches  -> Shahbaz Ahmed
-PASS  random card Shahbaz Ahmed: score 11 matches payload  -> 11
-PASS  random card Shahbaz Ahmed: 80% range 1–42 matches payload  -> 1–42
-PASS  random card Shahbaz Ahmed: rank 64 of 71 shown
-PASS  random card Shahbaz Ahmed: High-pressure legal balls 61 shown
-PASS  random card Shahbaz Ahmed: price band text shown
-PASS  random card Shahbaz Ahmed: age tagged UNKNOWN
-PASS  random card Kuldeep Yadav: name matches  -> Kuldeep Yadav
-PASS  random card Kuldeep Yadav: score 100 matches payload  -> 100
-PASS  random card Kuldeep Yadav: 80% range 96–100 matches payload  -> 96–100
-PASS  random card Kuldeep Yadav: rank 1 of 71 shown
-PASS  random card Kuldeep Yadav: High-pressure legal balls 226 shown
-PASS  random card Kuldeep Yadav: price band text shown
-PASS  random card Kuldeep Yadav: age tagged UNKNOWN
-PASS  random card Andre Russell: name matches  -> Andre Russell
-PASS  random card Andre Russell: score 20 matches payload  -> 20
-PASS  random card Andre Russell: 80% range 7–62 matches payload  -> 7–62
-PASS  random card Andre Russell: rank 57 of 71 shown
-PASS  random card Andre Russell: High-pressure legal balls 98 shown
-PASS  random card Andre Russell: price band text shown
-PASS  random card Andre Russell: age tagged UNKNOWN
-PASS  random card Rishabh Pant: name matches  -> Rishabh Pant
-PASS  random card Rishabh Pant: score 14 matches payload  -> 14
-PASS  random card Rishabh Pant: 80% range 2–46 matches payload  -> 2–46
-PASS  random card Rishabh Pant: rank 41 of 47 shown
-PASS  random card Rishabh Pant: High-pressure balls 112 shown
-PASS  random card Rishabh Pant: price band text shown
-PASS  random card Rishabh Pant: age tagged UNKNOWN
-PASS  match explorer: choosing a ball shows its situation and WPA
-PASS  match explorer: switching match redraws
-PASS  pressure map: innings toggle works
-PASS  compare: shows a verdict sentence  -> Ashutosh Sharma has the highest score (99). Too close to call with Patrick Cummins and Sameer Rizvi.
-PASS  compare: uses "too close to call"/"clearly ahead" wording
-PASS  auction basket: purse left for Plan A equals purse minus mid prices  -> 6.7 vs 6.70
-PASS  auction basket: warns when a limit breaks  -> ⚠ Over the purse even at mid-band prices: 27.6 cr against 15.0 cr. | ⚠ 3 overseas players, but only 1 overseas slots are
-PASS  method: states prediction of 2027 is not established
-PASS  method: backtest shown (score did not beat naive)
-PASS  method: facts ledger states no fact is VERIFIED
-PASS  method: audit shows pending when empty
-PASS  footer: public URL (or placeholder when unset)
 PASS  no console errors
 PASS  no external network requests
 Blocked/recorded request attempts: 0
 
 Per-tab notes (measured at 380px, automatic):
-  summary: lead="Back players whose quality has held up when the match was on the line, and know how sure w..." charts=1 svgs=23 tables=0 deep-sections=1 so-what-lines=2 page-height=7156px
-  pressure: lead="Pressure means how much one ball can swing the match. A ball with the match on a knife-edg..." charts=3 svgs=16 tables=5 deep-sections=1 so-what-lines=4 page-height=7008px
-  leaderboard: lead="Top batter on historical pressure performance: Vaibhav Sooryavanshi (99, range 92–100). 45..." charts=2 svgs=29 tables=3 deep-sections=2 so-what-lines=3 page-height=10396px
-  compare: lead="Ashutosh Sharma (99) and Patrick Cummins (96): too close to call. Their 80% ranges overlap..." charts=2 svgs=6 tables=1 deep-sections=0 so-what-lines=2 page-height=6176px
-  squad: lead="RR’s weakest areas under pressure are middle-overs batting and death-overs batting (direct..." charts=2 svgs=37 tables=2 deep-sections=1 so-what-lines=2 page-height=8486px
-  auction: lead="Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price r..." charts=1 svgs=14 tables=2 deep-sections=1 so-what-lines=2 page-height=11359px
-  method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict IP..." charts=1 svgs=4 tables=10 deep-sections=2 so-what-lines=1 page-height=5571px
+  summary: lead="Who delivered when the match was on the line: the top 10 batters and top 10 bowlers under..." charts=0 svgs=21 tables=0 deep-sections=0 takeaways=1 page-height=7016px
+  pressure: lead="Pressure means how much one ball can swing the match. A ball with the match on a knife-edg..." charts=3 svgs=16 tables=5 deep-sections=1 takeaways=4 page-height=7030px
+  leaderboard: lead="Top batter on historical pressure performance: Vaibhav Sooryavanshi (99.3, range 92–99.9)...." charts=2 svgs=29 tables=3 deep-sections=2 takeaways=3 page-height=8012px
+  compare: lead="Vaibhav Sooryavanshi has the highest score (99.3). Too close to call with Ashutosh Sharma..." charts=2 svgs=8 tables=1 deep-sections=0 takeaways=2 page-height=5461px
+  method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict ne..." charts=1 svgs=4 tables=9 deep-sections=2 takeaways=1 page-height=5738px
 
 Manual review notes (screenshots read by the builder):
-  summary: thesis, 5-line summary, KPI tiles, honest backtest note, Must-Back cards, whisker hero chart, before/after strips; all numbers filled from the payload.
-  pressure: explanation + formula, match explorer (slider / tap / drag), pressure heatmap (innings toggle), distribution with cut-offs, example balls; calibration/Brier/boosts/overlap in the Show-detail layer.
-  leaderboard: Batters/Bowlers/All-rounders, sortable table that becomes cards at 380px, whiskers, too-close-to-call count, rank-change chart, scatter + full metrics + not-scored list in the detail layer.
-  compare: 2-4 players, radar (percentile within role), real-number table with clearly-ahead / too-close tags, trend overlay, role-mismatch warning.
-  squad: overseas / hand / age facts with tags, RR-vs-league gap bars, Before / Plan A / Plan B strength bars, best XI, bowling plan, still-lacks line.
-  auction: tier columns, budget basket with live warnings and presets, Plan B rule, value map with bargain zone, contrarian / unsung / avoid, assumptions.
-  method: six-box flow, formula, weights (effective), why-not-average, backtest chart with claim, sensitivity, robustness, facts ledger, data notes, glossary, audit (pending if empty), build stamp.
-  Not verified by this script: colour-blindness simulation (shape + pattern + label cues are used everywhere, colour is never the only cue); real touch devices; Safari/Firefox (Chromium only).
+  summary: headline, brief, 3 KPI tiles, Top 10 batters and Top 10 bowlers (rank, name, team chip, score with mini whisker, tap for why, #11 edge note), read line, how to use, 3-step pressure definition, honest test note, 5-line summary.
+  pressure: plain explanation + formula, match explorer, pressure map, distribution with cut-offs, example balls; calibration, Brier, boosts and overlaps in the Show-detail layer.
+  leaderboard: Batters / Bowlers / All-rounders, sortable table that becomes cards at 380px, top 15 in Simple mode with Show all, rank-change chart, scatter and full metrics in the detail layer.
+  compare: 2-4 players, radar (percentile within role), real-number table with clearly-ahead / too-close tags, trend overlay.
+  method: six-box flow, formula, weights, why-not-average, backtest chart, sensitivity, robustness, official match-file check, data notes, limitations, glossary, audit, build stamp.
+  Not verified by this script: colour-blindness simulation (shapes, patterns and labels are used, colour is never the only cue); real touch devices; Safari / Firefox (Chromium only).
 
 RESULT: ALL CHECKS PASSED

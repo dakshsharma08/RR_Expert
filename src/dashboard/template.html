@@ -5,7 +5,7 @@
 <title>RR Clutch Index</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<meta name="description" content="Who delivered for the team when the match was on the line: a historical pressure-performance shortlist for the next season auction. Independent submission, not an official Rajasthan Royals product.">
+<meta name="description" content="Who delivered when the match was on the line: the top 10 batters and top 10 bowlers under pressure in IPL 2023-26. Independent submission, not an official Rajasthan Royals product.">
 <style>
 /*__FONTS__*/
 :root{
@@ -126,8 +126,6 @@ details.t10r[open] .chev{transform:rotate(-135deg)}
 .t10r .why{padding:2px 0 12px 36px;color:var(--muted);font-size:.92rem}
 .t10r .why p{margin:.2em 0 .5em}
 .edge{margin:10px 0 0;padding:8px 12px;background:var(--tint);border-radius:12px;font-size:.92rem}
-ha-must{grid-area:must}.ha-how{grid-area:how}.ha-kpi{grid-area:kpi;grid-template-columns:1fr;padding-top:26px}
-}
 .hero h1{font-size:clamp(1.75rem,6.4vw,var(--fs-2xl));line-height:1.12;font-weight:800;margin:0 0 .35em;max-width:22ch;letter-spacing:-.012em}
 .hero h1 em{color:var(--pink);font-style:normal}
 .hero .sub{font-size:1.0625rem;color:var(--muted);max-width:52ch;margin:0 0 16px}
@@ -768,13 +766,13 @@ function dial(score, lo, hi) {
   const w = 240, h = 140, cx = 120, cy = 122, R = 88;
   const pt = (v, r) => { const a = Math.PI * (1 - v / 100); return [cx + r * Math.cos(a), cy - r * Math.sin(a)]; };
   const arc = (a, b, r) => { const [x0, y0] = pt(a, r), [x1, y1] = pt(b, r); return `M${x0},${y0} A${r},${r} 0 0 1 ${x1},${y1}`; };
-  let s = svgOpen(w, h, `Clutch Score ${f0(score)} of 100, 80% range ${f0(lo)} to ${f0(hi)}`);
+  let s = svgOpen(w, h, `Clutch Score ${sc1(score)} of 100, 80% range ${fr(lo)} to ${fr(hi)}`);
   s += `<path d="${arc(0, 100, R)}" fill="none" stroke="${COL.grid}" stroke-width="14"/>`;
   s += `<path d="${arc(0, Math.max(score, .5), R)}" fill="none" stroke="${COL.pink}" stroke-width="14"/>`;
   s += `<path d="${arc(lo, Math.max(hi, lo + .5), R + 13)}" fill="none" stroke="${COL.blueL}" stroke-width="5"/>`;
   const [nx, ny] = pt(score, R - 20), [bx, by] = pt(score, R + 11);
   s += `<line x1="${nx}" y1="${ny}" x2="${bx}" y2="${by}" stroke="${COL.pink}" stroke-width="5"/>` + marker('circle', pt(score, R)[0], pt(score, R)[1], 8, '#fff', COL.pink);
-  s += T(cx - R, cy + 16, '0', 'ax', 'middle') + T(cx + R, cy + 16, '100', 'ax', 'middle') + T(cx, cy - 8, f0(score), 'axl', 'middle', 'style="font-size:30px;font-weight:800"');
+  s += T(cx - R, cy + 16, '0', 'ax', 'middle') + T(cx + R, cy + 16, '100', 'ax', 'middle') + T(cx, cy - 8, sc1(score), 'axl', 'middle', 'style="font-size:26px;font-weight:800"');
   return s + '</svg>';
 }
 
@@ -799,7 +797,7 @@ function backtestVerdictLine() {
 const shortSpan = s => String(s || '').replace(/(\d{4})–(\d{2})(\d{2})/, '$1–$3');
 function miniWhisker(lo, hi, score, small) {
   const w = 200, h = 16, sx = lin(0, 100, 6, w - 6);
-  return `<svg class="mw" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Score ${f0(score)}, 80% range ${f0(lo)} to ${f0(hi)}"><title>Score ${f0(score)}, 80% range ${f0(lo)} to ${f0(hi)}</title>`
+  return `<svg class="mw" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Score ${sc1(score)}, 80% range ${fr(lo)} to ${fr(hi)}"><title>Score ${sc1(score)}, 80% range ${fr(lo)} to ${fr(hi)}</title>`
     + `<line x1="6" x2="${w - 6}" y1="8" y2="8" stroke="${COL.grid}" stroke-width="3" stroke-linecap="round"/>`
     + `<line x1="${sx(lo)}" x2="${sx(hi)}" y1="8" y2="8" stroke="${small ? COL.grey : COL.blueL}" stroke-width="6" stroke-linecap="round" opacity=".55"/>`
     + `<line x1="${sx(lo)}" x2="${sx(lo)}" y1="2" y2="14" stroke="${COL.text}" stroke-width="2"/><line x1="${sx(hi)}" x2="${sx(hi)}" y1="2" y2="14" stroke="${COL.text}" stroke-width="2"/>`
@@ -826,15 +824,15 @@ function tabSummary() {
     <div class="ha-head hero"><p class="eyebrow">RR Clutch Index</p>
       <h1 class="lead">${esc(D.meta.thesis)}</h1>
       <p class="sub">${esc(D.meta.brief || '')}</p></div>
+    <div class="ha-lists"><div class="grid g2 t10grid">${top10Card('bat')}${top10Card('bowl')}</div>
+      <p class="small muted" style="margin:10px 0 0">${X(t.eligibility || '')}</p>
+      ${sowhat(X(t.read || ''))}</div>
+    <div class="ha-how"><div class="card hl howto"><h3>${ico('bulb')} How to use this score</h3><ul class="clean">${(D.meta.how_to_use || []).map(x => { const i = String(x).indexOf(':'); return `<li>${i > 0 ? `<b>${esc(x.slice(0, i + 1))}</b>${X(x.slice(i + 1))}` : X(x)}</li>`; }).join('')}</ul></div></div>
     <div class="kpis ha-kpi">
       <div class="card tile"><div class="v">${SCORABLE.length}</div><div class="l">players rated (${k.scorable_bat} batters, ${k.scorable_bowl} bowlers; ${k.scorable_ar} rated both ways)</div></div>
       <div class="card tile"><div class="v">${thou(k.scored_matches)}</div><div class="l">matches rated (IPL ${esc(shortSpan(k.seasons_scored))}, ${thou(k.scored_balls)} balls). <span class="faint">+${esc(k.training_only)} used to train only.</span></div></div>
       <div class="card tile warn"><div class="v txt">How sure: not very</div><div class="l">${tc} of ${tt} top-10 pairs are too close to call. Next-season test, top-10 hit rate: batters ${f1(bt.sc)}% vs ${f1(bt.nv)}% plain ranking; bowlers ${f1(bw.sc)}% vs ${f1(bw.nv)}% ${info('', 'Hit rate = share of the top 10 who were still above average the next season. Plain ranking = overall strike rate (batters) or economy (bowlers).')}</div></div>
     </div>
-    <div class="ha-lists"><div class="grid g2 t10grid">${top10Card('bat')}${top10Card('bowl')}</div>
-      <p class="small muted" style="margin:10px 0 0">${X(t.eligibility || '')}</p>
-      ${sowhat(X(t.read || ''))}</div>
-    <div class="ha-how"><div class="card hl howto"><h3>${ico('bulb')} How to use this score</h3><ul class="clean">${(D.meta.how_to_use || []).map(x => { const i = String(x).indexOf(':'); return `<li>${i > 0 ? `<b>${esc(x.slice(0, i + 1))}</b>${X(x.slice(i + 1))}` : X(x)}</li>`; }).join('')}</ul></div></div>
   </section>
   <section class="sec"><h2>How we define pressure</h2>
     <div class="flow">${steps.map((l, i) => `<div><b>${esc(stepTitles[i] || '')}</b><br>${X(l)}</div>`).join('')}</div>
@@ -1049,7 +1047,7 @@ function tabLeaderboard() {
   }
   const risers = role === 'ar' ? null : methodAdds(all, role);
   const nsName = x => x.name || (P.get(x.id) || {}).name || ('Name missing in data (id ' + x.id + ')');
-  const ns = D.auction.not_scorable.filter(x => !S.f.q.trim() || nsName(x).toLowerCase().includes(S.f.q.trim().toLowerCase()));
+  const ns = D.top10.not_scorable.filter(x => !S.f.q.trim() || nsName(x).toLowerCase().includes(S.f.q.trim().toLowerCase()));
   return `<section class="sec">${intro}${termsStrip(['clutch', 'range', 'rae', 'wpa', 'naive'])}${sel}
     <div class="card" style="margin:0 0 10px"><b>The Clutch Score does not change with filters.</b> <span class="muted">${esc(sliceCaption())}</span></div>
     ${body}
@@ -1057,7 +1055,7 @@ function tabLeaderboard() {
     <p class="faint small">${tagChip('Table note', 'info')} ${role === 'ar' ? 'All-rounders are scored as a batter and a bowler; the combined score and its range are shown. There is no naive baseline for all-rounders.' : 'Naive rank = ordering by plain ' + (role === 'bat' ? 'strike rate' : 'economy') + ' on pressure-scored balls.'}</p></section>
   ${risers ? `<section class="sec">${risers}</section>` : ''}
   <section class="sec">${deep('scatter', 'skill versus steadiness, and every metric', role === 'ar' ? '<p class="muted">All-rounder components are shown on the player cards.</p>' : lbScatter(all, role) + lbFullTable(all, role))}</section>
-  <section class="sec">${deep('ns', `players not scored (${ns.length})`, `<p class="small muted">These ${D.auction.not_scorable.length} players had too few High-pressure balls to score. They are never ranked; their numbers are shown for completeness.</p><div class="tw"><table class="rt"><thead><tr><th>Player</th><th class="num">High-pressure balls faced</th><th class="num">High-pressure balls bowled</th><th>Reason</th></tr></thead><tbody>${ns.map(x => `<tr><td data-l="Player">${plink(x.id, nsName(x))}</td><td class="num" data-l="Faced">${x.faced}</td><td class="num" data-l="Bowled">${x.bowled}</td><td data-l="Reason">${esc(x.reason)}</td></tr>`).join('')}</tbody></table></div>`)}</section>`;
+  <section class="sec">${deep('ns', `players not scored (${ns.length})`, `<p class="small muted">These ${D.top10.not_scorable.length} players had too few High-pressure balls to score. They are never ranked; their numbers are shown for completeness.</p><div class="tw"><table class="rt"><thead><tr><th>Player</th><th class="num">High-pressure balls faced</th><th class="num">High-pressure balls bowled</th><th>Reason</th></tr></thead><tbody>${ns.map(x => `<tr><td data-l="Player">${plink(x.id, nsName(x))}</td><td class="num" data-l="Faced">${x.faced}</td><td class="num" data-l="Bowled">${x.bowled}</td><td data-l="Reason">${esc(x.reason)}</td></tr>`).join('')}</tbody></table></div>`)}</section>`;
 }
 function lbRow(r, role, all) {
   const p = r.p, small = isWide(r.lo, r.hi);
@@ -1251,7 +1249,7 @@ function cmpVerdict(ps) {
   if (ps.length === 2) lead = tied.length ? `${L.p.name} (${sc1(L.b.score)}) and ${rest[0].p.name} (${sc1(rest[0].b.score)}): too close to call. Their 80% ranges overlap, so the data cannot say who is better.` : `${L.p.name} (${sc1(L.b.score)}, range ${fr(L.b.lo)}–${fr(L.b.hi)}) is clearly ahead of ${rest[0].p.name} (${sc1(rest[0].b.score)}): the 80% ranges do not overlap.`;
   else lead = `${L.p.name} has the highest score (${sc1(L.b.score)}). ${clear.length ? 'Clearly ahead of ' + niceList(clear.map(o => o.p.name)) + '. ' : ''}${tied.length ? 'Too close to call with ' + niceList(tied.map(o => o.p.name)) + '.' : ''}`;
   if (diffRole) lead += ' Roles differ, so this is not a like-for-like ranking.';
-  return { lead, sow: tied.length ? 'The ranges overlap, so do not pick on score alone: decide on role fit, price and availability, and treat these as interchangeable on pressure record.' : 'The score gap is real on this evidence, but it is a past record, not a forecast.' };
+  return { lead, sow: tied.length ? 'The ranges overlap, so do not pick on score alone: decide on role and the numbers below, and treat these as interchangeable on pressure record.' : 'The score gap is real on this evidence, but it is a past record, not a forecast.' };
 }
 function cmpRows(ps, set) {
   const row = (label, f, tipk) => `<tr><td data-l="Metric">${label}${tipk ? info(tipk) : ''}</td>${ps.map(p => `<td data-l="${esc(p.name)}">${f(p)}</td>`).join('')}</tr>`;
@@ -1439,7 +1437,6 @@ function moveBall(i) {
 function setFilter(k, v) { S.f[k] = v; if (k === 'role' && v !== 'all') S.lb = v; render(true); }
 function resetFilters() { S.f = Object.assign({}, FDEF); render(true); }
 function addCompare(id) { if (!S.cmp.includes(id) && S.cmp.length < CFG.cmpMax) S.cmp.push(id); S.cmpInit = true; S.player = null; S.tab = 'compare'; writeHash(); renderCard(); render(false); }
-function toggleBasket(id) { const i = S.basket.indexOf(id); if (i >= 0) S.basket.splice(i, 1); else S.basket.push(id); if (S.player) renderCard(); render(true); }
 
 document.addEventListener('click', e => {
   const t = e.target;
@@ -1461,10 +1458,6 @@ document.addEventListener('click', e => {
     case 'sortby': S.sort = { k: v, d: S.sort.k === v ? -S.sort.d : 1 }; render(true); break;
     case 'lbshowall': S.lbAll = !S.lbAll; render(true); break;
     case 'sortdir': S.sort.d = -S.sort.d; render(true); break;
-    case 'plan': S.squadPlan = v; render(true); break;
-    case 'basket': toggleBasket(id); break;
-    case 'bk-preset': S.basket = (v === 'A' ? D.squad.planA_ids : D.squad.planB_ids).slice(); render(true); break;
-    case 'bk-clear': S.basket = []; render(true); break;
     case 'cmp-remove': S.cmp = S.cmp.filter(x => x !== id); S.cmpInit = true; writeHash(); render(true); break;
     case 'cmp-preset': S.cmp = D.top10[v === 'bowl' ? 'bowl' : 'bat'].slice(0, 3).map(r => r.id); S.cmpInit = true; writeHash(); render(true); break;
     case 'compare-add': addCompare(id); break;
