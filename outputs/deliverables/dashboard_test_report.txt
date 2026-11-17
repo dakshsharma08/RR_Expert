@@ -1,5 +1,5 @@
 Dashboard file: /home/user/RR_Expert/outputs/deliverables/RR_Clutch_Index_Dashboard.html
-File size: 1,158,963 bytes (1.16 MB)
+File size: 1,164,910 bytes (1.16 MB)
 PASS  file under 5 MB
 PASS  [380] tab summary opens via URL hash  -> summary
 PASS  [380] no horizontal scroll on summary  -> scrollWidth 380 vs clientWidth 380
@@ -43,49 +43,48 @@ PASS  [380] active filter chips and reset are shown  -> Active filters: Season: 
 PASS  [380] no horizontal scroll with filters applied  -> 380/380
 PASS  [380] no horizontal scroll with profile card open  -> 380/380
 PASS  [380] profile card panel does not scroll sideways  -> 378/378
-PASS  random card Jasprit Bumrah: name matches  -> Jasprit Bumrah
-PASS  random card Jasprit Bumrah: score 99 matches payload  -> 99
-PASS  random card Jasprit Bumrah: 80% range 69–100 matches payload  -> 69–100
-PASS  random card Jasprit Bumrah: rank 2 of 71 shown
-PASS  random card Jasprit Bumrah: High-pressure legal balls 209 shown
-PASS  random card Jasprit Bumrah: price band text shown
-PASS  random card Jasprit Bumrah: age tagged UNKNOWN
-PASS  random card Shubman Gill: name matches  -> Shubman Gill
-PASS  random card Shubman Gill: score 65 matches payload  -> 65
-PASS  random card Shubman Gill: 80% range 30–91 matches payload  -> 30–91
-PASS  random card Shubman Gill: rank 17 of 47 shown
-PASS  random card Shubman Gill: High-pressure balls 284 shown
-PASS  random card Shubman Gill: price band text shown
-PASS  random card Shubman Gill: age tagged UNKNOWN
-PASS  random card Krunal Pandya: name matches  -> Krunal Pandya
-PASS  random card Krunal Pandya: score 84 matches payload  -> 84
-PASS  random card Krunal Pandya: 80% range 55–95 matches payload  -> 55–95
-PASS  random card Krunal Pandya: rank 1 of 8 shown
-PASS  random card Krunal Pandya: High-pressure balls 140 shown
-PASS  random card Krunal Pandya: High-pressure legal balls 170 shown
-PASS  random card Krunal Pandya: price band text shown
-PASS  random card Krunal Pandya: age tagged UNKNOWN
-PASS  random card Prasidh Krishna: name matches  -> Prasidh Krishna
-PASS  random card Prasidh Krishna: score 2 matches payload  -> 2
-PASS  random card Prasidh Krishna: 80% range 0–44 matches payload  -> 0–44
-PASS  random card Prasidh Krishna: rank 71 of 71 shown
-PASS  random card Prasidh Krishna: High-pressure legal balls 95 shown
-PASS  random card Prasidh Krishna: price band text shown
-PASS  random card Prasidh Krishna: age tagged UNKNOWN
-PASS  random card Kartik Tyagi: name matches  -> Kartik Tyagi
-PASS  random card Kartik Tyagi: score 5 matches payload  -> 5
-PASS  random card Kartik Tyagi: 80% range 1–23 matches payload  -> 1–23
-PASS  random card Kartik Tyagi: rank 69 of 71 shown
-PASS  random card Kartik Tyagi: High-pressure legal balls 105 shown
-PASS  random card Kartik Tyagi: price band text shown
-PASS  random card Kartik Tyagi: age tagged UNKNOWN
+PASS  random card Sandeep Sharma: name matches  -> Sandeep Sharma
+PASS  random card Sandeep Sharma: score 69 matches payload  -> 69
+PASS  random card Sandeep Sharma: 80% range 19–96 matches payload  -> 19–96
+PASS  random card Sandeep Sharma: rank 22 of 71 shown
+PASS  random card Sandeep Sharma: High-pressure legal balls 266 shown
+PASS  random card Sandeep Sharma: price band text shown
+PASS  random card Sandeep Sharma: age tagged UNKNOWN
+PASS  random card Avesh Khan: name matches  -> Avesh Khan
+PASS  random card Avesh Khan: score 69 matches payload  -> 69
+PASS  random card Avesh Khan: 80% range 26–96 matches payload  -> 26–96
+PASS  random card Avesh Khan: rank 21 of 71 shown
+PASS  random card Avesh Khan: High-pressure legal balls 294 shown
+PASS  random card Avesh Khan: price band text shown
+PASS  random card Avesh Khan: age tagged UNKNOWN
+PASS  random card Ayush Badoni: name matches  -> Ayush Badoni
+PASS  random card Ayush Badoni: score 7 matches payload  -> 7
+PASS  random card Ayush Badoni: 80% range 2–22 matches payload  -> 2–22
+PASS  random card Ayush Badoni: rank 43 of 47 shown
+PASS  random card Ayush Badoni: High-pressure balls 136 shown
+PASS  random card Ayush Badoni: price band text shown
+PASS  random card Ayush Badoni: age tagged UNKNOWN
+PASS  random card Patrick Cummins: name matches  -> Patrick Cummins
+PASS  random card Patrick Cummins: score 97 matches payload  -> 97
+PASS  random card Patrick Cummins: 80% range 61–100 matches payload  -> 61–100
+PASS  random card Patrick Cummins: rank 4 of 71 shown
+PASS  random card Patrick Cummins: High-pressure legal balls 123 shown
+PASS  random card Patrick Cummins: price band text shown
+PASS  random card Patrick Cummins: age tagged UNKNOWN
+PASS  random card Matheesha Pathirana: name matches  -> Matheesha Pathirana
+PASS  random card Matheesha Pathirana: score 98 matches payload  -> 98
+PASS  random card Matheesha Pathirana: 80% range 84–100 matches payload  -> 84–100
+PASS  random card Matheesha Pathirana: rank 3 of 71 shown
+PASS  random card Matheesha Pathirana: High-pressure legal balls 180 shown
+PASS  random card Matheesha Pathirana: price band text shown
+PASS  random card Matheesha Pathirana: age tagged UNKNOWN
 PASS  match explorer: choosing a ball shows its situation and WPA
 PASS  match explorer: switching match redraws
 PASS  pressure map: innings toggle works
 PASS  compare: shows a verdict sentence  -> Ashutosh Sharma has the highest score (99). Too close to call with Patrick Cummins, Sameer Rizvi and
 PASS  compare: uses "too close to call"/"clearly ahead" wording
 PASS  auction basket: purse left for Plan A equals purse minus mid prices  -> 1.2 vs 1.20
-PASS  auction basket: warns when a limit breaks  -> ⚠ Over the purse even at mid-band prices: 27.6 cr against 15.0 cr. | ⚠ 3 overseas players, but only 2 overseas slots are
+PASS  auction basket: warns when a limit breaks  -> ⚠ Over the purse even at mid-band prices: 27.6 cr against 15.0 cr. | ⚠ 3 overseas players, but only 1 overseas slots are
 PASS  method: states prediction of 2027 is not established
 PASS  method: backtest shown (score did not beat naive)
 PASS  method: facts ledger states no fact is VERIFIED
@@ -102,6 +101,16 @@ Per-tab notes (measured at 380px, automatic):
   compare: lead="Ashutosh Sharma (99) and Patrick Cummins (97): too close to call. Their 80% ranges overlap..." charts=2 svgs=6 tables=1 deep-sections=0 so-what-lines=2 page-height=5813px
   squad: lead="RR’s measured weakness is batting under pressure: middle: RR sits 7.3 runs per 100 High-pr..." charts=2 svgs=18 tables=2 deep-sections=1 so-what-lines=2 page-height=5954px
   auction: lead="Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price r..." charts=1 svgs=14 tables=2 deep-sections=1 so-what-lines=2 page-height=8525px
-  method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict IP..." charts=1 svgs=4 tables=9 deep-sections=2 so-what-lines=1 page-height=4528px
+  method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict IP..." charts=1 svgs=4 tables=10 deep-sections=2 so-what-lines=1 page-height=4528px
+
+Manual review notes (screenshots read by the builder):
+  summary: thesis, 5-line summary, KPI tiles, honest backtest note, Must-Back cards, whisker hero chart, before/after strips; all numbers filled from the payload.
+  pressure: explanation + formula, match explorer (slider / tap / drag), pressure heatmap (innings toggle), distribution with cut-offs, example balls; calibration/Brier/boosts/overlap in the Show-detail layer.
+  leaderboard: Batters/Bowlers/All-rounders, sortable table that becomes cards at 380px, whiskers, too-close-to-call count, rank-change chart, scatter + full metrics + not-scored list in the detail layer.
+  compare: 2-4 players, radar (percentile within role), real-number table with clearly-ahead / too-close tags, trend overlay, role-mismatch warning.
+  squad: overseas / hand / age facts with tags, RR-vs-league gap bars, Before / Plan A / Plan B strength bars, best XI, bowling plan, still-lacks line.
+  auction: tier columns, budget basket with live warnings and presets, Plan B rule, value map with bargain zone, contrarian / unsung / avoid, assumptions.
+  method: six-box flow, formula, weights (effective), why-not-average, backtest chart with claim, sensitivity, robustness, facts ledger, data notes, glossary, audit (pending if empty), build stamp.
+  Not verified by this script: colour-blindness simulation (shape + pattern + label cues are used everywhere, colour is never the only cue); real touch devices; Safari/Firefox (Chromium only).
 
 RESULT: ALL CHECKS PASSED

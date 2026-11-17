@@ -17,7 +17,9 @@ r1 = lambda x, d=1: None if x is None or (isinstance(x, float) and np.isnan(x)) 
 
 scope = T("step3_scope", dtype={"player_id": str})
 _pm = pd.read_csv(WORK / "player_map.csv", dtype={"player_id": str}).set_index("player_id").canonical_name
-scope["player_name"] = scope.player_name.fillna(scope.player_id.map(_pm))
+from io_raw import load_raw as _lr
+_rn = _lr()[["non_striker_id", "non_striker_name"]].drop_duplicates("non_striker_id").set_index("non_striker_id").non_striker_name
+scope["player_name"] = scope.player_name.fillna(scope.player_id.map(_pm)).fillna(scope.player_id.map(_rn))
 cand = T("step5_candidates", dtype={"player_id": str})
 sb = T("step4_scores_batters", dtype={"player_id": str}); sw = T("step4_scores_bowlers", dtype={"player_id": str})
 sa = T("step4_scores_allrounders", dtype={"player_id": str})
@@ -221,6 +223,8 @@ squad = dict(group=[dict(id=r.player_id, name=r.player_name, role=r.role, nation
                          bowl=r.main_pace_or_spin if isinstance(r.main_pace_or_spin, str) else "") for r in rrg.itertuples()],
              gaps=gap_rows, before=phase_strength(rr_ids), planA=phase_strength(rr_ids | planA_ids),
              planB=phase_strength(rr_ids | planB_ids), league=league,
+             planA_picks_only=phase_strength(planA_ids), planB_picks_only=phase_strength(planB_ids),
+             picks_note="Plan A picks' own High-pressure record (2025–26) in each phase, next to RR's group and the league. This is their past record, not a projection of RR's 2027 performance.",
              planA_ids=sorted(planA_ids), planB_ids=sorted(planB_ids),
              purse=float(T("step5_plans_meta").purse_cr.iloc[0]), purse_tag="[ASSUMPTION A4]",
              slots=int(T("step5_plans_meta").slots_assumed.iloc[0]), ovs_slots=int(T("step5_plans_meta").overseas_slots_assumed.iloc[0]),
@@ -236,7 +240,7 @@ squad = dict(group=[dict(id=r.player_id, name=r.player_name, role=r.role, nation
              still_lacks="")
 
 # ------------------------------------------------ auction board
-tier_cards = [dict(id=r.player_id, tier=r.tier, score=r1(r.score), lo=r1(r.score_lo80), hi=r1(r.score_hi80), price=r.price_band,
+tier_cards = [dict(id=r.player_id, tier=r.tier, tier_reason=r.tier_reason, score=r1(r.score), lo=r1(r.score_lo80), hi=r1(r.score_hi80), price=r.price_band,
                    walk_away=r1(r.walk_away_cr, 1), risk=r.risk_tags, fills=r.fills_gaps if isinstance(r.fills_gaps, str) else "",
                    sub=r.sub_role, nationality=r.nationality) for r in short.itertuples()]
 auction = dict(tiers=tier_cards, planA=sorted(planA_ids), planB=sorted(planB_ids),
@@ -345,18 +349,24 @@ glossary = [
     ("[ASSUMPTION]", "A value the data can't supply and the web couldn't verify here; stated with its reason."),
 ]
 summary["exec_summary"] = [
-    f"We rated {summary['scorable_bat']} batters, {summary['scorable_bowl']} bowlers and {summary['scorable_ar']} all-rounders on how they performed when a ball could swing the match (IPL 2023–26).",
+    f"We rated {summary['scorable_bat'] + summary['scorable_bowl'] - summary['scorable_ar']} players ({summary['scorable_bat']} batters and {summary['scorable_bowl']} bowlers, {summary['scorable_ar']} of them all-rounders rated both ways) on how they performed when a ball could swing the match (IPL 2023–26).",
     f"RR's measured gaps: {', '.join(g.split(': ')[1].lower() + '-overs batting' for g in summary['top_gaps'])} under pressure; RR's bowling under pressure is above league in every phase.",
     f"Must-Back if available: {', '.join(summary['must_back'])}. Plan A in an assumed Rs {T('step5_plans_meta').purse_cr.iloc[0]:g} cr purse: {', '.join(summary['planA'])}.",
     f"Honest test (top 10 still above average next season): batters {summary['backtest']['bat_score']}% v naive {summary['backtest']['bat_naive']}% v random pick {summary['backtest']['bat_base']}%; bowlers {summary['backtest']['bowl_score']}% v {summary['backtest']['bowl_naive']}% v {summary['backtest']['bowl_base']}%. Verdict: {verdict_word}.",
     "So read it as proof of past pressure performance, not a promise; prices, ages and availability are unverified assumptions to recheck before 16 Dec.",
 ]
 
-payload = dict(meta=dict(name="RR Clutch Index", thesis="Back players whose quality has held up when the match was on the line, and know how sure we are.",
+how_to_use = [
+    "What the score is: who has already delivered when a ball could swing the match, how sure we are, and who has not.",
+    "What it is not: a forecast. Tested one season ahead, it did not beat simple stats (strike rate/economy) or a random pick.",
+    "How to use it: build the shortlist and set walk-away prices from it, then decide on form, fitness, role and price.",
+]
+payload = dict(meta=dict(name="RR Clutch Index", how_to_use=how_to_use, thesis="Back players whose quality has held up when the match was on the line, and know how sure we are.",
                          **summary["stamp"] if "stamp" in summary else {}, **method["stamp"], kpi=summary),
                exec=summary["exec_summary"], glossary=[dict(term=a, meaning=b_) for a, b_ in glossary], players=players,
                agg=dict(bat=agg_bat, bat_cols=agg_bat_cols, bowl=agg_bowl, bowl_cols=agg_bowl_cols),
-               pressure=dict(formula="Pressure = leverage × (1 + 0.1·chase pressure + 0.1·below par + 0.1·death + 0.1·playoff + 0.1·collapse), ranked 0–100 against earlier balls only",
+               pressure=dict(cutoffs=dict(high=80, medium=50, rule="High = 80+ (about the top 20% of earlier balls), Medium = 50-80, Low = below 50 (D18/D27)"),
+                             formula="Pressure = leverage × (1 + 0.1·chase pressure + 0.1·below par + 0.1·death + 0.1·playoff + 0.1·collapse), ranked 0–100 against earlier balls only",
                              explain=["Every ball gets a win probability for the batting side, from a model that has only seen earlier seasons.",
                                       "Leverage = how much that probability could swing on this ball, weighted by what usually happens.",
                                       "Ranked against earlier balls: 80+ = High (about the top 20%), 50–80 = Medium, below 50 = Low."],

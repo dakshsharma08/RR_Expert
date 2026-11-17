@@ -25,7 +25,9 @@ pmap = pd.read_csv(WORK / "player_map.csv", dtype={"player_id": str}).set_index(
 sb = pd.read_csv(TABLES / "step4_scores_batters.csv", dtype={"player_id": str}).set_index("player_id")
 sw = pd.read_csv(TABLES / "step4_scores_bowlers.csv", dtype={"player_id": str}).set_index("player_id")
 sa = pd.read_csv(TABLES / "step4_scores_allrounders.csv", dtype={"player_id": str}).set_index("player_id")
-names = pmap.canonical_name
+names = pmap.canonical_name.copy()
+_rawn = load_raw()[["non_striker_id", "non_striker_name"]].drop_duplicates("non_striker_id").set_index("non_striker_id").non_striker_name
+names = names.combine_first(_rawn)          # players seen only as non-striker (e.g. id 6461) still get a name
 
 # ------------------------------------------------ nationality inference from non-IPL matches in this dataset (A7)
 raw = load_raw()
@@ -179,6 +181,21 @@ value = rest[(rest.score >= 60) & rest.price_tier.isin(["Regular", "Emerging"])]
 rest = rest[~rest.player_id.isin(value.player_id)]
 gems = rest[(rest.score >= 60) & (rest.score_lo80 >= 40)].sort_values("score_lo80", ascending=False).head(3)
 short = pd.concat([must.assign(tier="Must-Back"), value.assign(tier="Value Pick"), gems.assign(tier="Hidden Gem")]).head(10)
+
+
+def tier_reason(r):
+    if r.tier == "Must-Back":
+        return "Strongest pressure record among likely-available players that also fills an RR gap, with a solid floor and recent volume."
+    why_not = []
+    if r.score_lo80 < 50: why_not.append(f"lower end of range {r.score_lo80:.0f} (< 50)")
+    if r.fills_gaps == "": why_not.append("fills no measured RR gap")
+    if r.ipl2026_balls < MUST_RECENT: why_not.append(f"only {r.ipl2026_balls:.0f} balls in IPL 2026")
+    base = ("Good pressure record (score ≥ 60) at an assumed modest price band." if r.tier == "Value Pick"
+            else "Lower-profile player with a sturdy lower end of range (≥ 40).")
+    return base + (" Not Must-Back: " + "; ".join(why_not) + "." if why_not else "")
+
+
+short["tier_reason"] = [tier_reason(r) for r in short.itertuples()]
 
 # ------------------------------------------------ squad room (A5) and optimiser (A4, A10)
 rr_all = pd.DataFrame({"player_id": sorted(rr26)})

@@ -268,6 +268,17 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
 
   log('\nPer-tab notes (measured at 380px, automatic):');
   for (const t of TABS) { const n = notes[t]; if (n) log(`  ${t}: lead="${n.lead.slice(0, 90).trim()}..." charts=${n.charts} svgs=${n.svgs} tables=${n.tables} deep-sections=${n.deep} so-what-lines=${n.sowhat} page-height=${n.height}px`); }
+  log('\nManual review notes (screenshots read by the builder):');
+  [
+    'summary: thesis, 5-line summary, KPI tiles, honest backtest note, Must-Back cards, whisker hero chart, before/after strips; all numbers filled from the payload.',
+    'pressure: explanation + formula, match explorer (slider / tap / drag), pressure heatmap (innings toggle), distribution with cut-offs, example balls; calibration/Brier/boosts/overlap in the Show-detail layer.',
+    'leaderboard: Batters/Bowlers/All-rounders, sortable table that becomes cards at 380px, whiskers, too-close-to-call count, rank-change chart, scatter + full metrics + not-scored list in the detail layer.',
+    'compare: 2-4 players, radar (percentile within role), real-number table with clearly-ahead / too-close tags, trend overlay, role-mismatch warning.',
+    'squad: overseas / hand / age facts with tags, RR-vs-league gap bars, Before / Plan A / Plan B strength bars, best XI, bowling plan, still-lacks line.',
+    'auction: tier columns, budget basket with live warnings and presets, Plan B rule, value map with bargain zone, contrarian / unsung / avoid, assumptions.',
+    'method: six-box flow, formula, weights (effective), why-not-average, backtest chart with claim, sensitivity, robustness, facts ledger, data notes, glossary, audit (pending if empty), build stamp.',
+    'Not verified by this script: colour-blindness simulation (shape + pattern + label cues are used everywhere, colour is never the only cue); real touch devices; Safari/Firefox (Chromium only).'
+  ].forEach(x => log('  ' + x));
   log(`\nRESULT: ${failures === 0 ? 'ALL CHECKS PASSED' : failures + ' CHECK(S) FAILED'}`);
   fs.writeFileSync(REPORT, lines.join('\n') + '\n');
   process.exit(failures ? 1 : 0);

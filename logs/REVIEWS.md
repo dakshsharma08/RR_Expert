@@ -51,3 +51,9 @@ The critic is a fresh sub-agent that did not build the work it reviews (Part 2).
 | Step 5 | 1 | Price bands ignore reputation | #12 | Major | suspected | Tagged [ASSUMPTION A6], illustrative | Disclosed (named risk) |
 | Step 5 | 1 | XI order, keeper and impact choices unexplained | #13 | Major | yes | Slot-based XI with a "why" per player; spinner rule; LHB count computed | Fixed |
 | Step 5 | 1 | Minors: reasons missing, unsung bar, numeric tags | minors | Minor | yes | One-line data reasons added; unsung ranked by lower bound of the 80% range | Fixed |
+| Cold reader | 1 | Cheat sheet: understood in 2 min. Dashboard tabs and deck: "partly" | `outputs/reviews/cold_reader.csv` | — | yes | See rows below | — |
+| Cold reader | 1 | "Back X" vs a backtest that didn't beat naive: not reconciled | cold reader #1 | Major | yes | "How to use this score" (3 lines) added to the payload; dashboard and deck to show it | Fix in progress |
+| Cold reader | 1 | Jargon and internal codes on selector pages | #2 | Major | yes | Simple mode hides codes (tooltips keep them); plain phrases for metrics | Fix in progress |
+| Cold reader | 1 | Contradictions: "three" with two names, a wrong "tightest range", Pathirana's tier, a bowler filling a batting gap | #3 | Major | yes | Counts and superlatives computed; `tier_reason` per card; "(with the bat)" label | Fix in progress |
+| Cold reader | 1 | Plan A before/after reads as a projection and misleads (blended averages) | #4 | Major | yes | Replaced with the picks' own past record per phase, with n (payload `planA_picks_only`) | Fix in progress |
+| Cold reader | 1 | Phone leaderboard about 40 screens; tab row clipped; three names for one score; "avoid" scores look broken | #5 | Minor | yes | Top 15 + "Show all"; scrollable tabs; one name; reason lines shown | Fix in progress |
