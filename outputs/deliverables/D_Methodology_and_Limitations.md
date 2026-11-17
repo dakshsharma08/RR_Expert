@@ -2,11 +2,11 @@
 
 Submission to Rajasthan Royals' SupeRR Selector Season 2. Data: 367 IPL matches, 87,687 balls, to 2026-05-31 (build 2026-11-17, seed 2027). Raw data sha256 01e2b4379edfbab6a6e456d304cb3c70f554cb312ef93d9588f3f32a82cb396e.
 
-> **Read this first.** Historical pressure-performance indicator, not a forecast. Its ability to predict IPL 2027 is not established. Backtest, top 10 still above average next season: batters: score 42.9% v simple ranking 46.7%; random pick 50.8%; difference −3.8 points, 80% interval −17.1–3.8 (includes 0) (historical indicator; persistence not demonstrated); bowlers: score 72.8% v simple ranking 75.0%; random pick 59.5%; difference −2.2 points, 80% interval −14.6–4.4 (includes 0) (historical indicator; persistence not demonstrated). Prices, availability, ages and nationality are assumptions or UNKNOWN: nothing external was VERIFIED.
+> **Read this first.** Historical pressure-performance indicator, not a forecast. Its ability to predict IPL 2027 is not established. Backtest, top 10 still above average next season: batters: score 42.9% v simple ranking 46.7%; random pick 50.8%; difference −3.8 points, 80% interval −17.1 to +3.8 (includes 0) (historical indicator; persistence not demonstrated); bowlers: score 72.8% v simple ranking 75.0%; random pick 59.5%; difference −2.2 points, 80% interval −14.6 to +4.4 (includes 0) (historical indicator; persistence not demonstrated). Prices, availability, ages and nationality are assumptions or UNKNOWN: nothing external was VERIFIED.
 
 ## 1. What the score is, in one paragraph
 
-The Clutch Reliability Score (0 to 100, roughly a percentile within a role) measures how well a player performed on the balls that could swing a match, IPL 2023–2026. It is a **historical pressure-performance indicator**. Its ability to predict IPL 2027 performance is **not established** (D15). We rated 47 batters, 71 bowlers and 8 all-rounders. 147 of the 257 players in scope had too little High-pressure data and are listed separately as Not Scorable on IPL data. IPL 2022 is used only for training the win-probability model (D10).
+The Clutch Reliability Score (0 to 100, roughly a percentile within a role) measures how well a player performed on the balls that could swing a match, IPL 2023–2026. It is a **historical pressure-performance indicator**. Its ability to predict IPL 2027 performance is **not established** (D15). We rated 110 distinct players (47 in the batter list, 71 in the bowler list and 8 all-rounders, who are scored on both; some players are in more than one list). 147 of the 257 players in scope had too little High-pressure data and are listed separately as Not Scorable on IPL data. IPL 2022 is used only for training the win-probability model (D10).
 
 ## 2. The six steps, in plain words
 
@@ -36,7 +36,7 @@ Each component is shrunk toward the role average (Empirical Bayes using each pla
 | Bowlers | **H**: Holds up (Low-pressure form minus High-pressure form, sign set so that dropping off is penalised) | 0.15 | yes | -0.0374 | 0.002637 | **0.200** |
 | Bowlers | **C**: Consistency (share of seasons with enough High balls where the player was above expected) | 0.20 | yes | 0.4521 | 2 | **0.267** |
 
-**What this means.** Components with no detectable between-player differences at these sample sizes: match impact (I) (D30). With nothing to separate players, every player is shrunk to the mean and the component's z-score is set to 0. The effective weights are therefore batters: skill under pressure 0.40, match impact 0.25, holds up 0.15, consistency 0.20; bowlers: skill under pressure 0.53, holds up 0.20, consistency 0.27. The planned weights were frozen before any player number existed (pre-registration sha256 1a7bc8035d6c96327596ee83b99948b21ef70fc025457d3a890e3e9521dfe66d, D29) and were never tuned on the backtest (D6, D16).
+**What this means.** Components with no detectable between-player differences at these sample sizes: match impact (I) for bowlers only (D30). With nothing to separate players, every player is shrunk to the mean and the component's z-score is set to 0. The effective weights are therefore batters: skill under pressure 0.40, match impact 0.25, holds up 0.15, consistency 0.20; bowlers: skill under pressure 0.53, holds up 0.20, consistency 0.27. The planned weights were frozen before any player number existed (pre-registration sha256 1a7bc8035d6c96327596ee83b99948b21ef70fc025457d3a890e3e9521dfe66d, D29) and were never tuned on the backtest (D6, D16).
 
 ## 4. Why not a simple average?
 
@@ -81,13 +81,13 @@ Folds 2024, 2025, 2026. For fold N the score is rebuilt from seasons 2023 to N-1
 | Batters | 2024 | 18 | 6 | 4 / 5 | 75.0% / 60.0% | 66.7% | 30.0% / 30.0% | +0.31 / −0.60 | — | — |
 | Batters | 2025 | 36 | 23 | 6 / 6 | 16.7% / 50.0% | 43.5% | 10.0% / 30.0% | −0.43 / −0.19 | — | — |
 | Batters | 2026 | 60 | 30 | 4 / 4 | 50.0% / 25.0% | 53.3% | 20.0% / 10.0% | +0.00 / −0.19 | — | — |
-| Batters | **pooled** | 114 | 59 | 14 / 15 | 42.9% / 46.7% | 50.8% | 20.0% / 23.3% | −0.13 / −0.15 | −17.1–3.8 | historical indicator; persistence not demonstrated |
+| Batters | **pooled** | 114 | 59 | 14 / 15 | 42.9% / 46.7% | 50.8% | 20.0% / 23.3% | −0.13 / −0.15 | −17.1 to +3.8 | historical indicator; persistence not demonstrated |
 | Bowlers | 2024 | 40 | 18 | 5.3 / 4 | 50.0% / 50.0% | 66.7% | 26.3% / 20.0% | −0.37 / −0.29 | — | — |
 | Bowlers | 2025 | 61 | 33 | 7 / 10 | 85.7% / 70.0% | 54.5% | 60.0% / 70.0% | +0.20 / +0.44 | — | — |
 | Bowlers | 2026 | 77 | 23 | 4.3 / 6 | 79.5% / 100.0% | 60.9% | 34.4% / 60.0% | −0.30 / +0.50 | — | — |
-| Bowlers | **pooled** | 178 | 74 | 16.6 / 20 | 72.8% / 75.0% | 59.5% | 40.3% / 50.0% | −0.05 / +0.29 | −14.6–4.4 | historical indicator; persistence not demonstrated |
+| Bowlers | **pooled** | 178 | 74 | 16.6 / 20 | 72.8% / 75.0% | 59.5% | 40.3% / 50.0% | −0.05 / +0.29 | −14.6 to +4.4 | historical indicator; persistence not demonstrated |
 
-**Result.** Batters: score 42.9% v simple ranking 46.7%; random pick 50.8%; difference −3.8 points, 80% interval −17.1–3.8 (includes 0): **historical indicator; persistence not demonstrated**. Bowlers: score 72.8% v simple ranking 75.0%; random pick 59.5%; difference −2.2 points, 80% interval −14.6–4.4 (includes 0): **historical indicator; persistence not demonstrated**. Rank correlation with next-season outcome: batters −0.13 (naive −0.15), bowlers −0.05 (naive +0.29).
+**Result.** Batters: score 42.9% v simple ranking 46.7%; random pick 50.8%; difference −3.8 points, 80% interval −17.1 to +3.8 (includes 0): **historical indicator; persistence not demonstrated**. Bowlers: score 72.8% v simple ranking 75.0%; random pick 59.5%; difference −2.2 points, 80% interval −14.6 to +4.4 (includes 0): **historical indicator; persistence not demonstrated**. Rank correlation with next-season outcome: batters −0.13 (naive −0.15), bowlers −0.05 (naive +0.29).
 
 The random-pick hit rate is the share of all assessable players who were above average next season: it is what picking at random would score.
 
@@ -163,10 +163,12 @@ Expected runs come from earlier matches only and trail scoring jumps (D28). Seas
 4. The 2023 model learned from one season (2022) only.
 5. Expected runs from earlier matches trail scoring jumps: mean RAE per ball +0.02 (2023), +0.04 (2024), +0.00 (2025), +0.02 (2026). Season-centred check: top-20 unchanged 100%.
 6. Top-10 rankings are too close to call: no pair of top-10 players is separated by their 80% ranges (step4_too_close_to_call).
-7. Backtest: batters historical indicator; persistence not demonstrated; bowlers historical indicator; persistence not demonstrated. Intervals of the difference: batters −17.1–3.8, bowlers −14.6–4.4 points.
+7. Backtest: batters historical indicator; persistence not demonstrated; bowlers historical indicator; persistence not demonstrated. Intervals of the difference: batters −17.1 to +3.8, bowlers −14.6 to +4.4 points.
 8. Fielding is not in the data; wicketkeeper and captaincy are not identifiable.
 9. Ages, injuries and availability are not verifiable here; the shortlist is conditional on the official auction list.
-10. Components with no detectable between-player differences at these sample sizes carry no weight: match impact (I) (D30).
+10. Components with no detectable between-player differences at these sample sizes carry no weight: match impact (I) for bowlers only (D30).
+11. A rule-based definition of pressure keeps only 20% of the batter and 40% of the bowler top 20, so exact names depend on how pressure is defined.
+12. RR's phase gaps are within noise except powerplay batting; see the gap table (`step5_gaps.csv`).
 
 ## 11. External facts and assumptions
 
@@ -190,6 +192,6 @@ Under Golden Rule 2 every external fact is either VERIFIED or tagged. **None cou
 ## 12. Data handling
 
 - Scope: IPL only. 367 matches, 87,687 balls; 353 matches eligible for win probability (no-result, abandoned, DLS or reduced-overs matches excluded from pressure and WPA, still in descriptive totals).
-- Players: 257 in scope (appeared in IPL 2025 or 2026); 47 batters, 71 bowlers and 8 all-rounders scorable; 147 not scorable.
+- Players: 257 in scope (appeared in IPL 2025 or 2026); 110 distinct players scorable (47 batter list, 71 bowler list, 8 all-rounders; some are in more than one list); 147 not scorable.
 - Every drop, merge, filter or fix is logged: 32 entries in `logs/DATA_NOTES.md`. Super overs are excluded from all metrics. Venues are UNKNOWN for all matches (D23).
 - Every number in this note is read from `outputs/tables/*.csv`, `outputs/tables/summary_numbers.json` and `outputs/deliverables/dashboard_payload.json` by `src/step7_docs.py`.

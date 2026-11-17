@@ -112,6 +112,9 @@ def neg(x, d=1):
     return f"{x:.{d}f}".replace("-", MINUS)
 def rng(lo, hi, d=1):
     return f"{neg(lo, d)}\u2013{neg(hi, d)}"
+def ivl(lo, hi, d=1):
+    """interval of a difference, e.g. \u221217.1 to +3.8"""
+    return f"{sgn(lo, d)} to {sgn(hi, d)}"
 def scr(r, p=""):
     return f"{f1(r[p + 'score'] if p else r['score'])} ({rng(r['score_lo80'], r['score_hi80'])})"
 def nn(x, fmt=f1, dash="\u2014"):
@@ -214,7 +217,7 @@ def hit_line(r, role_lab):
     """one hit-rate statement with the naive rate, the 80% interval of the difference and the random-pick base rate"""
     base = f"; random pick {f1(r.base_rate_random_pick)}%" if HAS_BASE and pd.notna(r.base_rate_random_pick) else ""
     return (f"{role_lab}: score {f1(r.score_hit_rate_excl)}% v simple ranking {f1(r.naive_hit_rate_excl)}%{base}; difference {sgn(r.score_hit_rate_excl - r.naive_hit_rate_excl)} points, "
-            f"80% interval {rng(r.hit_diff_lo80, r.hit_diff_hi80)} ({'includes 0' if r.hit_diff_lo80 <= 0 <= r.hit_diff_hi80 else ('above 0' if r.hit_diff_lo80 > 0 else 'below 0')})")
+            f"80% interval {ivl(r.hit_diff_lo80, r.hit_diff_hi80)} ({'includes 0' if r.hit_diff_lo80 <= 0 <= r.hit_diff_hi80 else ('above 0' if r.hit_diff_lo80 > 0 else 'below 0')})")
 
 CLAIM_BAT, CLAIM_BOWL = claim_text(bat_p), claim_text(bowl_p)
 BEAT = bool(bat_p.hit_diff_lo80 > 0 or bowl_p.hit_diff_lo80 > 0)
@@ -237,7 +240,18 @@ def eff_phrase(role=None):
     return f"batters: {one(W_EFF_R['bat'])}; bowlers: {one(W_EFF_R['bowl'])}"
 NO_INFO = [c for c in "SIHC" if any(not bool(eff.loc[(r, c), "informative"]) for r in ("bat", "bowl"))]
 NO_INFO_TXT = names([CNAME[c] + f" ({c})" for c in NO_INFO]) if NO_INFO else "none"
-NO_INFO_PLAIN = names([CNAME[c] for c in NO_INFO]) if NO_INFO else "none"
+NO_INFO_BY_ROLE = {r: [c for c in "SIHC" if not bool(eff.loc[(r, c), "informative"])] for r in ("bat", "bowl")}
+def _noinfo(plain):
+    lab = (lambda c: CNAME[c]) if plain else (lambda c: CNAME[c] + f" ({c})")
+    if NO_INFO_BY_ROLE["bat"] == NO_INFO_BY_ROLE["bowl"]:
+        return names([lab(c) for c in NO_INFO_BY_ROLE["bat"]]) if NO_INFO_BY_ROLE["bat"] else "none"
+    parts = []
+    for c in NO_INFO:
+        rs = [{"bat": "batters", "bowl": "bowlers"}[r] for r in ("bat", "bowl") if c in NO_INFO_BY_ROLE[r]]
+        parts.append(f"{lab(c)} for {names(rs)} only")
+    return names(parts)
+NO_INFO_TXT = _noinfo(False)
+NO_INFO_PLAIN = _noinfo(True)
 
 tier_order = ["Must-Back", "Value Pick", "Hidden Gem"]
 short["tier"] = pd.Categorical(short.tier, tier_order, ordered=True)
@@ -247,11 +261,35 @@ mb_rng = [(r.score_lo80, r.score_hi80) for r in must.itertuples()]
 mb_sep, mb_pairs = sep_pairs(mb_rng)
 
 bowl_gaps = gaps[gaps.area.str.startswith("Bowling")]
-rr_bowl_above_all = bool((bowl_gaps.gap_vs_league_per100 > 0).all())
+rr_bowl_above_all = bool((bowl_gaps.gap_vs_league_per100 >= 0).all())    # "at or above league"
+NOISE = lambda a: str(gaps.set_index("area").loc[a, "verdict"]).startswith("within noise")
+bowl_noise = bool(bowl_gaps.verdict.str.startswith("within noise").all())
 top_gaps = list(S["top_gaps"])
 PA = plans[plans.plan == "A"]; PB = plans[plans.plan == "B"]
 purse = float(PA.purse_assumed_cr.iloc[0])
-purse_used_A, purse_used_B = float(PA.mid.sum()), float(PB.mid.sum())
+PMETA = T("step5_plans_meta").set_index("plan")
+purse_used_A, purse_used_B = float(PMETA.loc["A", "cost_mid_cr"]), float(PMETA.loc["B", "cost_mid_cr"])
+walk_A, walk_B = float(PMETA.loc["A", "cost_walkaway_cr"]), float(PMETA.loc["B", "cost_walkaway_cr"])
+COST_A = f"Rs {purse_used_A:.1f} cr at mid-price, Rs {walk_A:g} cr at walk-away prices"
+COST_B = f"Rs {purse_used_B:.1f} cr at mid-price, Rs {walk_B:g} cr at walk-away prices"
+_a5 = assum[assum.id == "A5"].iloc[0]
+_m = re.search(r"REPORTED context conflicts:(.*?)Limits REPORTED", _a5.reason, re.S)
+A5_CAVEAT = ("Reported context conflicts with these slots:" + re.sub(r"\s*\(F1-\d+\)", "", _m.group(1)).rstrip() if _m else str(_a5.reason)) + (" Plans are illustrative." if "illustrative" not in (_m.group(1) if _m else "") else "")
+_sq = re.search(r"(\d+)-player squad", _a5.reason); _left = re.search(r"Rs ([\d.]+) cr left", _a5.reason); _z = re.search(r"leave (\d+) slots", _a5.reason)
+A5_SHORT = (f"Reported context ({_sq.group(1)}-player squad, Rs {_left.group(1)} cr left" + (f", {_z.group(1)} slots until releases" if _z else "") + ") conflicts with the assumed slots, so the plans are illustrative.") if (_sq and _left) else A5_CAVEAT
+_a3 = assum[assum.id == "A3"].iloc[0]
+A3_DEF = str(_a3.value_used)[0].lower() + str(_a3.value_used)[1:]
+_a1 = assum[assum.id == "A1"].iloc[0]
+A1_DEF = str(_a1.value_used)[0].lower() + str(_a1.value_used)[1:]
+_a10 = assum[assum.id == "A10"].iloc[0]
+GAP_MIN_BALLS = re.search(r"\u2265\s*(\d+) balls", _a10.value_used).group(1)
+GAP_RULE = f"A player fills a gap only if his own High-pressure record in that phase beats the league on at least {GAP_MIN_BALLS} balls."
+DISTINCT = len(set(sb.player_id) | set(sw.player_id) | set(sa.player_id))
+assert DISTINCT == S["in_scope"] - S["not_scorable"], "distinct scored players differ from in-scope minus not-scorable"
+ROB = rob.set_index(["variant", "role"]).top20_overlap_pct
+ROB_RULE = f"A rule-based definition of pressure keeps only {ROB[('rule_based', 'bat')]:.0f}% of the batter and {ROB[('rule_based', 'bowl')]:.0f}% of the bowler top 20, so exact names depend on how pressure is defined."
+bat_gap_areas = [g for g in top_gaps if g.startswith("Batting")]
+gap_noise_note = ("directional only, each 80% range includes zero" if all(NOISE(g) for g in bat_gap_areas) else "see the 80% ranges")
 ovs_A = int(PA.overseas.fillna(False).astype(bool).sum()) if "overseas" in PA else 0
 slots, ovs_slots = SQ["slots"], SQ["ovs_slots"]
 seasons_scored = S["seasons_scored"]
@@ -268,16 +306,16 @@ HONESTY_SHORT = ("Historical indicator, not a forecast: its ability to predict I
                  + ("Tested one season ahead, the Clutch Score did not clearly beat a simple strike-rate or economy ranking" + (", or a random pick." if HAS_BASE else ".") if not BEAT else "Tested one season ahead, the Clutch Score beat a simple ranking in the backtest, but the samples are tiny.")
                  + f" Top 10 above average next season: batters {f1(bat_p.score_hit_rate_excl)}% v {f1(bat_p.naive_hit_rate_excl)}% simple ranking"
                  + (f" v {f1(bat_p.base_rate_random_pick)}% random pick" if HAS_BASE else "") + f"; bowlers {f1(bowl_p.score_hit_rate_excl)}% v {f1(bowl_p.naive_hit_rate_excl)}%"
-                 + (f" v {f1(bowl_p.base_rate_random_pick)}%" if HAS_BASE else "") + f" ({CLAIM_BAT}; the 80% ranges of the differences are {rng(bat_p.hit_diff_lo80, bat_p.hit_diff_hi80)} and {rng(bowl_p.hit_diff_lo80, bowl_p.hit_diff_hi80)} points). "
+                 + (f" v {f1(bowl_p.base_rate_random_pick)}%" if HAS_BASE else "") + f" (score minus simple ranking: batters {sgn(bat_p.score_hit_rate_excl - bat_p.naive_hit_rate_excl)} pts, 80% interval {ivl(bat_p.hit_diff_lo80, bat_p.hit_diff_hi80)}; bowlers {sgn(bowl_p.score_hit_rate_excl - bowl_p.naive_hit_rate_excl)} pts, {ivl(bowl_p.hit_diff_lo80, bowl_p.hit_diff_hi80)}; {CLAIM_BAT}). "
                  "Prices, availability, ages and nationality are assumptions or UNKNOWN; nothing external was verified.")
 
 EXEC = [
-    f"We scored {S['scorable_bat']} batters, {S['scorable_bowl']} bowlers and {S['scorable_ar']} all-rounders with the Clutch Score (short for Clutch Reliability Score): how well they played when a ball could swing the match (IPL {seasons_scored}, {S['ipl_matches']} matches, {S['ipl_balls']:,} balls).",
+    f"We scored {DISTINCT} players ({S['scorable_bat']} batters and {S['scorable_bowl']} bowlers; {S['scorable_ar']} all-rounders are scored on both and some players sit in more than one list) with the Clutch Score (short for Clutch Reliability Score): how well they played when a ball could swing the match (IPL {seasons_scored}, {S['ipl_matches']} matches, {S['ipl_balls']:,} balls).",
     f"Must-Back if {'they reach' if len(must) > 1 else 'he reaches'} the auction pool [ASSUMPTION]: {names(list(must.player_name))}. "
     + ("Their 80% ranges overlap, so their order is too close to call." if (mb_sep == 0 and len(must) > 1) else ("Some of their 80% ranges are clear of the others." if len(must) > 1 else "")),
-    f"RR's measured gaps are {names([g.split(': ')[1].lower() + '-overs batting' for g in top_gaps])} under pressure. "
-    + ("RR bowling under pressure is above league in every phase." if rr_bowl_above_all else "RR bowling is not above league in every phase."),
-    f"Plan A in an assumed Rs {purse:g} cr purse [ASSUMPTION]: {names(list(PA.player_name))} (assumed cost Rs {purse_used_A:.1f} cr).",
+    f"RR's measured gaps are {names([g.split(': ')[1].lower() + '-overs batting' for g in top_gaps])} under pressure ({gap_noise_note}). "
+    + (f"RR bowling under pressure is at or above league in every phase{' (also within noise)' if bowl_noise else ''}." if rr_bowl_above_all else "RR bowling is not at or above league in every phase."),
+    f"Plan A in an assumed Rs {purse:g} cr purse [ASSUMPTION]: {names(list(PA.player_name))}. Assumed cost: {COST_A}. Illustrative only.",
     f"Honest test (does the top 10 stay above average next season?): batters {f1(bat_p.score_hit_rate_excl)}% v {f1(bat_p.naive_hit_rate_excl)}% for a simple strike-rate ranking; bowlers {f1(bowl_p.score_hit_rate_excl)}% v {f1(bowl_p.naive_hit_rate_excl)}% for a simple economy ranking ({CLAIM_BAT}). Read the score as a record of past pressure play, not a promise.",
 ]
 
@@ -322,6 +360,7 @@ LIMITS_SLIDE = [
     f"Scoring rose faster than the 'expected runs' benchmark built from earlier matches; a season-adjusted check kept {_sc_txt} of the top 20.",
     "Fielding, wicketkeeping and captaincy are not in the data.",
 ] + ([f"Some parts of the score could not tell players apart ({NO_INFO_PLAIN}) and carry no weight."] if NO_INFO else []) + [
+    ROB_RULE,
     "Backtest: persistence not demonstrated for batters or bowlers." if CLAIM_BAT == CLAIM_BOWL and "not demonstrated" in CLAIM_BAT else f"Backtest: batters {CLAIM_BAT}; bowlers {CLAIM_BOWL}.",
     "Ages, injuries and availability cannot be verified here: the shortlist is conditional on the official auction list.",
 ]
@@ -331,7 +370,9 @@ FORMULA = ("Score = 100 \u00d7 \u03a6( \u03a3 w\u00b7z / sd ), with z = each com
 # the payload's own "Backtest:" limitation is replaced by a line built from the current backtest table (pre-registered wording, D31)
 LIMITS = [x for x in METHOD["limitations"] if not x.lower().startswith("backtest") and "no detectable player differences" not in x]
 LIMITS.append("Components with no detectable between-player differences at these sample sizes carry no weight: " + NO_INFO_TXT + " (D30).")
-LIMITS.insert(6 if len(LIMITS) >= 6 else len(LIMITS), f"Backtest: batters {CLAIM_BAT}; bowlers {CLAIM_BOWL}. Intervals of the difference: batters {rng(bat_p.hit_diff_lo80, bat_p.hit_diff_hi80)}, bowlers {rng(bowl_p.hit_diff_lo80, bowl_p.hit_diff_hi80)} points.")
+LIMITS.append(ROB_RULE)
+LIMITS.append("RR's phase gaps are within noise except powerplay batting; see the gap table (`step5_gaps.csv`).")
+LIMITS.insert(6 if len(LIMITS) >= 6 else len(LIMITS), f"Backtest: batters {CLAIM_BAT}; bowlers {CLAIM_BOWL}. Intervals of the difference: batters {ivl(bat_p.hit_diff_lo80, bat_p.hit_diff_hi80)}, bowlers {ivl(bowl_p.hit_diff_lo80, bowl_p.hit_diff_hi80)} points.")
 
 # ------------------------------------------------------------------------------------------ charts
 def b64(path):
@@ -377,14 +418,18 @@ def chart_backtest(path, figsize):
             for (v, c, h, lab), o in zip(bars, off):
                 ax.bar(k + o, v, 0.25 if len(bars) == 3 else 0.36, color=c, hatch=h, edgecolor=INK if c == "#C9CED8" else "white", linewidth=0.5 if c == "#C9CED8" else 0.0, zorder=2, label=lab if k == 0 else None)
                 ax.text(k + o, v + 1.5, f"{f1(v)}%", ha="center", fontsize=8.5, fontweight="bold", color=INK)
-        ax.set_xticks([0, 1]); ax.set_xticklabels(["Batters", "Bowlers"], fontsize=10)
+        ax.set_xticks([0, 1])
+        if with_base:
+            ax.set_xticklabels([f"{lab}\nscore minus simple: {sgn(BTP.loc[rl].score_hit_rate_excl - BTP.loc[rl].naive_hit_rate_excl)} pts\n(80% interval {ivl(BTP.loc[rl].hit_diff_lo80, BTP.loc[rl].hit_diff_hi80)})" for rl, lab in (("bat", "Batters"), ("bowl", "Bowlers"))], fontsize=7.8)
+        else:
+            ax.set_xticklabels(["Batters", "Bowlers"], fontsize=9)
         ax.set_ylim(0, 100); ax.set_yticks(range(0, 101, 20))
         ax.yaxis.grid(True, color="#E3E6EC", zorder=0); ax.set_axisbelow(True)
         ax.set_title(title, fontsize=9, color=INK, pad=6)
     axes[0].set_ylabel("Top 10 above average next season (%)", fontsize=9.5)
     h, l = axes[0].get_legend_handles_labels()
     fig.legend(h, l, loc="lower center", ncol=3, frameon=False, fontsize=8.5)
-    fig.subplots_adjust(left=0.10, right=0.99, top=0.90, bottom=0.20, wspace=0.08)
+    fig.subplots_adjust(left=0.10, right=0.99, top=0.90, bottom=0.29, wspace=0.08)
     fig.savefig(path); plt.close(fig)
 
 def chart_pressure(path, figsize):
@@ -407,8 +452,8 @@ def chart_pressure(path, figsize):
 
 CH = {}
 CH["short_deck"] = TMP / "short_deck.png"; chart_shortlist(CH["short_deck"], (6.2, 4.3), fs=9)
-CH["short_cs"] = TMP / "short_cs.png"; chart_shortlist(CH["short_cs"], (7.4, 2.2), fs=8.0)
-CH["backtest"] = TMP / "backtest.png"; chart_backtest(CH["backtest"], (6.6, 3.6))
+CH["short_cs"] = TMP / "short_cs.png"; chart_shortlist(CH["short_cs"], (7.4, 1.95), fs=7.8)
+CH["backtest"] = TMP / "backtest.png"; chart_backtest(CH["backtest"], (6.6, 3.9))
 CH["pressure"] = TMP / "pressure.png"; chart_pressure(CH["pressure"], (6.6, 4.1))
 
 # ------------------------------------------------------------------------------------------ shared HTML pieces
@@ -558,7 +603,7 @@ def deck_html():
             f"<p class='small' style='margin-top:8px'>All-rounders (top 3 of {S['scorable_ar']}): {ar_txt}.<br>"
             f"Top-10 pairs with clearly separate 80% ranges: batters {bsep[0]} of {bsep[1]}; bowlers {wsep[0]} of {wsep[1]}. Every other pair is too close to call.<br>"
             f"High balls = High-pressure balls faced or bowled. * Strike rate (batters) or economy (bowlers) over High- and Low-pressure balls, for comparison.<br>"
-            f"Availability: RR squad = played for RR in 2026; Pool UNKNOWN = we could not check who is in the auction; Likely retained = our assumption (each team's six most-involved players). All three are [ASSUMPTION]s.</p>")
+            f"Availability: RR squad = {esc(A1_DEF)}; Pool UNKNOWN = we could not check who is in the auction; Likely retained = {esc(A3_DEF)}. All three are [ASSUMPTION]s.</p>")
     sl.append(slide(4, "Leaderboard",
                     f"{sb.iloc[0].player_name} and {sw.iloc[0].player_name} lead their lists, but {'no two of the top 10 are clearly apart' if bsep[0] + wsep[0] == 0 else 'most ranges are wide and overlap'}.", body,
                     "Use the board to build a long list, not a strict order: " + ("no top-10 pair has separate ranges, so every order within the top 10 is too close to call" if bsep[0] + wsep[0] == 0 else "only pairs with separate ranges are really ranked") + ", and several of the top names are RR already or likely to be retained."))
@@ -598,19 +643,20 @@ def deck_html():
     above_league = all(pk[ph]["bat"] > SQ["league"][ph]["bat"] for ph in gap_ph)
     title6 = ("Plan A picks have a strong record where RR is weak (past record, not a projection)" if strong
               else "Plan A picks against RR's gaps: their own past record, not a projection")
+    GAP_ROWS = [[esc(r.area.replace(' under pressure', '')), sgn(r.gap_vs_league_per100), ivl(r.gap_lo80, r.gap_hi80), esc(str(r.verdict).replace(' (directional only)', ', directional only'))] for r in gaps.itertuples()]
     pa_names = names(list(PA.player_name)); pb_names = names(list(PB.player_name))
-    rules = "".join(f"<br>If {esc(r.if_player)} goes past Rs {r.goes_past_cr:g} cr, take {esc(r.switch_to)} (RR loses about {r.rr_loses_pct:.0f}% of Plan A's pressure value)." for r in planb.itertuples())
+    rules = "".join(f"<br>{esc(r.if_player)} past Rs {r.goes_past_cr:g} cr: take {esc(r.switch_to)} (RR loses about {r.rr_loses_pct:.0f}% of Plan A's pressure value)" for r in planb.itertuples())
     body = (f"<div class='cols'><div class='col' style='flex:1.2'><h2>Past record per 100 High-pressure balls, 2025–26 (balls in brackets; higher is better)</h2>"
             + table(["Area", "Plan A picks", "Plan B picks", "RR group now", "League"], fit_rows, "tbl dense", ["l", "r", "r", "r", "r"], raw=True)
-            + f"<p class='small' style='margin-top:4px'>{esc(SQ['picks_note'])} Batting = runs scored above what an average batter would score in the same spot; bowling = runs saved against what an average bowler would concede. † = fewer than 30 balls, too few to read.</p></div>"
-            f"<div class='col' style='flex:1'><h2>Two budget plans (assumed Rs {purse:g} cr, {slots} slots, up to {ovs_slots} overseas; all [ASSUMPTION])</h2>"
-            f"<div class='card' style='border-left:6px solid var(--pink);padding:8px 12px;margin-bottom:8px'><b>Plan A</b> (assumed cost Rs {purse_used_A:.1f} cr): {esc(pa_names)}.</div>"
-            f"<div class='card' style='border-left:6px solid var(--blue);padding:8px 12px;margin-bottom:8px'><b>Plan B</b> (assumed cost Rs {purse_used_B:.1f} cr): {esc(pb_names)}.<br><span class='small'>Switch rules (what Plan B changes):{rules}</span></div>"
-            f"<p class='small'>Prices are rule-based bands, not market data. A pick's \"gap\" tag comes from his role, not from his own record in that phase.</p>"
-            f"{placeholder_box(True)}</div></div>")
-    sw6 = (f"Against RR's measured gaps the Plan A picks' own record is {'above' if above_league else 'not always above'} RR's and the league's, but {int(small_cells)} of 6 picks-only cells rest on fewer than 30 balls: "
-           "treat it as support for the shortlist, not a forecast of 2027.")
-    sl.append(slide(6, "Squad fit", title6, body, sw6 + (" RR's bowling is already above league in every phase, so bowling is a strength to protect, not the place to spend." if rr_bowl_above_all else "")))
+            + f"<p class='small' style='margin-top:4px'>{esc(SQ['picks_note'])} The picks were chosen on this same record, so it is not independent evidence. Batting = runs scored above what an average batter would score in the same spot; bowling = runs saved against what an average bowler would concede. † = fewer than 30 balls, too few to read.</p>"
+            f"<h2 style='margin-top:8px'>How big are RR's gaps? RR minus league, per 100 High-pressure balls</h2>"
+            + table(["Area", "Gap", "80% range", "Verdict"], GAP_ROWS, "tbl dense", ["l", "r", "r", "l"], raw=True) + f"<div style='margin-top:8px'>{placeholder_box(True)}</div></div>"
+            f"<div class='col' style='flex:1'><h2>Two illustrative budget plans (assumed Rs {purse:g} cr, {slots} slots, up to {ovs_slots} overseas; all [ASSUMPTION])</h2>"
+            f"<div class='card' style='border-left:6px solid var(--pink);padding:8px 12px;margin-bottom:8px'><b>Plan A</b>: {esc(pa_names)}.<br><span class='small'>Assumed cost: {COST_A}, against an assumed Rs {purse:g} cr purse.</span></div>"
+            f"<div class='card' style='border-left:6px solid var(--blue);padding:8px 12px;margin-bottom:8px'><b>Plan B</b>: {esc(pb_names)}.<br><span class='small'>Assumed cost: {COST_B}.<br>Switch rules:{rules}</span></div>"
+            f"<p class='small'>Prices are rule-based bands, not market data. {esc(GAP_RULE)} {esc(A5_CAVEAT)}</p></div></div>")
+    sw6 = (f"On RR's batting gaps the Plan A picks' own record is {'above' if above_league else 'not always above'} RR's and the league's, but {int(small_cells)} of 6 cells rest on under 30 balls and the picks were chosen on this same record: past record, not a projection. RR's gaps are {gap_noise_note}.")
+    sl.append(slide(6, "Squad fit", title6, body, sw6 + (" Bowling is at or above league in every phase (within noise): protect it, do not spend on it." if rr_bowl_above_all else "")))
     # ---- 7 risks and limits
     lim = "".join(f"<li>{inline(x)}</li>" for x in LIMITS_SLIDE)
     nfacts = pd.Series([f["status"] for f in METHOD["facts"]]).value_counts()
@@ -655,7 +701,8 @@ def cheat_html():
     n_must = len(must)
     av_txt = "; ".join(f"{esc(r.player_name)} {f1(r.score)} ({rng(r.score_lo80, r.score_hi80)})" for r in avoid.itertuples())
     ct_txt = "; ".join(f"{esc(r.player_name)} {f1(r.score)} ({rng(r.score_lo80, r.score_hi80)})" for r in contr.itertuples())
-    bowl_note = "RR bowling is above league in all three High-pressure phases, so bowlers fill no measured gap; they add quality and depth." if rr_bowl_above_all else ""
+    _bf = [f"{r.player_name}, a bowler, fills {gap_text(r.role, r.fills_gaps)}" for r in short.itertuples() if r.role == "Bowler" and isinstance(r.fills_gaps, str) and r.fills_gaps.startswith("Batting")]
+    bowl_note = (f"{GAP_RULE} " + (names(_bf) + ". " if _bf else "") + (f"RR bowling is at or above league in every phase{' (within noise)' if bowl_noise else ''}, so other bowlers add quality and depth, not a measured gap." if rr_bowl_above_all else ""))
     # why high scorers are not Must-Back (from the shortlist's own tier_reason)
     notmb = []
     for r in short[(short.tier != "Must-Back") & (short.score >= must.score.min())].itertuples():
@@ -667,7 +714,7 @@ def cheat_html():
         v, n = pk[ph]["bat"], pk[ph]["bat_balls"]
         return f"{neg(v)} ({n} balls{', too few to read' if n < 30 else ''})"
     pick_note = " ".join(f"{ph}-overs batting: Plan A picks {pcell(ph)} v RR {neg(SQ['before'][ph]['bat'])} v league {neg(SQ['league'][ph]['bat'])} per 100 High-pressure balls." for ph in [g.split(': ')[1] for g in top_gaps if g.startswith('Batting')])
-    rules = " ".join(f"If {esc(r.if_player)} goes past Rs {r.goes_past_cr:g} cr, take {esc(r.switch_to)} ({r.rr_loses_pct:.0f}% less pressure value)." for r in planb.itertuples())
+    rules = "Switch: " + "; ".join(f"{esc(r.if_player)} past Rs {r.goes_past_cr:g} cr, take {esc(r.switch_to)} (-{r.rr_loses_pct:.0f}%)" for r in planb.itertuples()) + "."
     howto = "".join(f"<li>{inline(x)}</li>" for x in HOW_TO_USE)
     return na(f"""<!doctype html><html><head><meta charset='utf-8'><title>RR Clutch Index cheat sheet</title><style>{CS_CSS}</style></head><body><div class="page">
 <div class="top"><div class="k">RR Clutch Index &middot; IPL 2027 auction cheat sheet &middot; data to {esc(META['last_match'])}</div>
@@ -681,11 +728,11 @@ def cheat_html():
 <img class="chart" src="{b64(CH['short_cs'])}">
 <div class="sw"><b>So what for RR:</b> the ranges are wide{" and the Must-Back ranges overlap" if (mb_sep == 0 and n_must > 1) else ""}, so use the score to build a shortlist and set walk-away prices, not to rank players to the decimal.</div>
 <div class="two"><div><h2>Budget plans (assumed Rs {purse:g} cr, {slots} slots [ASSUMPTION])</h2>
-<p><b>Plan A</b> (assumed Rs {purse_used_A:.1f} cr): {esc(names(list(PA.player_name)))}.<br><b>Plan B</b> (assumed Rs {purse_used_B:.1f} cr): {esc(names(list(PB.player_name)))}.<br>
-<span class='small'>{rules} {esc(pick_note)} Past record, not a projection.</span></p></div>
-<div><h2>Do not chase</h2><p class='small' style='color:var(--ink)'><b>Lowest scores in the assumed pool:</b> {av_txt}.<br><b>Popular but low score:</b> {ct_txt}.</p></div></div>
+<p><b>Plan A</b>: {esc(names(list(PA.player_name)))} (assumed {COST_A}).<br><b>Plan B</b>: {esc(names(list(PB.player_name)))} (assumed {COST_B}).<br>
+<span class='small'>{rules} {esc(pick_note)} Past record of players chosen on that record, not a projection. RR's batting gaps are {gap_noise_note}. {esc(A5_SHORT)}</span></p></div>
+<div><h2>Do not chase</h2><p class='small' style='color:var(--ink)'><b>Lowest scores in the assumed pool:</b> {av_txt}.<br><b>Popular (top quarter by 2025\u201326 runs or wickets) but low score:</b> {ct_txt}.</p></div></div>
 <div class="small" style="margin-top:4px"><b>Dashboard URL and QR code: pending, to be added when the public link exists.</b> No link has been invented.</div>
-<div class="foot"><b>How to read it.</b> Clutch Score (short for Clutch Reliability Score) = how well a player did on balls that could swing the match (Pressure Index {PARAM['high_cut']}+), IPL {esc(seasons_scored)}, against an average player in the same spot, pulled toward average for small samples. Price bands are rule-based assumptions, not market data; walk-away = top of band. Nationality (shown for overseas players only) is inferred from the data. None of the external facts could be verified (network blocked): recheck before the auction. <b>Key to [ASSUMPTION] tags:</b> {esc(ASSUME_KEY)}.</div>
+<div class="foot"><b>How to read it.</b> Clutch Score (short for Clutch Reliability Score) = how well a player did on balls that could swing the match (Pressure Index {PARAM['high_cut']}+), IPL {esc(seasons_scored)}, against an average player in the same spot, pulled toward average for small samples. Price bands are rule-based assumptions, not market data; walk-away = top of band. {esc(ROB_RULE)} Nationality (shown for overseas players only) is inferred from the data. None of the external facts could be verified (network blocked): recheck before the auction. <b>Key to [ASSUMPTION] tags:</b> {esc(ASSUME_KEY)}.</div>
 </div></body></html>""")
 
 # ------------------------------------------------------------------------------------------ D: methodology note + data dictionary (one block model, two renderers)
@@ -755,7 +802,7 @@ def build_method():
     d.note("**Read this first.** " + HONESTY)
     d.h2("1. What the score is, in one paragraph")
     d.p(f"The Clutch Reliability Score (0 to 100, roughly a percentile within a role) measures how well a player performed on the balls that could swing a match, IPL {seasons_scored}. "
-        f"It is a **historical pressure-performance indicator**. Its ability to predict IPL 2027 performance is **not established** (D15). We rated {S['scorable_bat']} batters, {S['scorable_bowl']} bowlers and {S['scorable_ar']} all-rounders. "
+        f"It is a **historical pressure-performance indicator**. Its ability to predict IPL 2027 performance is **not established** (D15). We rated {DISTINCT} distinct players ({S['scorable_bat']} in the batter list, {S['scorable_bowl']} in the bowler list and {S['scorable_ar']} all-rounders, who are scored on both; some players are in more than one list). "
         f"{S['not_scorable']} of the {S['in_scope']} players in scope had too little High-pressure data and are listed separately as Not Scorable on IPL data. IPL {S['training_only']} is used only for training the win-probability model (D10).")
     d.h2("2. The six steps, in plain words")
     d.ol([x for x in METHOD["flow"]])
@@ -800,7 +847,7 @@ def build_method():
         if HAS_BASE:
             row.append(base)
         row += [f"{r.score_hit_rate_as_miss:.1f}% / {r.naive_hit_rate_as_miss:.1f}%", f"{sgn(r.spearman_score_outcome, 2)} / {sgn(r.spearman_naive_outcome, 2)}",
-                rng(r.hit_diff_lo80, r.hit_diff_hi80) if pooled else "\u2014"]
+                ivl(r.hit_diff_lo80, r.hit_diff_hi80) if pooled else "\u2014"]
         if HAS_CLAIM:
             row.append(claim_text(r._asdict()) if pooled else "\u2014")
         br.append(row)
@@ -849,7 +896,7 @@ def build_method():
     d.table(["ID", "Item", "Value used", "Reason"], [[r.id, r.item, r.value_used, r.reason] for r in assum.itertuples()], ["l", "l", "l", "l"])
     d.h2("12. Data handling")
     d.ul([f"Scope: IPL only. {S['ipl_matches']} matches, {S['ipl_balls']:,} balls; {S['wp_eligible']} matches eligible for win probability (no-result, abandoned, DLS or reduced-overs matches excluded from pressure and WPA, still in descriptive totals).",
-          f"Players: {S['in_scope']} in scope (appeared in IPL 2025 or 2026); {S['scorable_bat']} batters, {S['scorable_bowl']} bowlers and {S['scorable_ar']} all-rounders scorable; {S['not_scorable']} not scorable.",
+          f"Players: {S['in_scope']} in scope (appeared in IPL 2025 or 2026); {DISTINCT} distinct players scorable ({S['scorable_bat']} batter list, {S['scorable_bowl']} bowler list, {S['scorable_ar']} all-rounders; some are in more than one list); {S['not_scorable']} not scorable.",
           f"Every drop, merge, filter or fix is logged: {len(METHOD['data_notes'])} entries in `logs/DATA_NOTES.md`. Super overs are excluded from all metrics. Venues are UNKNOWN for all matches (D23).",
           "Every number in this note is read from `outputs/tables/*.csv`, `outputs/tables/summary_numbers.json` and `outputs/deliverables/dashboard_payload.json` by `src/step7_docs.py`."])
     return d
@@ -897,7 +944,7 @@ def build_dictionary():
     at = [["tier", "Must-Back (lower end of 80% range at or above 50, best gap fit), Value Pick (score 60+, Regular or Emerging price), Hidden Gem (score 60+, smallest samples)"],
           ["price_band, walk_away_cr", "Rule-based price band in Rs crore and its top, the walk-away price [ASSUMPTION A6]"], ["price_tier", "Established, Regular or Emerging, from seasons with 10+ matches [A6]"],
           ["availability", "Whether the player is in the auction pool: UNKNOWN [A2], likely retained [A3] or RR squad [A1]"], ["risk_tags", "Plain-language risks: sample size, short record, age or injury UNKNOWN"],
-          ["fills_gaps", "RR gap the player's batting or bowling role could fill; derived from role, not from his own phase record"], ["fit_weight", "1.5 if the player fills a measured RR gap, else 0.6 [A10]"],
+          ["fills_gaps", GAP_RULE + " (D33)"], ["fit_weight", "1.5 if the player fills a measured RR gap, else 0.6 [A10]"],
           ["value", "score / 100 x fit_weight, the quantity the budget plan maximises [A10]"], ["rr_group_per100, league_per100, gap_vs_league_per100", "RR and league runs above (batting) or saved (bowling) per 100 High-pressure balls, and the difference"]]
     d.table(["Column", "Meaning"], at, ["l", "l"])
     d.h2("Part C. Shared definitions (from `logs/DEFINITIONS.md`)")

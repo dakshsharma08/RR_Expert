@@ -354,8 +354,8 @@ function codeChip(code) {
 function scrub(s) { // remove internal decision / ledger / step codes from payload sentences in Simple mode
   if (s == null || S.detail) return s;
   return String(s)
-    .replace(/\s*\((?:D\d+|F\d-\d+|A\d+)(?:[,;]\s*(?:D\d+|F\d-\d+|A\d+))*\)/g, '')
-    .replace(/\s*\[(?:REPORTED\s+)?(?:F\d-\d+|A\d+|ASSUMPTION[^\]]*)\]/g, '')
+    .replace(/\s*\((?:D\d+|F\d-\d+(?:\/\d+)?|A\d+)(?:[,;]\s*(?:D\d+|F\d-\d+(?:\/\d+)?|A\d+))*\)/g, '')
+    .replace(/\s*\[(?:REPORTED\s+)?(?:F\d-\d+(?:\/\d+)?|A\d+|ASSUMPTION[^\]]*)\]/g, '')
     .replace(/\(step\d\w*_\w+(?:\.csv)?\)/g, '').replace(/\bstep\d\w*_\w+(?:\.csv)?/g, 'the coverage table')
     .replace(/\s*\bD\d{1,2}\b/g, '').replace(/ {2,}/g, ' ').replace(/\s+([.,;:])/g, '$1');
 }
@@ -1254,32 +1254,53 @@ function picksSowhat(pk) {
   ['Powerplay', 'Middle', 'Death'].forEach(ph => ['bat', 'bowl'].forEach(kind => { const v = (p[ph] || {})[kind], nb = (p[ph] || {})[kind + '_balls'], rr = (sq.before[ph] || {})[kind]; tot++; if (isN(nb) && nb < CFG.smallSlice) small++; else if (isN(v) && isN(rr) && v > rr) n++; }));
   return `In ${n} of ${tot} phase areas the picks’ own record (on ${CFG.smallSlice}+ balls) is above RR’s current group${small ? `; ${small} area${small > 1 ? 's rest' : ' rests'} on too few balls to say` : ''}. It is a past record from other teams and other situations, so use it to build the shortlist, not to predict 2027.`;
 }
+function planMeta(k) { return (D.auction.plans_meta || []).find(x => x.plan === k) || null; }
+function planCost(k) { const m = planMeta(k); return m ? { mid: m.cost_mid_cr, walk: m.cost_walkaway_cr, purse: m.purse_cr } : { mid: k === 'A' ? D.squad.purse_used.A : D.squad.purse_used.B, walk: null, purse: D.squad.purse }; }
+function a5Note() { const a = (D.method.assumptions || []).find(x => x.id === 'A5'); return a ? `<div class="note small"><b>Why these plans are illustrative:</b> ${X(a.value_used)}. ${X(a.reason)}</div>` : ''; }
+/* gap chart: bar = RR minus league, whisker = 80% range; the axis is cut if one row would dominate it */
+function gapChart(rows, w) {
+  const ext = r => Math.max(Math.abs(r.gap), Math.abs(r.lo), Math.abs(r.hi));
+  const sorted = rows.map(ext).sort((a, b) => b - a);
+  const cut = sorted.length > 2 && sorted[0] > 1.8 * sorted[1];
+  const max = (cut ? sorted[1] : sorted[0]) * 1.2;
+  const x0 = 46, x1 = w - 46, sx = v => lin(-max, max, x0, x1)(clamp(v, -max, max)), z = sx(0);
+  let h = divAxis(w, max, 'RR minus league, runs per 100 High-pressure balls. Negative = RR behind. Whisker = 80% range.' + (cut ? ' <b>Axis is cut at ±' + f0(max) + ': bars marked » run past the edge.</b>' : ''));
+  rows.forEach(r => {
+    const out = Math.abs(r.gap) > max || Math.abs(r.lo) > max || Math.abs(r.hi) > max;
+    let s = svgOpen(w, 30, r.area + ' gap with 80% range') + `<line x1="${z}" x2="${z}" y1="0" y2="30" stroke="${COL.muted}"/>`;
+    s += `<rect x="${Math.min(z, sx(r.gap))}" y="6" width="${Math.max(1, Math.abs(sx(r.gap) - z))}" height="18" fill="${r.gap < 0 ? 'url(#p-amber)' : 'url(#p-hatch)'}" stroke="#fff"/>`;
+    s += `<line x1="${sx(r.lo)}" x2="${sx(r.hi)}" y1="15" y2="15" stroke="#fff" stroke-width="2.4"/><line x1="${sx(r.lo)}" x2="${sx(r.lo)}" y1="8" y2="22" stroke="#fff" stroke-width="2.4"/><line x1="${sx(r.hi)}" x2="${sx(r.hi)}" y1="8" y2="22" stroke="#fff" stroke-width="2.4"/>`;
+    if (out) s += T(x1 + 4, 19, '»', 'axl', 'start', `style="fill:${COL.amber};font-size:16px"`);
+    const within = /noise/i.test(r.verdict || '');
+    h += `<div class="wrow"><div class="wh"><span><b>${esc(r.area)}</b></span><span class="wm">gap ${sg(r.gap, f1)} (80% range ${sg(r.lo, f1)} to ${sg(r.hi, f1)})${out ? ' · axis cut' : ''}</span></div>${s}</svg><div class="small ${within ? 'muted' : ''}">RR ${sg(r.rr, f1)} vs league ${sg(r.league, f1)} · n = ${thou(r.balls)} balls · ${within ? '○' : '●'} <b>${esc(r.verdict || '')}</b></div></div>`;
+  });
+  return h;
+}
 function tabSquad() {
   const sq = D.squad, g = sq.group;
   const ovs = g.filter(x => /^Overseas/.test(x.nationality)).length, ind = g.filter(x => /^Indian/.test(x.nationality)).length, unk = g.length - ovs - ind;
   const lhb = g.filter(x => x.hand === 'LHB').length, rhb = g.filter(x => x.hand === 'RHB').length, nohand = g.length - lhb - rhb;
   const pk = S.squadPlan === 'B' ? 'B' : 'A';
   const gapRows = sq.gaps.slice().sort((a, b) => a.gap - b.gap);
-  const gw = CW() - 8, gmax = Math.max(...gapRows.map(r => Math.abs(r.gap))) * 1.15;
-  let gs = divAxis(gw, gmax, 'RR minus league, runs per 100 High-pressure balls. Negative = RR behind the league.');
-  gapRows.forEach(r => { gs += `<div class="wrow"><div class="wh"><span><b>${esc(r.area)}</b></span><span class="wm">RR ${sg(r.rr, f1)} vs league ${sg(r.league, f1)} \u00b7 n = ${thou(r.balls)} balls</span></div>${divBar(gw, gmax, r.gap, r.gap < 0 ? 'url(#p-amber)' : 'url(#p-hatch)', null, null, r.area + ' gap')}</div>`; });
+  const gs = gapChart(gapRows, CW() - 8);
   const worst = gapRows[0];
   const xi = sq.xi.slice().sort((a, b) => a.order - b.order);
   const planIds = pk === 'A' ? sq.planA_ids : pk === 'B' ? sq.planB_ids : [];
   const used = pk === 'A' ? sq.purse_used.A : pk === 'B' ? sq.purse_used.B : 0, ovsUsed = pk === 'A' ? sq.overseas_used.A : pk === 'B' ? sq.overseas_used.B : 0;
   const unkPlan = planIds.filter(id => P.get(id) && P.get(id).overseas == null).length;
-  return `<section class="sec"><p class="lead">RR’s measured weakness is <em>${esc(worst.area.toLowerCase())}</em>: RR sits ${f1(Math.abs(worst.gap))} runs per 100 High-pressure balls behind the league there. The Plan A picks’ own past records are shown further down; they are a record, not a forecast.</p>
+  const behind = gapRows.filter(r => r.gap < 0), within = gapRows.filter(r => /noise/i.test(r.verdict || '')).length;
+  return `<section class="sec"><p class="lead">RR’s weakest areas under pressure are <em>${niceList(behind.map(r => { const g = gapParse(r.area); return g ? ({ Powerplay: 'powerplay', Middle: 'middle-overs', Death: 'death-overs' }[g.phase] || g.phase.toLowerCase()) + ' ' + KIND_LABEL[g.kind].toLowerCase() : r.area.toLowerCase(); }))}</em> (directional: ${within} of ${gapRows.length} gaps are within noise). The Plan A picks’ own past records are shown further down; they are a record, not a forecast.</p>
   <div class="grid g3">
    <div class="card"><h3>Overseas count ${tagChip('inferred', 'assume')}</h3><div class="tile"><span class="v">${ovs}</span> <span class="muted">of ${g.length} in the 2026 group</span></div><p class="small muted">${ind} Indian, ${unk} unknown. Nationality is inferred from international data in the file: not verified. Limit: ${tg(D.auction.limits.overseas)}.</p></div>
    <div class="card"><h3>Left / right balance ${tagChip('from data', 'info')}</h3><div class="tile"><span class="v">${lhb} L · ${rhb} R</span></div><p class="small muted">Batting hand in the data; ${nohand} unknown. Left-handers in the best XI: ${sq.lhb_in_xi}.</p></div>
    <div class="card"><h3>Age profile</h3><div class="tile"><span class="v">${tg('UNKNOWN [A8]')}</span></div><p class="small muted">Ages are not in the data and could not be verified. No age claim is made.</p></div>
   </div></section>
   <section class="sec">${chartCard({
-    title: `RR trails the league under pressure in ${gapRows.filter(r => r.gap < 0).length} of ${gapRows.length} areas, most in ${esc(worst.area.toLowerCase())}`,
-    sub: `RR current group (2026) minus league, by phase and by batting / bowling, High-pressure balls ${CFG.recent}. Negative = RR behind the league.`,
+    title: `RR trails the league in ${behind.length} of ${gapRows.length} areas, but ${within} of ${gapRows.length} gaps are within noise`,
+    sub: `RR current group (2026) minus league, by phase and by batting / bowling, High-pressure balls ${CFG.recent}. Negative = RR behind the league. Whisker = 80% range; a whisker that crosses zero means the gap could be chance.`,
     svg: `<div>${gs}</div>`, n: `n = High-pressure balls shown on each row. Small phase samples can swing a lot.`,
-    legend: `<span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-amber)"/></svg> ▼ behind league</span><span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-hatch)"/></svg> ▲ ahead of league</span>`,
-    sowhat: `The data points to ${esc(worst.area.toLowerCase())} as the first thing to fix. ${KIND_LABEL.bat} rows resting on few balls should be double-checked before leaning on them.`
+    legend: `<span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-amber)"/></svg> ▼ behind league</span><span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-hatch)"/></svg> ▲ at or above league</span><span>│─│ 80% range</span>`,
+    sowhat: `${esc(worst.area)} looks weakest, but its 80% range (${sg(worst.lo, f1)} to ${sg(worst.hi, f1)}) ${worst.lo <= 0 && worst.hi >= 0 ? 'includes zero, so treat it as a lead, not a finding' : 'does not include zero'}. Read these gaps as directional only.`
   })}</section>
   <section class="sec"><h2>Do the Plan A picks have a strong record where RR is weak?</h2>
    <div class="seg" role="group" aria-label="Plan" style="margin:0 0 10px">${['A', 'B'].map(k => `<button type="button" data-act="plan" data-v="${k}" aria-pressed="${pk === k}">${planLabel(k)} picks</button>`).join('')}</div>
@@ -1289,7 +1310,8 @@ function tabSquad() {
     legend: `<span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-pink)"/></svg> the picks</span><span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-hatch)"/></svg> RR group today</span><span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-dots)"/></svg> league average</span><span><svg width="16" height="14" aria-hidden="true"><rect width="16" height="14" fill="url(#p-grey)"/></svg> small sample</span>`,
     sowhat: picksSowhat(pk)
   })}
-   <div class="card"><h3>${planLabel(pk)} resources</h3><dl class="kv"><dt>Picks</dt><dd>${planIds.map(id => plink(id)).join(', ')}</dd><dt>Purse used ${tagChip('ASSUMPTION A4', 'assume')}</dt><dd>${f1(used)} of ${f1(sq.purse)} cr (mid-band prices)</dd><dt>Overseas slots used</dt><dd>${ovsUsed} of ${sq.ovs_slots}${unkPlan ? ` (${unkPlan} pick${unkPlan > 1 ? 's have' : ' has'} unknown origin and ${unkPlan > 1 ? 'are' : 'is'} counted as not overseas)` : ''}</dd><dt>Open squad slots</dt><dd>${planIds.length} of ${sq.slots}</dd></dl></div></div></section>
+   <div class="card"><h3>${planLabel(pk)} resources</h3><dl class="kv"><dt>Picks</dt><dd>${planIds.map(id => plink(id)).join(', ')}</dd><dt>Cost ${tagChip('ASSUMPTION A4', 'assume')}</dt><dd>${f1(planCost(pk).mid)} cr at mid prices; ${isN(planCost(pk).walk) ? f1(planCost(pk).walk) + ' cr at walk-away prices' : 'walk-away cost n/a'}, against an assumed ${f1(sq.purse)} cr purse</dd><dt>Overseas slots used</dt><dd>${ovsUsed} of ${sq.ovs_slots}${unkPlan ? ` (${unkPlan} pick${unkPlan > 1 ? 's have' : ' has'} unknown origin and ${unkPlan > 1 ? 'are' : 'is'} counted as not overseas)` : ''}</dd><dt>Open squad slots</dt><dd>${planIds.length} of ${sq.slots}</dd></dl></div></div></section>
+  <section class="sec">${a5Note()}</section>
   <section class="sec"><h3>Lineup card (Plan A best XI)</h3>
    <div class="grid g2"><div class="card"><h4>Best XI in batting order</h4><ol style="margin:.2em 0;padding-left:1.4em">${xi.map(x => `<li style="margin:4px 0">${plink(x.id, x.name)} <span class="muted small">${esc(x.sub)}${x.overseas ? ' · overseas' : ''}</span></li>`).join('')}</ol>
     <p class="small"><b>Impact Player:</b> ${esc(sq.impact)}${sq.impact_why ? ` (${esc(sq.impact_why)})` : ''}</p><p class="small"><b>Bench:</b> ${esc(sq.bench.join(', '))}</p></div>
@@ -1317,6 +1339,7 @@ function basketHtml() {
    <div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr))"><div class="card tile"><div class="v" id="bk-left">${f1(b.left)}</div><div class="l">Purse left (cr) of ${f1(sq.purse)}</div></div><div class="card tile"><div class="v">${b.ovs}</div><div class="l">Overseas of ${sq.ovs_slots} slots${b.unk ? ` (+${b.unk} unknown)` : ''}</div></div><div class="card tile"><div class="v">${b.ps.length}</div><div class="l">Squad slots used of ${sq.slots}</div></div></div>
    ${b.warns.length ? b.warns.map(w => `<div class="warnbox" role="alert">⚠ ${esc(w)}</div>`).join('') : (b.ps.length ? '<div class="okbox">✓ Within the assumed purse, overseas and squad limits.</div>' : '<p class="muted small">Tap “Add” on a card, or pick a preset.</p>')}
    ${b.ps.map(p => `<div class="mi"><span>${plink(p.id)} <span class="muted small">mid ${f1(p.price_mid)} cr, walk-away ${f1(p.walk_away)} cr</span></span><button type="button" class="btn sm" data-act="basket" data-id="${esc(p.id)}" aria-label="Remove ${esc(p.name)}">Remove</button></div>`).join('')}
+   <p class="small"><b>Basket cost:</b> ${f1(b.mid)} cr at mid prices; ${f1(b.walk)} cr at walk-away prices.</p>${a5Note()}
    <p class="small muted">Costs use the middle of each assumed price band. Walk-away = top of the band. Both are assumptions, not market facts. Limits: squad ${tg(D.auction.limits.squad)}, overseas ${tg(D.auction.limits.overseas)}.</p></div>`;
 }
 function auctionCard(t) {
@@ -1342,9 +1365,9 @@ function tabAuction() {
   const cardIds = new Set(a.tiers.map(t => t.id));
   const pts = vm.map(x => { const p = P.get(x.id), tier = (a.tiers.find(t => t.id === x.id) || {}).tier; return { x: x.price, y: x.score, id: x.id, shape: tier ? TIER_SHAPE[tier] : (x.tier === 'Established' ? 'square' : 'circle'), r: tier ? 7 : 4.5, fill: tier ? TIER_STROKE[tier] : (x.tier === 'Established' ? COL.grey : '#5b6aa8'), stroke: x.rr ? COL.pink : '#fff', op: tier ? 1 : .75, tip: `${p ? p.name : x.id}: score ${f0(x.score)}, expected price ${f1(x.price)} cr [ASSUMPTION], ${tier || x.tier}${x.core ? ', likely retained' : ''}${x.rr ? ', RR player' : ''}` }; });
   const maxP = Math.max(...mP), maxS = 100;
-  const vsvg = scatter({ w, h: 340, pts, x: [0, Math.ceil(maxP * 1.05)], y: [0, maxS], xlabel: 'Expected price (Rs crore, assumed mid-band)', ylabel: 'Clutch Score (0–100)', label: 'Value map: score against expected price', zone: { x0: 0, x1: medP, y0: medS, y1: 100, label: 'Bargain zone' }, xfmt: v => v, yfmt: v => v });
+  const vsvg = scatter({ w, h: 340, pts, x: [0, Math.ceil(maxP * 1.05)], y: [0, maxS], xlabel: 'Expected price (Rs crore, assumed mid-band)', ylabel: 'Clutch Score (0–100)', label: 'Value map: score against expected price', zone: { x0: 0, x1: medP, y0: medS, y1: 100, label: 'High score, lower price' }, xfmt: v => v, yfmt: v => v });
   const inZone = vm.filter(x => x.price <= medP && x.score >= medS && !x.core && !x.rr).length;
-  const sec2 = (title, arr, kind) => `<div class="card"><h3>${title}</h3>${arr.map(t => { const p = P.get(t.id); return `<div class="pcard"><div class="pn">${plink(t.id)} <span class="muted small">${esc(p.sub_role)} · ${esc(p.team)}</span></div><div>Score <b>${f0(t.score)}</b> (${f0(t.lo)}–${f0(t.hi)}) ${rangeTag(t.lo, t.hi)}</div><div class="small">${esc(oneStat(t.id))}.</div><div class="small muted">${X(t.reason || kind(p, t))}</div></div>`; }).join('')}</div>`;
+  const sec2 = (title, arr, kind) => `<div class="card"><h3>${title}</h3>${arr.map(t => { const p = P.get(t.id); return `<div class="pcard"><div class="pn">${plink(t.id)} <span class="muted small">${esc(p.sub_role)} · latest team in data (${p.team_season}): ${esc(p.team)}</span></div><div>Score <b>${f0(t.score)}</b> (${f0(t.lo)}–${f0(t.hi)}) ${rangeTag(t.lo, t.hi)}</div><div class="small">${esc(oneStat(t.id))}.</div><div class="small muted">${X(t.reason || kind(p, t))}</div></div>`; }).join('')}</div>`;
   return `<section class="sec"><p class="lead">Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price runs away. <em>Every availability and price here is an assumption, not a fact.</em></p>
    ${howToUse()}
    ${termsStrip(['clutch', 'range', 'walk', 'naive'])}
@@ -1353,13 +1376,13 @@ function tabAuction() {
    ${sowhat('Bars with a wide range are drawn grey and tagged: a high score on a wide range is a lead to check, not a certainty.')}</section>
   <section class="sec grid g2">${basketHtml()}
    <div class="card"><h3>Plan B: if the price runs away</h3><div class="tw"><table class="rt"><thead><tr><th>If this player</th><th>goes past</th><th>switch to</th><th>What changes</th><th>What RR loses</th></tr></thead><tbody>${(a.planB_table && a.planB_table.length ? a.planB_table : [{ if_player: r.if_player, past_cr: r.past_cr, switch_to: r.switch_to, what_changes: '', loses_text: r.loses }]).map(x => { const w1 = BYNAME.get(x.if_player), w2 = BYNAME.get(x.switch_to); return `<tr><td data-l="If">${w1 ? plink(w1.id) : esc(x.if_player)}</td><td data-l="Past">${f1(x.past_cr)} cr ${tagChip('ASSUMPTION', 'assume')}</td><td data-l="Switch to">${w2 ? plink(w2.id) : esc(x.switch_to)}</td><td data-l="Changes">${esc(x.what_changes || '')}</td><td data-l="Loses">${isN(x.loses_pct) ? f0(x.loses_pct) + '% of Plan A\u2019s pressure value' : esc(x.loses_text || '')}</td></tr>`; }).join('')}</tbody></table></div>
-   <p class="small"><b>Plan A:</b> ${pa.map(i => plink(i)).join(', ')}.<br><b>Plan B:</b> ${pb.map(i => plink(i)).join(', ')}.</p><p class="small muted">Only in Plan A: ${only(pa, pb).map(nm).join(', ') || 'none'}. Only in Plan B: ${only(pb, pa).map(nm).join(', ') || 'none'}. Purse used: A ${f1(D.squad.purse_used.A)} cr, B ${f1(D.squad.purse_used.B)} cr.</p></div></section>
+   <p class="small"><b>Plan A:</b> ${pa.map(i => plink(i)).join(', ')}.<br><b>Plan B:</b> ${pb.map(i => plink(i)).join(', ')}.</p><p class="small muted">Only in Plan A: ${only(pa, pb).map(nm).join(', ') || 'none'}. Only in Plan B: ${only(pb, pa).map(nm).join(', ') || 'none'}. Cost at mid prices / walk-away prices: A ${f1(planCost('A').mid)} / ${f1(planCost('A').walk)} cr, B ${f1(planCost('B').mid)} / ${f1(planCost('B').walk)} cr (assumed purse ${f1(D.squad.purse)} cr).</p></div></section>
   <section class="sec">${chartCard({
-    title: `Score against price: ${inZone} non-RR, not-likely-retained players sit in the bargain zone`,
-    sub: `Each point is a scored player. Up = higher Clutch Score; left = cheaper (assumed). Shaded = above-median score at below-median price. Cut axes: price starts at 0, score 0–100.`,
+    title: `Score against assumed price (illustrative): ${inZone} non-RR, not-likely-retained players sit in the high-score, lower-price corner`,
+    sub: `Each point is a scored player. Up = higher Clutch Score; left = cheaper (assumed). Shaded = above-median score at below-median assumed price. Price bands are rule-based assumptions, so this map is illustrative, not a price forecast. Axes: price starts at 0, score 0–100.`,
     svg: vsvg, n: `n = ${vm.length} players. Median score ${f0(medS)}, median expected price ${f1(medP)} cr. Prices are ${tagChip('ASSUMPTION A6', 'assume')}.`,
     legend: legendMark('circle', COL.pinkL, '#fff', 'Must-Back') + legendMark('diamond', COL.blueL, '#fff', 'Value Pick') + legendMark('triangle', COL.amber, '#fff', 'Hidden Gem') + legendMark('square', COL.grey, '#fff', 'Established price tier') + legendMark('circle', '#5b6aa8', '#fff', 'Emerging price tier') + `<span>pink outline = RR player</span>`,
-    sowhat: `Cheap and good is rare: the bargain zone is where RR can add pressure performance without spending its purse. Prices are guesses, so re-check after the official list is out.`
+    sowhat: `Players in the shaded corner combine a high score with a lower assumed price, so they are worth a closer look. The prices are assumptions, so re-check them once the official list and real prices are known.`
   })}</section>
   <section class="sec grid g3">${sec2('Contrarian picks', a.contrarian, (p, t) => 'Where the plain rank and the clutch rank disagree, that gap is the story. A caution, not a verdict.')}${sec2('Unsung hero', a.unsung, (p, t) => 'Judged on the pressure record rather than the headline stat.')}${sec2('Who not to chase', a.avoid, (p, t) => 'Low on the pressure record so far. Past record only; role, price or a better sample could change the case.')}</section>
   <section class="sec">${deep('assume', 'assumptions behind the board', `<div class="tw"><table class="rt"><thead><tr>${S.detail ? '<th>ID</th>' : ''}<th>Item</th><th>Value used</th><th>Why</th></tr></thead><tbody>${a.assumptions.map(x => `<tr>${S.detail ? `<td data-l="ID">${esc(x.id)}</td>` : ''}<td data-l="Item">${X(x.item)}</td><td data-l="Value used">${X(x.value_used)}</td><td data-l="Why">${X(x.reason)}</td></tr>`).join('')}</tbody></table></div>`)}</section>`;
@@ -1391,7 +1414,12 @@ function tabMethod() {
   bs += '</svg>';
   const eff = me.weights.filter(x => x.role === 'bat' || x.role === 'bowl');
   const nameC = { S: 'Skill', I: 'Impact', H: 'Holds-up', C: 'Consistency' };
-  const sensMax = Math.min(...me.sensitivity.map(s => s.top10_overlap_pct));
+  const wRows = me.sensitivity.filter(x => ['S', 'I', 'H', 'C'].includes(x.component)), altRows = me.sensitivity.filter(x => !['S', 'I', 'H', 'C'].includes(x.component));
+  const sensMax = Math.min(...wRows.map(s => s.top10_overlap_pct)), sensMaxHi = Math.max(...wRows.map(s => s.top10_overlap_pct));
+  const altName = { skill_only: 'Skill only', consistency_only: 'Consistency only', equal_weights: 'Equal weights' };
+  const altTxt = altRows.map(x => `${altName[x.component] || x.component.replace(/_/g, ' ')} (${x.role === 'bat' ? 'batters' : 'bowlers'}): ${f0(x.top10_overlap_pct)}%`).join('; ');
+  const zeroW = me.weights.filter(x => !x.informative || x.effective_weight === 0);
+  const zeroTxt = zeroW.length ? zeroW.map(x => `${({ S: 'Skill', I: 'Match impact', H: 'Holds-up', C: 'Consistency' })[x.component] || x.component} for ${x.role === 'bat' ? 'batters' : 'bowlers'}`) : [];
   const robName = { leverage_only: 'Leverage only', rule_based: 'Rule-based', with_close_game: 'Plus close-game boost', d18_strict_buckets: 'Strict buckets', season_centred: 'Season-centred' };
   return `<section class="sec"><p class="lead">The Clutch Score is a <em>historical pressure-performance indicator</em>. Its ability to predict IPL 2027 is <em>not established</em>.</p>
   <div class="note"><b>Backtest, in plain words.</b> ${esc(backtestVerdictLine())} ${X(k.claim)}</div>
@@ -1400,7 +1428,7 @@ function tabMethod() {
   <div class="flow" style="margin-top:12px">${me.flow.map(f => `<div>${X(f)}</div>`).join('')}</div>
   <p class="mono" style="margin-top:10px">${X(me.formula)}</p></section>
   <section class="sec grid g2">
-   <div class="card"><h3>Weights ${info('', 'Weights were frozen before any ranking. Effective weights are what the score really uses after components with no detectable player differences were dropped.')}</h3><div class="tw"><table><thead><tr><th>Role</th><th>Component</th><th class="num">Planned weight</th><th class="num">Effective weight</th><th>Informative? ${info('', 'No = no detectable player differences, so the component gets zero effective weight.')}</th></tr></thead><tbody>${eff.map(x => `<tr><td data-l="Role">${x.role === 'bat' ? 'Batters' : 'Bowlers'}</td><td data-l="Component">${nameC[x.component] || x.component}</td><td class="num" data-l="Planned">${f2(x.weight)}</td><td class="num" data-l="Effective">${f2(x.effective_weight)}</td><td data-l="Informative">${x.informative ? 'Yes' : 'No'}</td></tr>`).join('')}</tbody></table></div></div>
+   <div class="card"><h3>Weights ${info('', 'Weights were frozen before any ranking. Effective weights are what the score really uses after components with no detectable player differences were dropped.')}</h3>${zeroTxt.length ? `<p class="small"><b>No effective weight:</b> ${esc(niceList(zeroTxt))} (no detectable player differences). Other components keep their weights.</p>` : ''}<div class="tw"><table><thead><tr><th>Role</th><th>Component</th><th class="num">Planned weight</th><th class="num">Effective weight</th><th>Informative? ${info('', 'No = no detectable player differences, so the component gets zero effective weight.')}</th></tr></thead><tbody>${eff.map(x => `<tr><td data-l="Role">${x.role === 'bat' ? 'Batters' : 'Bowlers'}</td><td data-l="Component">${nameC[x.component] || x.component}</td><td class="num" data-l="Planned">${f2(x.weight)}</td><td class="num" data-l="Effective">${f2(x.effective_weight)}</td><td data-l="Informative">${x.informative ? 'Yes' : 'No'}</td></tr>`).join('')}</tbody></table></div></div>
    <div class="card"><h3>Why not a simple average?</h3><ul class="clean">${me.why_not_average.map(l => `<li>• ${X(l)}</li>`).join('')}</ul></div></section>
   <section class="sec"><h2>Proof</h2><div class="grid g2">
    ${chartCard({
@@ -1412,13 +1440,13 @@ function tabMethod() {
   })}
    <div class="card"><h3>Honest verdicts</h3><ul class="clean">
     <li><b>Backtest:</b> ${esc(backtestVerdictLine())}</li>
-    <li><b>Weight sensitivity:</b> moving any weight by 10% keeps at least ${f0(sensMax)}% of the top 10 unchanged (${me.sensitivity.length} tests).</li>
+    <li><b>Weight sensitivity:</b> moving any one weight (Skill, Impact, Holds-up or Consistency) by 10% keeps ${f0(sensMax)}\u2013${f0(sensMaxHi)}% of the top 10 unchanged (${wRows.length} tests). <b>Alternative weightings</b> change the top 10 much more: ${altTxt || 'not available'}. So the list is stable to small nudges but depends on the weighting choice.</li>
     <li><b>Pressure definitions:</b> top-20 overlap with the main definition ranges from ${f0(Math.min(...me.robustness.map(x => x.top20_overlap_pct)))}% to ${f0(Math.max(...me.robustness.map(x => x.top20_overlap_pct)))}%. Lower overlap means the list depends on how pressure is defined.</li></ul></div></div>
   </section>
   <section class="sec">${deep('bt', 'backtest by season, sensitivity and robustness', `
    <h4>Backtest by fold</h4><div class="tw"><table><thead><tr><th>Role</th><th>Test season</th><th class="num">Qualified</th><th class="num">Score hit rate</th><th class="num">Plain-ranking hit rate</th>${bt.some(hasAnyRate) ? '<th class="num">Random-pick rate</th>' : ''}<th class="num">Difference (80% range)</th><th class="num">Rank correlation</th></tr></thead><tbody>${btRows}</tbody></table></div>
    ${claims.map(c => `<p class="small"><b>${c.role === 'bat' ? 'Batters' : 'Bowlers'} (pre-registered claim):</b> ${X(c.claim)}</p>`).join('')}
-   <h4 style="margin-top:14px">Weight sensitivity (top-10 overlap when one weight moves)</h4><div class="tw"><table><thead><tr><th>Role</th><th>Component</th><th class="num">Change</th><th class="num">Top-10 unchanged</th></tr></thead><tbody>${me.sensitivity.map(s => `<tr><td data-l="Role">${s.role === 'bat' ? 'Batters' : 'Bowlers'}</td><td data-l="Component">${nameC[s.component] || s.component}</td><td class="num" data-l="Change">${sg(s.change * 100, f0)}%</td><td class="num" data-l="Overlap">${f0(s.top10_overlap_pct)}%</td></tr>`).join('')}</tbody></table></div>
+   <h4 style="margin-top:14px">Weight sensitivity (top-10 overlap when one weight moves, and under alternative weightings)</h4><div class="tw"><table><thead><tr><th>Role</th><th>Component</th><th class="num">Change</th><th class="num">Top-10 unchanged</th></tr></thead><tbody>${me.sensitivity.map(s => `<tr><td data-l="Role">${s.role === 'bat' ? 'Batters' : 'Bowlers'}</td><td data-l="Component">${nameC[s.component] || altName[s.component] || s.component}</td><td class="num" data-l="Change">${['S', 'I', 'H', 'C'].includes(s.component) ? sg(s.change * 100, f0) + '%' : 'alternative weighting'}</td><td class="num" data-l="Overlap">${f0(s.top10_overlap_pct)}%</td></tr>`).join('')}</tbody></table></div>
    <h4 style="margin-top:14px">Pressure-definition robustness</h4><div class="tw"><table><thead><tr><th>Variant</th><th>Role</th><th class="num">Scored (main / variant)</th><th class="num">Top-20 overlap</th><th class="num">Rank correlation</th></tr></thead><tbody>${me.robustness.map(x => `<tr><td data-l="Variant">${esc(robName[x.variant] || x.variant)}</td><td data-l="Role">${x.role === 'bat' ? 'Batters' : 'Bowlers'}</td><td class="num" data-l="Scored">${x.scorable_main} / ${x.scorable_variant}</td><td class="num" data-l="Overlap">${f0(x.top20_overlap_pct)}%</td><td class="num" data-l="Spearman">${f2(x.spearman_common)}</td></tr>`).join('')}</tbody></table></div>
    ${me.too_close ? tooCloseTbl(me.too_close) : ''}`)}</section>
   <section class="sec" id="assumptions">${deep('facts', `data notes, facts ledger (${me.facts.length}), assumptions (${me.assumptions.length}), limitations, glossary, audit`, `

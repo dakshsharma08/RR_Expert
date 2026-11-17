@@ -1,5 +1,5 @@
 Dashboard file: /home/user/RR_Expert/outputs/deliverables/RR_Clutch_Index_Dashboard.html
-File size: 1,173,800 bytes (1.17 MB)
+File size: 1,181,124 bytes (1.18 MB)
 PASS  file under 5 MB
 PASS  [380] tab summary opens via URL hash  -> summary
 PASS  [380] no horizontal scroll on summary  -> scrollWidth 380 vs clientWidth 380
@@ -39,6 +39,15 @@ PASS  Show all N lists every player  -> 47 vs 47
 PASS  Detailed mode still shows codes (e.g. A8)
 PASS  Squad tab asks "Do the Plan A picks have a strong record where RR is weak?" and shows picks_note
 PASS  no "lifts" / "after" wording in Plan A sections
+PASS  squad: every gap shows its 80% range and verdict from the payload
+PASS  squad: headline says directional / within noise, not "first thing to fix"
+PASS  squad: cut axis is labelled
+PASS  squad: Plan A cost shows mid and walk-away
+PASS  squad: A5 reason shown next to the plans
+PASS  auction: no "bargain" / "pressure-proven" / "without spending" claims
+PASS  auction: value map says prices are assumptions / illustrative
+PASS  auction: A5 reason beside the budget builder
+PASS  method: alternative weightings reported separately from +/-10% nudges
 PASS  every auction card shows its tier reason
 PASS  contrarian / unsung / avoid reasons are shown
 PASS  batting gap for a bowler reads "(with the bat)"
@@ -60,34 +69,20 @@ PASS  [380] active filter chips and reset are shown  -> Active filters: Season: 
 PASS  [380] no horizontal scroll with filters applied  -> 380/380
 PASS  [380] no horizontal scroll with profile card open  -> 380/380
 PASS  [380] profile card panel does not scroll sideways  -> 378/378
-PASS  random card Sameer Rizvi: name matches  -> Sameer Rizvi
-PASS  random card Sameer Rizvi: score 80 matches payload  -> 80
-PASS  random card Sameer Rizvi: 80% range 45–95 matches payload  -> 45–95
-PASS  random card Sameer Rizvi: rank 8 of 47 shown
-PASS  random card Sameer Rizvi: High-pressure balls 101 shown
-PASS  random card Sameer Rizvi: price band text shown
-PASS  random card Sameer Rizvi: age tagged UNKNOWN
-PASS  random card Virat Kohli: name matches  -> Virat Kohli
-PASS  random card Virat Kohli: score 88 matches payload  -> 88
-PASS  random card Virat Kohli: 80% range 58–98 matches payload  -> 58–98
-PASS  random card Virat Kohli: rank 5 of 47 shown
-PASS  random card Virat Kohli: High-pressure balls 255 shown
-PASS  random card Virat Kohli: price band text shown
-PASS  random card Virat Kohli: age tagged UNKNOWN
-PASS  random card Ruturaj Gaikwad: name matches  -> Ruturaj Gaikwad
-PASS  random card Ruturaj Gaikwad: score 66 matches payload  -> 66
-PASS  random card Ruturaj Gaikwad: 80% range 24–81 matches payload  -> 24–81
-PASS  random card Ruturaj Gaikwad: rank 16 of 47 shown
-PASS  random card Ruturaj Gaikwad: High-pressure balls 129 shown
-PASS  random card Ruturaj Gaikwad: price band text shown
-PASS  random card Ruturaj Gaikwad: age tagged UNKNOWN
-PASS  random card Shivam Dube: name matches  -> Shivam Dube
-PASS  random card Shivam Dube: score 8 matches payload  -> 8
-PASS  random card Shivam Dube: 80% range 2–35 matches payload  -> 2–35
-PASS  random card Shivam Dube: rank 42 of 47 shown
-PASS  random card Shivam Dube: High-pressure balls 193 shown
-PASS  random card Shivam Dube: price band text shown
-PASS  random card Shivam Dube: age tagged UNKNOWN
+PASS  random card Vaibhav Arora: name matches  -> Vaibhav Arora
+PASS  random card Vaibhav Arora: score 23 matches payload  -> 23
+PASS  random card Vaibhav Arora: 80% range 3–61 matches payload  -> 3–61
+PASS  random card Vaibhav Arora: rank 56 of 71 shown
+PASS  random card Vaibhav Arora: High-pressure legal balls 151 shown
+PASS  random card Vaibhav Arora: price band text shown
+PASS  random card Vaibhav Arora: age tagged UNKNOWN
+PASS  random card Kartik Tyagi: name matches  -> Kartik Tyagi
+PASS  random card Kartik Tyagi: score 5 matches payload  -> 5
+PASS  random card Kartik Tyagi: 80% range 1–22 matches payload  -> 1–22
+PASS  random card Kartik Tyagi: rank 69 of 71 shown
+PASS  random card Kartik Tyagi: High-pressure legal balls 105 shown
+PASS  random card Kartik Tyagi: price band text shown
+PASS  random card Kartik Tyagi: age tagged UNKNOWN
 PASS  random card Mohammed Shami: name matches  -> Mohammed Shami
 PASS  random card Mohammed Shami: score 49 matches payload  -> 49
 PASS  random card Mohammed Shami: 80% range 17–86 matches payload  -> 17–86
@@ -95,6 +90,20 @@ PASS  random card Mohammed Shami: rank 29 of 71 shown
 PASS  random card Mohammed Shami: High-pressure legal balls 155 shown
 PASS  random card Mohammed Shami: price band text shown
 PASS  random card Mohammed Shami: age tagged UNKNOWN
+PASS  random card Vyshak Kumar: name matches  -> Vyshak Kumar
+PASS  random card Vyshak Kumar: score 91 matches payload  -> 91
+PASS  random card Vyshak Kumar: 80% range 36–99 matches payload  -> 36–99
+PASS  random card Vyshak Kumar: rank 8 of 71 shown
+PASS  random card Vyshak Kumar: High-pressure legal balls 88 shown
+PASS  random card Vyshak Kumar: price band text shown
+PASS  random card Vyshak Kumar: age tagged UNKNOWN
+PASS  random card Arshdeep Singh: name matches  -> Arshdeep Singh
+PASS  random card Arshdeep Singh: score 40 matches payload  -> 40
+PASS  random card Arshdeep Singh: 80% range 10–90 matches payload  -> 10–90
+PASS  random card Arshdeep Singh: rank 40 of 71 shown
+PASS  random card Arshdeep Singh: High-pressure legal balls 317 shown
+PASS  random card Arshdeep Singh: price band text shown
+PASS  random card Arshdeep Singh: age tagged UNKNOWN
 PASS  match explorer: choosing a ball shows its situation and WPA
 PASS  match explorer: switching match redraws
 PASS  pressure map: innings toggle works
@@ -112,13 +121,13 @@ PASS  no external network requests
 Blocked/recorded request attempts: 0
 
 Per-tab notes (measured at 380px, automatic):
-  summary: lead="Back players whose quality has held up when the match was on the line, and know how sure w..." charts=1 svgs=20 tables=0 deep-sections=0 so-what-lines=2 page-height=7338px
+  summary: lead="Back players whose quality has held up when the match was on the line, and know how sure w..." charts=1 svgs=20 tables=0 deep-sections=0 so-what-lines=2 page-height=7458px
   pressure: lead="Pressure means how much one ball can swing the match. A ball with the match on a knife-edg..." charts=3 svgs=16 tables=5 deep-sections=1 so-what-lines=4 page-height=6916px
   leaderboard: lead="Top batter on historical pressure performance: Vaibhav Sooryavanshi (99, range 92–100). 45..." charts=2 svgs=29 tables=3 deep-sections=2 so-what-lines=3 page-height=10340px
-  compare: lead="Ashutosh Sharma (99) and Patrick Cummins (97): too close to call. Their 80% ranges overlap..." charts=2 svgs=6 tables=1 deep-sections=0 so-what-lines=2 page-height=5971px
-  squad: lead="RR’s measured weakness is batting under pressure: middle: RR sits 7.3 runs per 100 High-pr..." charts=2 svgs=37 tables=2 deep-sections=1 so-what-lines=2 page-height=7557px
-  auction: lead="Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price r..." charts=1 svgs=14 tables=2 deep-sections=1 so-what-lines=2 page-height=10927px
-  method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict IP..." charts=1 svgs=4 tables=10 deep-sections=2 so-what-lines=1 page-height=5222px
+  compare: lead="Ashutosh Sharma (99) and Patrick Cummins (96): too close to call. Their 80% ranges overlap..." charts=2 svgs=6 tables=1 deep-sections=0 so-what-lines=2 page-height=5971px
+  squad: lead="RR’s weakest areas under pressure are middle-overs batting and death-overs batting (direct..." charts=2 svgs=37 tables=2 deep-sections=1 so-what-lines=2 page-height=8270px
+  auction: lead="Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price r..." charts=1 svgs=14 tables=2 deep-sections=1 so-what-lines=2 page-height=11469px
+  method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict IP..." charts=1 svgs=4 tables=10 deep-sections=2 so-what-lines=1 page-height=5513px
 
 Manual review notes (screenshots read by the builder):
   summary: thesis, 5-line summary, KPI tiles, honest backtest note, Must-Back cards, whisker hero chart, before/after strips; all numbers filled from the payload.

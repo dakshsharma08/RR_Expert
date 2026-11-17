@@ -153,7 +153,7 @@ These describe a player and are not part of the score unless listed in B2. Prefi
 | price_tier | Established, Regular or Emerging, from seasons with 10+ matches [A6] |
 | availability | Whether the player is in the auction pool: UNKNOWN [A2], likely retained [A3] or RR squad [A1] |
 | risk_tags | Plain-language risks: sample size, short record, age or injury UNKNOWN |
-| fills_gaps | RR gap the player's batting or bowling role could fill; derived from role, not from his own phase record |
+| fills_gaps | A player fills a gap only if his own High-pressure record in that phase beats the league on at least 30 balls. (D33) |
 | fit_weight | 1.5 if the player fills a measured RR gap, else 0.6 [A10] |
 | value | score / 100 x fit_weight, the quantity the budget plan maximises [A10] |
 | rr_group_per100, league_per100, gap_vs_league_per100 | RR and league runs above (batting) or saved (bowling) per 100 High-pressure balls, and the difference |
