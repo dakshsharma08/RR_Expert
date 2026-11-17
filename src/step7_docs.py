@@ -233,8 +233,8 @@ def dash_box():
         uri, _ = qr_uri(DASH_URL)
         return (f"<div class='ph-real'><img src='{uri}' width='100' height='100' alt='QR code for the dashboard'>"
                 f"<div><b>Scan to open the interactive dashboard</b><br><a class='url' href='{esc(DASH_URL)}'>{esc(DASH_URL)}</a></div></div>")
-    return (f"<div class='ph'><div class='ph-sq'>QR<br>pending</div><div><b>{esc(PLACEHOLDER)}</b><br>"
-            f"<span>No link has been invented and no QR code was generated.</span></div></div>")
+    return ("<div class='ph-real'><div><b>Interactive dashboard (attached file)</b><br>"
+            "Open <b>RR_Clutch_Index_Dashboard.html</b> in any web browser. No login and no internet needed; it works on a phone or a laptop.</div></div>")
 
 # ------------------------------------------------------------------------------------------ charts
 def b64(path):

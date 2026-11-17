@@ -1367,12 +1367,12 @@ let lastTab = null, lastW = 0, returnFocus = null;
 
 function chromeText() {
   $('#honest').innerHTML = `<b>Read with care:</b> ${X(KPI.claim)} <button type="button" class="plink" data-goto="method">See the backtest</button>`;
-  const url = D.meta.public_url ? `<a href="${esc(D.meta.public_url)}" rel="noopener">${esc(D.meta.public_url)}</a>` : 'pending (placeholder)';
+  const url = D.meta.public_url ? `<a href="${esc(D.meta.public_url)}" rel="noopener">${esc(D.meta.public_url)}</a>` : '';
   $('#foot').innerHTML = `<p class="disc2">Independent submission for Rajasthan Royals' SupeRR Selector Season 2. Not an official Rajasthan Royals product.</p>
    <p><b>${esc(D.meta.name)}</b> — ${X(KPI.claim)}</p>
    <p>Last match in data: ${esc(D.meta.last_match)} · Build: ${esc(D.meta.build)} · Seed: ${esc(D.meta.seed)} · Data fingerprint: <span class="mono">${esc(D.meta.data_sha256)}</span></p>
    <p>Everything on this page comes from the IPL ball-by-ball match data supplied for the challenge. No outside facts are used.</p>
-   <p>Public URL: ${url}</p>`;
+   <p>${url ? 'Public URL: ' + url : 'This is a single offline file: it opens in any web browser, with no login and no internet.'}</p>`;
 }
 function buildChrome() {
   $('#brand-name').textContent = D.meta.name;

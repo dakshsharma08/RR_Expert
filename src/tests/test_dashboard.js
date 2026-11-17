@@ -356,7 +356,7 @@ const norm = s => String(s).replace(/\s+/g, ' ').trim();
     check('embedded fonts load offline (Plus Jakarta Sans, Space Grotesk)', d.fontOk && d.loaded >= 3 && /Plus Jakarta Sans/.test(d.bodyFont) && /Space Grotesk/.test(d.numFont), `${d.loaded} loaded`);
     check('side gutters are at least 16px', d.wrapL >= 16 && d.wrapR >= 16, d.wrapL + '/' + d.wrapR);
     check('disclaimer visible in header and footer', /Independent submission for Rajasthan Royals' SupeRR Selector Season 2\. Not an official Rajasthan Royals product\./.test(d.head) && /Not an official Rajasthan Royals product/.test(d.foot));
-    check('footer shows the Public URL (from meta.public_url / URL file) or "pending (placeholder)"', /Public URL: (pending \(placeholder\)|https?:\/\/\S+)/.test(d.foot), (d.foot.match(/Public URL:[^\n]*/) || [''])[0]);
+    check('footer shows the Public URL when set, else the offline-file note', /Public URL: https?:\/\/\S+|opens in any web browser, with no login and no internet/.test(d.foot), (d.foot.match(/(Public URL|This is a single offline)[^\n]*/) || [''])[0]);
     check('body text is 16px or larger', d.bodySize >= 16, d.bodySize);
     for (const tab of TABS) { await page.goto(url('#' + tab)); await page.waitForSelector('#tabs'); const a = await page.$eval('#tabs button[aria-selected=true]', b => b.dataset.tab); const hh = await page.evaluate(() => location.hash); check(`hash #${tab} opens that tab and stays plain`, a === tab && hh === '#' + tab, hh); }
     await page.goto(url('#nonsense')); await page.waitForSelector('#view h1');
