@@ -38,7 +38,7 @@ lines = [
     "",
     "## Reproduce",
     "- `pip install -r requirements.txt`, then `python3 -I src/run_all.py`. The whole pipeline runs from `data/raw` in about 3 minutes, with seed 2027.",
-    "- Then `python3 -I src/step7_build_dashboard.py`, `python3 -I src/step7_docs.py`, `python3 -I src/step7_video_script.py`, `python3 -I src/step7_notebook.py`, `python3 -I src/step8_audit.py` and `python3 -I src/step8_handover.py`.",
+    "- Deliverables and audit, in order: `python3 -I src/build_final.py` (notebook → dashboard + tests → docs → video script → audit → handover).",
     "- Dashboard tests: `node src/tests/test_dashboard.js`.",
     "",
     "## Where things are",
