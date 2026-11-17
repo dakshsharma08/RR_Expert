@@ -15,7 +15,7 @@
 - **Coverage:** 367 IPL matches and 87,687 balls. Scored seasons 2023–2026; 2022 used only to train. Last match 2026-05-31.
 - **Players scored:** 110 (47 batters and 71 bowlers, 8 of them all-rounders rated both ways). 147 players in scope are listed as Not Scorable on IPL Data.
 - **Must-Back, if available at the auction:** Ashutosh Sharma, Patrick Cummins.
-- **Plan A**, with an assumed Rs 15 cr purse, 5 slots and 1 overseas: Patrick Cummins, Abdul Samad, Ashutosh Sharma, Sameer Rizvi. Cost Rs 13.8 cr at mid-band prices, Rs 21.0 cr at walk-away prices.
+- **Plan A**, with an assumed Rs 15 cr purse, 5 slots and 1 overseas: Patrick Cummins, Ashutosh Sharma, Sameer Rizvi. Cost Rs 8.3 cr at mid-band prices, Rs 13.0 cr at walk-away prices.
 - **Backtest** (top 10 still above average next season):
   - batters 42.9% v naive 46.7% v random pick 50.8%;
   - bowlers 72.8% v naive 75.0% v random pick 59.5%.

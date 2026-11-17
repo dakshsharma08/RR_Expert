@@ -1,5 +1,5 @@
 Dashboard file: /home/user/RR_Expert/outputs/deliverables/RR_Clutch_Index_Dashboard.html
-File size: 1,181,328 bytes (1.18 MB)
+File size: 1,181,370 bytes (1.18 MB)
 PASS  file under 5 MB
 PASS  [380] tab summary opens via URL hash  -> summary
 PASS  [380] no horizontal scroll on summary  -> scrollWidth 380 vs clientWidth 380
@@ -69,48 +69,47 @@ PASS  [380] active filter chips and reset are shown  -> Active filters: Season: 
 PASS  [380] no horizontal scroll with filters applied  -> 380/380
 PASS  [380] no horizontal scroll with profile card open  -> 380/380
 PASS  [380] profile card panel does not scroll sideways  -> 378/378
-PASS  random card Nicholas Pooran: name matches  -> Nicholas Pooran
-PASS  random card Nicholas Pooran: score 35 matches payload  -> 35
-PASS  random card Nicholas Pooran: 80% range 3–86 matches payload  -> 3–86
-PASS  random card Nicholas Pooran: rank 31 of 47 shown
-PASS  random card Nicholas Pooran: High-pressure balls 133 shown
-PASS  random card Nicholas Pooran: price band text shown
-PASS  random card Nicholas Pooran: age tagged UNKNOWN
-PASS  random card Sandeep Sharma: name matches  -> Sandeep Sharma
-PASS  random card Sandeep Sharma: score 69 matches payload  -> 69
-PASS  random card Sandeep Sharma: 80% range 19–96 matches payload  -> 19–96
-PASS  random card Sandeep Sharma: rank 22 of 71 shown
-PASS  random card Sandeep Sharma: High-pressure legal balls 266 shown
-PASS  random card Sandeep Sharma: price band text shown
-PASS  random card Sandeep Sharma: age tagged UNKNOWN
-PASS  random card Axar Patel: name matches  -> Axar Patel
-PASS  random card Axar Patel: score 70 matches payload  -> 70
-PASS  random card Axar Patel: 80% range 35–94 matches payload  -> 35–94
-PASS  random card Axar Patel: rank 2 of 8 shown
-PASS  random card Axar Patel: High-pressure balls 147 shown
-PASS  random card Axar Patel: High-pressure legal balls 150 shown
-PASS  random card Axar Patel: price band text shown
-PASS  random card Axar Patel: age tagged UNKNOWN
-PASS  random card Tristan Stubbs: name matches  -> Tristan Stubbs
-PASS  random card Tristan Stubbs: score 17 matches payload  -> 17
-PASS  random card Tristan Stubbs: 80% range 4–48 matches payload  -> 4–48
-PASS  random card Tristan Stubbs: rank 39 of 47 shown
-PASS  random card Tristan Stubbs: High-pressure balls 179 shown
-PASS  random card Tristan Stubbs: price band text shown
-PASS  random card Tristan Stubbs: age tagged UNKNOWN
-PASS  random card Yuzvendra Chahal: name matches  -> Yuzvendra Chahal
-PASS  random card Yuzvendra Chahal: score 61 matches payload  -> 61
-PASS  random card Yuzvendra Chahal: 80% range 25–97 matches payload  -> 25–97
-PASS  random card Yuzvendra Chahal: rank 25 of 71 shown
-PASS  random card Yuzvendra Chahal: High-pressure legal balls 258 shown
-PASS  random card Yuzvendra Chahal: price band text shown
-PASS  random card Yuzvendra Chahal: age tagged UNKNOWN
+PASS  random card Prince Yadav: name matches  -> Prince Yadav
+PASS  random card Prince Yadav: score 10 matches payload  -> 10
+PASS  random card Prince Yadav: 80% range 1–61 matches payload  -> 1–61
+PASS  random card Prince Yadav: rank 66 of 71 shown
+PASS  random card Prince Yadav: High-pressure legal balls 88 shown
+PASS  random card Prince Yadav: price band text shown
+PASS  random card Prince Yadav: age tagged UNKNOWN
+PASS  random card Harshal Patel: name matches  -> Harshal Patel
+PASS  random card Harshal Patel: score 33 matches payload  -> 33
+PASS  random card Harshal Patel: 80% range 3–91 matches payload  -> 3–91
+PASS  random card Harshal Patel: rank 47 of 71 shown
+PASS  random card Harshal Patel: High-pressure legal balls 178 shown
+PASS  random card Harshal Patel: price band text shown
+PASS  random card Harshal Patel: age tagged UNKNOWN
+PASS  random card Yash Thakur: name matches  -> Yash Thakur
+PASS  random card Yash Thakur: score 44 matches payload  -> 44
+PASS  random card Yash Thakur: 80% range 14–83 matches payload  -> 14–83
+PASS  random card Yash Thakur: rank 36 of 71 shown
+PASS  random card Yash Thakur: High-pressure legal balls 119 shown
+PASS  random card Yash Thakur: price band text shown
+PASS  random card Yash Thakur: age tagged UNKNOWN
+PASS  random card Jitesh Sharma: name matches  -> Jitesh Sharma
+PASS  random card Jitesh Sharma: score 54 matches payload  -> 54
+PASS  random card Jitesh Sharma: 80% range 16–94 matches payload  -> 16–94
+PASS  random card Jitesh Sharma: rank 20 of 47 shown
+PASS  random card Jitesh Sharma: High-pressure balls 144 shown
+PASS  random card Jitesh Sharma: price band text shown
+PASS  random card Jitesh Sharma: age tagged UNKNOWN
+PASS  random card Marco Jansen: name matches  -> Marco Jansen
+PASS  random card Marco Jansen: score 33 matches payload  -> 33
+PASS  random card Marco Jansen: 80% range 4–86 matches payload  -> 4–86
+PASS  random card Marco Jansen: rank 48 of 71 shown
+PASS  random card Marco Jansen: High-pressure legal balls 197 shown
+PASS  random card Marco Jansen: price band text shown
+PASS  random card Marco Jansen: age tagged UNKNOWN
 PASS  match explorer: choosing a ball shows its situation and WPA
 PASS  match explorer: switching match redraws
 PASS  pressure map: innings toggle works
-PASS  compare: shows a verdict sentence  -> Ashutosh Sharma has the highest score (99). Too close to call with Patrick Cummins, Sameer Rizvi and
+PASS  compare: shows a verdict sentence  -> Ashutosh Sharma has the highest score (99). Too close to call with Patrick Cummins and Sameer Rizvi.
 PASS  compare: uses "too close to call"/"clearly ahead" wording
-PASS  auction basket: purse left for Plan A equals purse minus mid prices  -> 1.2 vs 1.20
+PASS  auction basket: purse left for Plan A equals purse minus mid prices  -> 6.7 vs 6.70
 PASS  auction basket: warns when a limit breaks  -> ⚠ Over the purse even at mid-band prices: 27.6 cr against 15.0 cr. | ⚠ 3 overseas players, but only 1 overseas slots are
 PASS  method: states prediction of 2027 is not established
 PASS  method: backtest shown (score did not beat naive)
@@ -122,12 +121,12 @@ PASS  no external network requests
 Blocked/recorded request attempts: 0
 
 Per-tab notes (measured at 380px, automatic):
-  summary: lead="Back players whose quality has held up when the match was on the line, and know how sure w..." charts=1 svgs=20 tables=0 deep-sections=0 so-what-lines=2 page-height=7458px
+  summary: lead="Back players whose quality has held up when the match was on the line, and know how sure w..." charts=1 svgs=20 tables=0 deep-sections=0 so-what-lines=2 page-height=7480px
   pressure: lead="Pressure means how much one ball can swing the match. A ball with the match on a knife-edg..." charts=3 svgs=16 tables=5 deep-sections=1 so-what-lines=4 page-height=6916px
   leaderboard: lead="Top batter on historical pressure performance: Vaibhav Sooryavanshi (99, range 92–100). 45..." charts=2 svgs=29 tables=3 deep-sections=2 so-what-lines=3 page-height=10340px
   compare: lead="Ashutosh Sharma (99) and Patrick Cummins (96): too close to call. Their 80% ranges overlap..." charts=2 svgs=6 tables=1 deep-sections=0 so-what-lines=2 page-height=5971px
-  squad: lead="RR’s weakest areas under pressure are middle-overs batting and death-overs batting (direct..." charts=2 svgs=37 tables=2 deep-sections=1 so-what-lines=2 page-height=8270px
-  auction: lead="Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price r..." charts=1 svgs=14 tables=2 deep-sections=1 so-what-lines=2 page-height=11469px
+  squad: lead="RR’s weakest areas under pressure are middle-overs batting and death-overs batting (direct..." charts=2 svgs=37 tables=2 deep-sections=1 so-what-lines=2 page-height=8342px
+  auction: lead="Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price r..." charts=1 svgs=14 tables=2 deep-sections=1 so-what-lines=2 page-height=11208px
   method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict IP..." charts=1 svgs=4 tables=10 deep-sections=2 so-what-lines=1 page-height=5513px
 
 Manual review notes (screenshots read by the builder):

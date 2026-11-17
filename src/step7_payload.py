@@ -205,13 +205,15 @@ gap_rows = [dict(area=r.area, rr=r1(r.rr_group_per100), league=r1(r.league_per10
             for r in gaps.itertuples()]
 # Plan A phase strength: group per-100 by phase with and without Plan A picks (High pressure, 2025-26)
 hi = b[(b.season >= 2025) & (b.bucket == "High")]
-def phase_strength(ids):
+def phase_strength(ids, min_n=1):
+    """per-100 under High pressure by phase; values with fewer than min_n balls are suppressed (None)."""
     out = {}
     f = hi[hi.ball_faced.astype(bool) & hi.striker_id.isin(ids)]
     w = hi[hi.bowler_id.isin(ids)]
     for ph in ["Powerplay", "Middle", "Death"]:
         a = f[f.phase == ph]; c = w[w.phase == ph]
-        out[ph] = dict(bat=r1(100 * a.rae_bat.sum() / len(a), 1) if len(a) else None, bowl=r1(100 * c.rse_bowl.sum() / len(c), 1) if len(c) else None,
+        out[ph] = dict(bat=r1(100 * a.rae_bat.sum() / len(a), 1) if len(a) >= min_n else None,
+                       bowl=r1(100 * c.rse_bowl.sum() / len(c), 1) if len(c) >= min_n else None,
                        bat_balls=int(len(a)), bowl_balls=int(len(c)))
     return out
 rr_ids = set(rrg.player_id)
@@ -223,8 +225,8 @@ squad = dict(group=[dict(id=r.player_id, name=r.player_name, role=r.role, nation
                          bowl=r.main_pace_or_spin if isinstance(r.main_pace_or_spin, str) else "") for r in rrg.itertuples()],
              gaps=gap_rows, before=phase_strength(rr_ids), planA=phase_strength(rr_ids | planA_ids),
              planB=phase_strength(rr_ids | planB_ids), league=league,
-             planA_picks_only=phase_strength(planA_ids), planB_picks_only=phase_strength(planB_ids),
-             picks_note="Plan A picks' own High-pressure record (2025–26) in each phase, next to RR's group and the league. This is their past record, not a projection of RR's 2027 performance.",
+             planA_picks_only=phase_strength(planA_ids, min_n=30), planB_picks_only=phase_strength(planB_ids, min_n=30),
+             picks_note="Plan A picks' own High-pressure record (2025–26) in each phase, next to RR's group and the league. Past record, not a projection; the picks were chosen on this record, so agreement is expected. Cells with fewer than 30 balls are not shown.",
              planA_ids=sorted(planA_ids), planB_ids=sorted(planB_ids),
              purse=float(T("step5_plans_meta").purse_cr.iloc[0]), purse_tag="[ASSUMPTION A4]",
              slots=int(T("step5_plans_meta").slots_assumed.iloc[0]), ovs_slots=int(T("step5_plans_meta").overseas_slots_assumed.iloc[0]),

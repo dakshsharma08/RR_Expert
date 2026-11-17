@@ -1,5 +1,4 @@
 if_player,player_id,goes_past_cr,switch_to,value_planA,value_planB,rr_loses_pct,what_changes
-Ashutosh Sharma,8101,3.0,Digvesh Rathi,5.321870661957353,4.269251412789,19.779121215644228,Finisher → Spin bowler
-Sameer Rizvi,8238,3.0,Digvesh Rathi,5.321870661957353,4.5496974826265895,14.509431520960009,Middle-order batter → Spin bowler
-Patrick Cummins,1758,7.0,Venkatesh Iyer,5.321870661957353,5.067887753569264,4.772436696059717,Pace bowler → Top-order batter
-Abdul Samad,7446,8.0,Venkatesh Iyer,5.321870661957353,5.320994359677998,0.016466057426356432,Finisher → Top-order batter
+Ashutosh Sharma,8101,3.0,Digvesh Rathi,4.127518401519193,3.07489915235084,25.502472594208694,Finisher → Spin bowler
+Sameer Rizvi,8238,3.0,Digvesh Rathi,4.127518401519193,3.3553452221884297,18.707928208062114,Middle-order batter → Spin bowler
+Patrick Cummins,1758,7.0,Abdul Samad,4.127518401519193,3.8744117954104587,6.1321738993477295,Pace bowler → Finisher

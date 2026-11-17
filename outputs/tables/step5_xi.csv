@@ -4,8 +4,8 @@ slot,player_id,player_name,role,sub_role,bat_order,overseas_b,score,why
 3,8238,Sameer Rizvi,Batter,Middle-order batter,4.0,False,79.98711550449032,batter by pressure score
 4,7260,Dhruv Jurel,Batter,Middle-order batter,5.0,False,7.253694714389207,wicketkeeper [ASSUMPTION A11]
 5,152,Ravindra Jadeja,All-rounder,All-rounder,6.0,False,66.33456212437315,frontline spinner (at least one spin option)
-6,8101,Ashutosh Sharma,Batter,Finisher,7.0,False,98.6835201603296,batter by pressure score
-7,7446,Abdul Samad,Batter,Finisher,7.0,False,79.62348402921063,batter by pressure score
+6,60700,Ravi Singh,Not scorable (sample),,6.0,False,,batter by pressure score
+7,8101,Ashutosh Sharma,Batter,Finisher,7.0,False,98.6835201603296,batter by pressure score
 8,1758,Patrick Cummins,Bowler,Pace bowler,8.0,True,96.49725776979297,frontline bowler (≥2 overs a match)
 9,3298,Jofra Archer,Bowler,Pace bowler,8.0,True,85.49228449115893,frontline bowler (≥2 overs a match)
 10,67036,Brijesh Sharma,Bowler,Pace bowler,10.0,False,75.646709624603,frontline bowler (≥2 overs a match)

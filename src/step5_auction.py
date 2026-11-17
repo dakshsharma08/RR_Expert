@@ -222,7 +222,7 @@ def best_plan(df, exclude=()):
     for k in range(1, min(SLOTS, len(d)) + 1):
         for combo in itertools.combinations(range(len(d)), k):
             c = d.iloc[list(combo)]
-            if c.mid.sum() > PURSE or c.overseas.fillna(False).astype(bool).sum() > OVS_SLOTS:
+            if c.walk_away_cr.sum() > PURSE or c.overseas.fillna(False).astype(bool).sum() > OVS_SLOTS:
                 continue
             if not need <= set(c.player_id) or (c.fills_gaps == "").sum() > 1:
                 continue
@@ -234,7 +234,7 @@ def best_plan(df, exclude=()):
         for k in range(1, min(SLOTS, len(d)) + 1):
             for combo in itertools.combinations(range(len(d)), k):
                 c = d.iloc[list(combo)]
-                if c.mid.sum() > PURSE or c.overseas.fillna(False).astype(bool).sum() > OVS_SLOTS or (c.fills_gaps == "").sum() > 1:
+                if c.walk_away_cr.sum() > PURSE or c.overseas.fillna(False).astype(bool).sum() > OVS_SLOTS or (c.fills_gaps == "").sum() > 1:
                     continue
                 v = (c.score / 100 * c.fit_weight).sum() + 10 * len(need & set(c.player_id))
                 if v > best_v:
@@ -341,7 +341,7 @@ ASSUMPTIONS = [
     ("A7", "Overseas / Indian status", "Inferred from T20Is in this dataset (2022–26); UNKNOWN when a player has none. UNKNOWN players count as Indian in the optimiser and XI, which is flagged", "Evidence-based, not verified externally"),
     ("A8", "Age", "UNKNOWN for every player", "Not in the data and not verifiable here"),
     ("A9", "Overseas limit in XI", "4 (REPORTED, F1-008)", "One source only"),
-    ("A10", "Optimiser value", "score/100 × 1.5 if the player fills a measured RR gap (his own High-pressure record in that phase beats the league on ≥30 balls; D33), × 0.6 otherwise; at most one non-gap 'depth' pick; Must-Back picks forced in where feasible", "RR's gaps are directional (see gap table: within noise), so this is a judgement weighting, not a proof"),
+    ("A10", "Optimiser value", "Plan must fit the purse even if every pick costs his walk-away price (D36); value = score/100 × 1.5 if the player fills a measured RR gap (his own High-pressure record in that phase beats the league on ≥30 balls; D33), × 0.6 otherwise; at most one non-gap 'depth' pick; Must-Back picks forced in where feasible", "RR's gaps are directional (see gap table: within noise), so this is a judgement weighting, not a proof"),
     ("A11", "Wicketkeeper", "Dhruv Jurel keeps wicket in the sample XI", "Keeper not recorded in the data (no fielder column); external, unverified"),
     ("A12", "Impact Player rule in 2027", "Assumed to continue (REPORTED F1-014: expected to continue, under review)", "Affects the XI + Impact Player format only"),
 ]
