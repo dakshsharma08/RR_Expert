@@ -25,7 +25,7 @@ ASSUMPTIONS = [
     ("A8", "Age", "UNKNOWN for every player", "Not in the data and not verifiable here"),
     ("A9", "Overseas limit in XI", "4 (REPORTED, F1-008)", "One source only"),
     ("A11", "Wicketkeeper", "Dhruv Jurel keeps wicket in the sample XI", "The keeper is not recorded in the data (no fielder column). Jurel is RR's most-involved middle-order batter in 2026; keeper status is external and unverified here"),
-    ("A10", "Optimiser value", "score/100 x 1.5 if the player fills a measured RR gap (Step 5 gap table), x 0.6 otherwise", "Puts the purse on RR's measured weaknesses. RR's bowling is above league in every phase, so extra bowlers add less"),
+    ("A10", "Optimiser value", "score/100 x 1.5 if the player fills a measured RR gap (his own High-pressure record in that phase beats the league, on at least 30 balls; D33), x 0.6 otherwise", "Puts the purse on RR's measured weaknesses. RR's bowling is above league in every phase, so extra bowlers add less"),
 ]
 
 scope = pd.read_csv(TABLES / "step3_scope.csv", dtype={"player_id": str})
@@ -157,17 +157,25 @@ rr_all["main_pace_or_spin"] = rr_all.player_id.map(pmap.set_index("player_id").m
 rr_all = rr_all.sort_values("ipl2026_involvement_balls", ascending=False)
 
 
+# D33: a candidate "fills" a gap only if HIS OWN High-pressure record in that phase (2023-26) beats the league
+# for that phase, on at least 30 balls. (Before: inferred from batting role only.)
+h23 = b[(b.season >= 2023) & (b.bucket == "High")]
+fb_ = h23[h23.ball_faced.astype(bool)]
+own_bat = fb_.groupby(["striker_id", "phase"]).agg(x=("rae_bat", "sum"), n=("rae_bat", "size"))
+own_bowl = h23.groupby(["bowler_id", "phase"]).agg(x=("rse_bowl", "sum"), n=("rse_bowl", "size"))
+lg_bat = fb_.groupby("phase").rae_bat.mean() * 100
+lg_bowl = h23.groupby("phase").rse_bowl.mean() * 100
+MIN_PHASE_BALLS = 30
+
+
 def fills(row):
     out = []
     for g in top_gaps:
-        if g.startswith("Batting") and row.role in ("Batter", "All-rounder"):
-            ph = g.split(": ")[1]
-            if (ph == "Death" and row.sub_role in ("Finisher", "Middle-order batter")) or (ph == "Powerplay" and row.sub_role == "Top-order batter") \
-               or (ph == "Middle" and row.sub_role in ("Middle-order batter", "Top-order batter")) or row.role == "All-rounder":
-                out.append(g)
-        if g.startswith("Bowling") and row.role in ("Bowler", "All-rounder"):
-            ph = g.split(": ")[1]
-            if ph != "Death" or (row.death_share or 0) >= 0.25:
+        kind, ph = g.split(" under pressure: ")
+        src, lg = (own_bat, lg_bat) if kind == "Batting" else (own_bowl, lg_bowl)
+        if (row.player_id, ph) in src.index:
+            r = src.loc[(row.player_id, ph)]
+            if r.n >= MIN_PHASE_BALLS and 100 * r.x / r.n > lg[ph]:
                 out.append(g)
     return out
 

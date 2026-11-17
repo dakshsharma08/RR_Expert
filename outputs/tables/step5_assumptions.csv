@@ -9,4 +9,4 @@ A7,Overseas / Indian status,Inferred from the dataset: a player who appears for 
 A8,Age,UNKNOWN for every player,Not in the data and not verifiable here
 A9,Overseas limit in XI,"4 (REPORTED, F1-008)",One source only
 A11,Wicketkeeper,Dhruv Jurel keeps wicket in the sample XI,The keeper is not recorded in the data (no fielder column). Jurel is RR's most-involved middle-order batter in 2026; keeper status is external and unverified here
-A10,Optimiser value,"score/100 x 1.5 if the player fills a measured RR gap (Step 5 gap table), x 0.6 otherwise","Puts the purse on RR's measured weaknesses. RR's bowling is above league in every phase, so extra bowlers add less"
+A10,Optimiser value,"score/100 x 1.5 if the player fills a measured RR gap (his own High-pressure record in that phase beats the league, on at least 30 balls; D33), x 0.6 otherwise","Puts the purse on RR's measured weaknesses. RR's bowling is above league in every phase, so extra bowlers add less"

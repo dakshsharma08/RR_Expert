@@ -21,11 +21,11 @@ Samples: a batter needs at least 100 High-pressure balls faced, a bowler at leas
 
 ## 3. The formula and the weights
 
-`Score = 100 × Φ( Σ w·z ) with z = standardised component among scorable players of the role; w: Skill 0.40, Impact 0.25, Holds-up 0.15, Consistency 0.20 (Impact and Holds-up showed no detectable player differences → effective Skill 2/3, Consistency 1/3).`
+Score = 100 × Φ( Σ w·z / sd ), with z = each component standardised among scorable players of the role. Planned weights: Skill under pressure 0.40, Match impact 0.25, Holds up 0.15, Consistency 0.20. Effective weights after components with no detectable player differences drop out: batters: skill under pressure 0.40, match impact 0.25, holds up 0.15, consistency 0.20; bowlers: skill under pressure 0.53, holds up 0.20, consistency 0.27.
 
-Each component is shrunk toward the role average (Empirical Bayes; k floored at 30 balls; consistency uses a prior strength of 2 seasons). Recent seasons count more: 2026 = 1.00, 2025 = 0.75, 2024 = 0.56, 2023 = 0.42 (decay 0.75 a season). Intervals: 1,000 bootstrap draws over the player's matches, seed 2027; the 80% range is the 10th to 90th percentile. All-rounders: 0.5 x batting score + 0.5 x bowling score.
+Each component is shrunk toward the role average (Empirical Bayes using each player's own sampling variance and a Kish effective sample size, D31; shrinkage strength floored at 30 balls; consistency uses a prior strength of 2 seasons). Recent seasons count more: 2026 = 1.00, 2025 = 0.75, 2024 = 0.56, 2023 = 0.42 (decay 0.75 a season). Intervals: 1,000 bootstrap draws over the player's matches, seed 2027; the 80% range is the 10th to 90th percentile. All-rounders: 0.5 x batting score + 0.5 x bowling score.
 
-| Role | Component | Planned weight | Informative? | Prior mean | Prior strength k | Effective weight |
+| Role | Component | Planned weight | Informative? | Prior mean | Prior spread (S, I, H: between-player variance; C: prior strength in seasons) | Effective weight |
 | :--- | :--- | ---: | :--- | ---: | ---: | ---: |
 | Batters | **S**: Skill under pressure (runs above expected for batters, runs saved vs expected for bowlers, per ball in High pressure) | 0.40 | yes | 0.0735 | 0.02029 | **0.400** |
 | Batters | **I**: Match impact (win probability added per ball in High pressure) | 0.25 | yes | 0.0030 | 7.669e-07 | **0.250** |
@@ -36,7 +36,7 @@ Each component is shrunk toward the role average (Empirical Bayes; k floored at 
 | Bowlers | **H**: Holds up (Low-pressure form minus High-pressure form, sign set so that dropping off is penalised) | 0.15 | yes | -0.0374 | 0.002637 | **0.200** |
 | Bowlers | **C**: Consistency (share of seasons with enough High balls where the player was above expected) | 0.20 | yes | 0.4521 | 2 | **0.267** |
 
-**What this means.** Components with no detectable between-player differences at these sample sizes: match impact (I) (D30). With nothing to separate players, every player is shrunk to the mean and the component's z-score is set to 0. The effective weights are therefore batters: skill under pressure 2/5, match impact 1/4, holds up 0.15, consistency 1/5; bowlers: skill under pressure 0.53, holds up 1/5, consistency 0.27. The planned weights were frozen before any player number existed (pre-registration sha256 1a7bc8035d6c96327596ee83b99948b21ef70fc025457d3a890e3e9521dfe66d, D29) and were never tuned on the backtest (D6, D16).
+**What this means.** Components with no detectable between-player differences at these sample sizes: match impact (I) (D30). With nothing to separate players, every player is shrunk to the mean and the component's z-score is set to 0. The effective weights are therefore batters: skill under pressure 0.40, match impact 0.25, holds up 0.15, consistency 0.20; bowlers: skill under pressure 0.53, holds up 0.20, consistency 0.27. The planned weights were frozen before any player number existed (pre-registration sha256 1a7bc8035d6c96327596ee83b99948b21ef70fc025457d3a890e3e9521dfe66d, D29) and were never tuned on the backtest (D6, D16).
 
 ## 4. Why not a simple average?
 
@@ -91,40 +91,40 @@ Folds 2024, 2025, 2026. For fold N the score is rebuilt from seasons 2023 to N-1
 
 The random-pick hit rate is the share of all assessable players who were above average next season: it is what picking at random would score.
 
-**Caution.** Only 14 batter and 16.6 bowler player-seasons in the score's top 10 could be assessed across the three folds, so every hit rate is very noisy. Counting players who could not be assessed as misses lowers every rate (see the table). The result is published as it came out; no weight or metric was changed after seeing it. A pre-fix run is kept for the record in `step4_backtest_summary_prefix_bug.csv` (D30); its conclusion is the same.
+**Caution.** Only 14 batter and 16.6 bowler player-seasons in the score's top 10 could be assessed across the three folds, so every hit rate is very noisy. Counting players who could not be assessed as misses lowers every rate (see the table). The result is published as it came out; no weight or metric was changed after seeing it. Earlier runs are kept for the record in `step4_backtest_summary_prefix_bug.csv` (D30) and `step4_backtest_summary_v1_preD31.csv` (before the D31 corrections).
 
 ## 7. Sensitivity: do the weights matter?
 
 | Role | Weight changed | −10% | +10% |
 | :--- | :--- | ---: | ---: |
-| Batters | C | 100% | 90% |
-| Batters | H | 100% | 100% |
-| Batters | I | 100% | 100% |
-| Batters | S | 90% | 100% |
-| Bowlers | C | 100% | 100% |
-| Bowlers | H | 100% | 100% |
-| Bowlers | I | 100% | 100% |
 | Bowlers | S | 100% | 100% |
+| Bowlers | I | 100% | 100% |
+| Bowlers | H | 100% | 100% |
+| Bowlers | C | 100% | 100% |
+| Batters | S | 90% | 100% |
+| Batters | I | 100% | 100% |
+| Batters | H | 100% | 100% |
+| Batters | C | 100% | 90% |
 
 Each planned weight moved by plus or minus 10% (others renormalised): the top-10 overlap with the main ranking never drops below 90%. If some components carry no information (section 3), changing their weights cannot change the ranking.
 
 Alternative weightings (D31): consistency_only; equal_weights; skill_only.
 
-| role | component | change | top10 overlap pct |
-| :--- | :--- | ---: | ---: |
-| bat | skill_only | 0.0 | 80.0 |
-| bat | consistency_only | 0.0 | 40.0 |
-| bat | equal_weights | 0.0 | 90.0 |
-| bowl | skill_only | 0.0 | 80.0 |
-| bowl | consistency_only | 0.0 | 60.0 |
-| bowl | equal_weights | 0.0 | 90.0 |
+| Role | Alternative weighting | Top-10 overlap with main |
+| :--- | :--- | ---: |
+| Batters | Only skill under pressure (S) | 80% |
+| Batters | Only consistency (C) | 40% |
+| Batters | All informative components equal | 90% |
+| Bowlers | Only skill under pressure (S) | 80% |
+| Bowlers | Only consistency (C) | 60% |
+| Bowlers | All informative components equal | 90% |
 
 Top-10 pairs separated by their 80% ranges (`step4_too_close_to_call.csv`); every other pair is too close to call.
 
-| role | top10 pairs | pairs separated by 80pct ranges | pairs too close to call |
-| :--- | :--- | :--- | :--- |
-| bat | 45 | 0 | 45 |
-| bowl | 45 | 0 | 45 |
+| Role | Top-10 pairs | Pairs separated by 80% ranges | Pairs too close to call |
+| :--- | ---: | ---: | ---: |
+| Batters | 45 | 0 | 45 |
+| Bowlers | 45 | 0 | 45 |
 
 ## 8. Robustness: other definitions of pressure
 
@@ -153,7 +153,7 @@ Top-20 overlap is the share of the main top 20 that is also in the variant's top
 | 2025 | 16,576 | +0.004 | 1.525 | 1.521 |
 | 2026 | 16,727 | +0.016 | 1.563 | 1.547 |
 
-Expected runs come from earlier matches only and trail scoring jumps (D28). The season-centred check leaves the top 20 unchanged (100% for batters and bowlers).
+Expected runs come from earlier matches only and trail scoring jumps (D28). Season-centred check (comparison only): top-20 overlap with the main list is 100% for batters and 100% for bowlers.
 
 ## 10. Limitations, stated plainly
 

@@ -287,7 +287,11 @@ method = dict(
           "Fair comparison: runs above (batters) or saved (bowlers) versus an average player in the same situation, from earlier matches only.",
           "Reliability: small samples pulled toward average (shrinkage), recent seasons weighted more, 80% ranges by resampling matches.",
           "Clutch score 0–100: frozen weights, percentile-like scale within role; backtested against a naive ranking."],
-    formula="Score = 100 × Φ( Σ w·z ) with z = standardised component among scorable players of the role; w: Skill 0.40, Impact 0.25, Holds-up 0.15, Consistency 0.20 (Impact and Holds-up showed no detectable player differences → effective Skill 2/3, Consistency 1/3).",
+    formula=("Score = 100 × Φ( Σ w·z / sd ) with z = standardised, shrunk component among scorable players of the role; "
+             "pre-registered w: Skill 0.40, Impact 0.25, Holds-up 0.15, Consistency 0.20. A component with no detectable player "
+             "differences gets weight 0 (D30). Effective weights: " + "; ".join(
+                 f"{r_} " + ", ".join(f"{c} {100 * comp[(comp.role == r_) & (comp.component == c)].effective_weight.iloc[0]:.0f}%" for c in "SIHC")
+                 for r_ in ("bat", "bowl")) + "."),
     weights=comp.to_dict("records"),
     why_not_average=["Components are on different scales, so each is standardised before weighting.",
                      "Small samples are shrunk toward the average first, so 30 lucky balls can't top the list.",
@@ -305,7 +309,9 @@ method = dict(
         "First-innings win probabilities have little skill beyond the base rate; second-innings ones are informative.",
         "The 2023 model learned from one season (2022) only.",
         "Expected runs from earlier matches trail scoring jumps: mean RAE per ball +0.02 (2023), +0.04 (2024), +0.00 (2025), +0.02 (2026). Season-centred check: top-20 unchanged 100%.",
-        "Match impact (WPA) and pressure drop showed no detectable player differences at these sample sizes.",
+        ("Components with no detectable player differences at these sample sizes (weight 0): " +
+         (", ".join(f"{r_.role} {dict(S='skill', I='match impact (WPA)', H='holds up', C='consistency')[r_.component]}" for r_ in comp[~comp.informative].itertuples()) or "none") + "."),
+        "Top-10 rankings are too close to call: no pair of top-10 players is separated by their 80% ranges (step4_too_close_to_call).",
         "Backtest: persistence of the score from one season to the next is not demonstrated (small samples; see Method & Proof for hit rates against naive and random-pick baselines).",
         "Fielding is not in the data; wicketkeeper and captaincy are not identifiable.",
         "Ages, injuries and availability are not verifiable here; the shortlist is conditional on the official auction list."],

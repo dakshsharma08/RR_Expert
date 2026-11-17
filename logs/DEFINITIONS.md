@@ -69,4 +69,26 @@ Columns marked *(inferred)* are decisions drawn from the structure of the data, 
 
 One line per metric, added as each metric is introduced. Format: **Name**: plain-language meaning (step, owner).
 
-*(none yet)*
+- **Pressure Index (0–100)**: How much a ball could swing the match result, ranked against earlier balls; 80+ = High pressure.
+- **Leverage**: The expected size of the win-probability swing on a ball, given what usually happens in that situation.
+- **Win probability**: The batting side's chance of winning before a ball, from a model trained on earlier seasons only.
+- **WPA (win probability added)**: How much a player's ball changed his team's chance of winning (in percentage points).
+- **Runs Above Expected (RAE)**: Runs scored minus what an average batter would score on the same balls in the same situations.
+- **Runs Saved vs Expected (RSE)**: Runs an average bowler would concede on the same balls minus the runs actually conceded.
+- **Shrinkage**: Pulling small samples toward the average so a few lucky balls can't top a ranking.
+- **80% range**: The range we are 80% sure the true value sits in, from resampling the player's matches.
+- **Consistency**: Share of seasons (with ≥30 High-pressure balls) in which the player was above expected.
+- **Clutch Reliability Score**: 0–100 historical pressure-performance indicator within role; roughly a percentile. Not a forecast.
+- **Backtest**: Score built from earlier seasons only, then checked against the next season's pressure performance.
+- **Too close to call**: Two players whose 80% ranges overlap: the data can't say who is better.
+- **[ASSUMPTION]**: A value the data can't supply and the web couldn't verify here; stated with its reason.
+
+- **High / Medium / Low pressure**: Pressure Index 80+ / 50–80 / below 50. High = about the top 20% of balls seen earlier; Low = the ordinary half (Step 1B, D27).
+- **Skill under pressure (S)**: shrunk, recency-weighted RAE (batters) or RSE (bowlers) per ball on High-pressure balls (Step 4).
+- **Match impact (I)**: shrunk WPA per ball on High-pressure balls (Step 4).
+- **Holds up (H)**: High-pressure minus Low-pressure RAE/RSE per ball; positive = better under pressure (Step 4).
+- **Pressure drop (descriptive)**: RAE/RSE per 100 balls in High minus Low (Step 3).
+- **Hit rate (backtest)**: share of a ranking's top 10 who were above the league average under pressure the next season (Step 4).
+- **Random-pick base rate**: hit rate expected by picking assessable players at random (Step 4).
+- **Effective sample size**: (Σw·n)²/Σw²·n for recency-weighted balls (D31).
+

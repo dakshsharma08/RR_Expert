@@ -8,40 +8,40 @@ Part A lists every column of the ball table. Part B lists every metric. Part C g
 
 | Column | Kind | Meaning | Rule |
 | :--- | :--- | :--- | :--- |
-| `row_id` | raw column | 0-based position of the row in the raw file (line = row_id + 2). Added by load_raw() | unchanged string from load_raw() |
-| `match_id` | raw column | Match identifier | unchanged string from load_raw() |
-| `innings` | raw column | 1, 2 = main innings; 3, 4 = super over | unchanged string from load_raw() |
-| `overid` | raw column | Over number, 1 to 20 (1 in a super over) | unchanged string from load_raw() |
-| `over_ball_num` | raw column | Delivery counter inside the over; counts wides and no-balls (max 11) | unchanged string from load_raw() |
-| `innings_ball_num` | raw column | Delivery counter inside the innings; counts every delivery | unchanged string from load_raw() |
-| `batting_team_id` | raw column | Team id batting | unchanged string from load_raw() |
-| `bowling_team_id` | raw column | Team id bowling | unchanged string from load_raw() |
-| `striker_id` | raw column | Batter facing the ball | unchanged string from load_raw() |
-| `striker_name` | raw column | Name as in source | unchanged string from load_raw() |
-| `non_striker_id` | raw column | Batter at the other end | unchanged string from load_raw() |
-| `non_striker_name` | raw column | Name as in source | unchanged string from load_raw() |
-| `bowler_id` | raw column | Bowler id | unchanged string from load_raw() |
-| `bowler_name` | raw column | Name as in source | unchanged string from load_raw() |
-| `batting_type` | raw column | RHB / LHB of the striker | unchanged string from load_raw() |
-| `bowling_type` | raw column | Bowling style text | unchanged string from load_raw() |
-| `batting_order` | raw column | Batting position of the striker | unchanged string from load_raw() |
-| `runs` | raw column | Runs off the bat only (confirmed in section 4) | unchanged string from load_raw() |
-| `is_four` | raw column | true when runs == 4 as a boundary | unchanged string from load_raw() |
-| `is_six` | raw column | true when runs == 6 as a boundary | unchanged string from load_raw() |
-| `is_wicket` | raw column | true exactly when dismissal_type is non-empty | unchanged string from load_raw() |
-| `dismissal_type_id` | raw column | Numeric code of dismissal_type | unchanged string from load_raw() |
-| `dismissal_type` | raw column | Dismissal text; two spellings of obstructing the field | unchanged string from load_raw() |
-| `dismissed_player_id` | raw column | Player dismissed as recorded (5 non-wicket rows carry an id, 1 wicket row lacks one) | unchanged string from load_raw() |
-| `extras_type` | raw column | None, wide, Overstep (no-ball), other (no-ball-type, inferred), legbyes, byes, Penalty | unchanged string from load_raw() |
-| `extras1_runs` | raw column | All extras runs on the ball except extras_2_runs | unchanged string from load_raw() |
-| `extras_2_runs` | raw column | Second extras amount: byes / leg-byes off a no-ball (inferred) | unchanged string from load_raw() |
-| `pace_or_spin` | raw column | Pace or Spin of the bowler | unchanged string from load_raw() |
-| `bowl_speed` | raw column | Speed; 0 = not recorded, -1 invalid; not used | unchanged string from load_raw() |
-| `stroke` | raw column | Shot name as in source | unchanged string from load_raw() |
-| `delivery_style` | raw column | Delivery description as in source | unchanged string from load_raw() |
-| `over_or_around` | raw column | Over or Around the wicket | unchanged string from load_raw() |
-| `on_or_off` | raw column | Off-side / On-side | unchanged string from load_raw() |
-| `delivery_ist_time` | raw column | Recorded clock time with a 'UTC' label; actually IST for 2022-23 and UTC from 2024 (see coverage) | unchanged string from load_raw() |
+| `row_id` | raw | 0-based position of the row in the raw file (line = row_id + 2). Added by load_raw() | unchanged string from load_raw() |
+| `match_id` | raw | Match identifier | unchanged string from load_raw() |
+| `innings` | raw | 1, 2 = main innings; 3, 4 = super over | unchanged string from load_raw() |
+| `overid` | raw | Over number, 1 to 20 (1 in a super over) | unchanged string from load_raw() |
+| `over_ball_num` | raw | Delivery counter inside the over; counts wides and no-balls (max 11) | unchanged string from load_raw() |
+| `innings_ball_num` | raw | Delivery counter inside the innings; counts every delivery | unchanged string from load_raw() |
+| `batting_team_id` | raw | Team id batting | unchanged string from load_raw() |
+| `bowling_team_id` | raw | Team id bowling | unchanged string from load_raw() |
+| `striker_id` | raw | Batter facing the ball | unchanged string from load_raw() |
+| `striker_name` | raw | Name as in source | unchanged string from load_raw() |
+| `non_striker_id` | raw | Batter at the other end | unchanged string from load_raw() |
+| `non_striker_name` | raw | Name as in source | unchanged string from load_raw() |
+| `bowler_id` | raw | Bowler id | unchanged string from load_raw() |
+| `bowler_name` | raw | Name as in source | unchanged string from load_raw() |
+| `batting_type` | raw | RHB / LHB of the striker | unchanged string from load_raw() |
+| `bowling_type` | raw | Bowling style text | unchanged string from load_raw() |
+| `batting_order` | raw | Batting position of the striker | unchanged string from load_raw() |
+| `runs` | raw | Runs off the bat only (confirmed in section 4) | unchanged string from load_raw() |
+| `is_four` | raw | true when runs == 4 as a boundary | unchanged string from load_raw() |
+| `is_six` | raw | true when runs == 6 as a boundary | unchanged string from load_raw() |
+| `is_wicket` | raw | true exactly when dismissal_type is non-empty | unchanged string from load_raw() |
+| `dismissal_type_id` | raw | Numeric code of dismissal_type | unchanged string from load_raw() |
+| `dismissal_type` | raw | Dismissal text; two spellings of obstructing the field | unchanged string from load_raw() |
+| `dismissed_player_id` | raw | Player dismissed as recorded (5 non-wicket rows carry an id, 1 wicket row lacks one) | unchanged string from load_raw() |
+| `extras_type` | raw | None, wide, Overstep (no-ball), other (no-ball-type, inferred), legbyes, byes, Penalty | unchanged string from load_raw() |
+| `extras1_runs` | raw | All extras runs on the ball except extras_2_runs | unchanged string from load_raw() |
+| `extras_2_runs` | raw | Second extras amount: byes / leg-byes off a no-ball (inferred) | unchanged string from load_raw() |
+| `pace_or_spin` | raw | Pace or Spin of the bowler | unchanged string from load_raw() |
+| `bowl_speed` | raw | Speed; 0 = not recorded, -1 invalid; not used | unchanged string from load_raw() |
+| `stroke` | raw | Shot name as in source | unchanged string from load_raw() |
+| `delivery_style` | raw | Delivery description as in source | unchanged string from load_raw() |
+| `over_or_around` | raw | Over or Around the wicket | unchanged string from load_raw() |
+| `on_or_off` | raw | Off-side / On-side | unchanged string from load_raw() |
+| `delivery_ist_time` | raw | Recorded clock time with a 'UTC' label; actually IST for 2022-23 and UTC from 2024 (see coverage) | unchanged string from load_raw() |
 | `season` | derived | Season of the match | calendar year of the first-ball date of the match (no season column in raw) |
 | `match_date` | derived | Match date | date part of the earliest delivery_ist_time in the match (recorded clock) |
 | `ts_ist` | derived | Delivery time on an IST clock | delivery_ist_time as is for 2022-23; +5h30 from 2024 (clock claim, section 3) |

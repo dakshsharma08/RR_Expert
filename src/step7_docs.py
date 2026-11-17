@@ -66,7 +66,7 @@ xmeta = T("step5_xi_meta")
 TCC = T("step4_too_close_to_call") if (TABLES / "step4_too_close_to_call.csv").exists() else None
 LB_AV = {r["id"]: r["avail"] for k in ("bat", "bowl") for r in P["leaderboard"][k]}   # availability string per player id
 LB_RISK = {r["id"]: r["risk"] for k in ("bat", "bowl") for r in P["leaderboard"][k]}
-LB_NAIVE = {r["id"]: r["naive"] for k in ("bat", "bowl") for r in P["leaderboard"][k]}
+LB_NAIVE = {k: {r["id"]: r["naive"] for r in P["leaderboard"][k]} for k in ("bat", "bowl")}
 
 # ------------------------------------------------------------------------------------------ method parameters parsed from the logs
 PRE = (LOGS / "PREREGISTRATION.md").read_text()
@@ -204,10 +204,9 @@ W_EFF_R = {role: {c: float(eff.loc[(role, c), "effective_weight"]) for c in "SIH
 SAME_W = all(abs(W_EFF_R["bat"][c] - W_EFF_R["bowl"][c]) < 1e-6 for c in "SIHC")
 CNAME = {"S": "skill under pressure", "I": "match impact", "H": "holds up", "C": "consistency"}
 def frac(x):
-    for d in range(1, 7):
-        if abs(x * d - round(x * d)) < 0.01:
-            return f"{round(x * d)}/{d}"
+    """effective weight for display (2 dp; the table value is exact to 3 dp)"""
     return f"{x:.2f}"
+NUMW = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten", 11: "eleven", 12: "twelve"}
 def eff_phrase(role=None):
     """e.g. 'skill under pressure 2/3, consistency 1/3'; per role when batters and bowlers differ"""
     def one(w):
@@ -243,6 +242,13 @@ HONESTY = (f"Historical pressure-performance indicator, not a forecast. Its abil
            f"{hit_line(bat_p, 'batters')} ({CLAIM_BAT}); {hit_line(bowl_p, 'bowlers')} ({CLAIM_BOWL}). "
            f"Prices, availability, ages and nationality are assumptions or UNKNOWN: nothing external was VERIFIED.")
 
+HONESTY_SHORT = (f"Historical pressure-performance indicator, not a forecast: its ability to predict IPL 2027 is not established. Backtest, top 10 above average next season: "
+                 f"batters {f1(bat_p.score_hit_rate_excl)}% v naive {f1(bat_p.naive_hit_rate_excl)}%"
+                 + (f" v random pick {f1(bat_p.base_rate_random_pick)}%" if HAS_BASE else "") + f" (difference {rng(bat_p.hit_diff_lo80, bat_p.hit_diff_hi80)} pts, 80% interval); "
+                 f"bowlers {f1(bowl_p.score_hit_rate_excl)}% v naive {f1(bowl_p.naive_hit_rate_excl)}%"
+                 + (f" v random pick {f1(bowl_p.base_rate_random_pick)}%" if HAS_BASE else "") + f" ({rng(bowl_p.hit_diff_lo80, bowl_p.hit_diff_hi80)}). Verdicts: batters {CLAIM_BAT}; bowlers {CLAIM_BOWL}. "
+                 "Prices, availability, ages and nationality are assumptions or UNKNOWN; nothing external was VERIFIED.")
+
 EXEC = [
     f"We rated {S['scorable_bat']} batters, {S['scorable_bowl']} bowlers and {S['scorable_ar']} all-rounders on how they played when a ball could swing the match (IPL {seasons_scored}, {S['ipl_matches']} matches, {S['ipl_balls']:,} balls).",
     f"Must-Back if they reach the auction pool [ASSUMPTION A2]: {names(S['must_back'])}. "
@@ -265,6 +271,10 @@ def squad_fit_text():
                         closes=a["bat"] >= lg["bat"]))
     return out
 FIT = squad_fit_text()
+OPEN_GAP = "".join(f" {f['phase']}-overs batting stays below the league level with Plan A." for f in FIT if not f["closes"])
+AUCTION_DATE = next((f["value"] for f in METHOD["facts"] if f["id"] == "F1-002"), "date UNKNOWN")
+FORMULA = ("Score = 100 \u00d7 \u03a6( \u03a3 w\u00b7z / sd ), with z = each component standardised among scorable players of the role. Planned weights: "
+           + ", ".join(f"{CNAME[c].capitalize() if c == 'S' else CNAME[c].capitalize()} {W_NOM[c]:.2f}" for c in "SIHC") + ". Effective weights after components with no detectable player differences drop out: " + eff_phrase() + ".")
 
 # the payload's own "Backtest:" limitation is replaced by a line built from the current backtest table (pre-registered wording, D31)
 LIMITS = [x for x in METHOD["limitations"] if not x.lower().startswith("backtest") and "no detectable player differences" not in x]
@@ -298,24 +308,24 @@ def chart_shortlist(path, figsize, fs=9.5):
     # widen the canvas on the right for the text labels without moving the 0-100 axis
     ax.set_xlim(0, 100)
     ax.spines["bottom"].set_bounds(0, 100)
-    fig.subplots_adjust(left=0.30, right=0.76, top=0.90, bottom=0.17)
+    fig.subplots_adjust(left=0.30, right=0.76, top=0.88, bottom=0.21 if figsize[1] < 3 else 0.17)
     fig.savefig(path); plt.close(fig)
 
 def chart_backtest(path, figsize):
     fig, axes = plt.subplots(1, 2, figsize=figsize, dpi=220, sharey=True)
-    panels = [("score_hit_rate_excl", "naive_hit_rate_excl", "Players who could not be assessed left out"),
-              ("score_hit_rate_as_miss", "naive_hit_rate_as_miss", "Players who could not be assessed counted as misses")]
-    for ax, (cs, cn, title) in zip(axes, panels):
-        xs = np.arange(2)
-        for k, (role, lab) in enumerate([("bat", "Batters"), ("bowl", "Bowlers")]):
+    panels = [("score_hit_rate_excl", "naive_hit_rate_excl", True, "Unassessable players left out"),
+              ("score_hit_rate_as_miss", "naive_hit_rate_as_miss", False, "Unassessable players counted as misses")]
+    for ax, (cs, cn, with_base, title) in zip(axes, panels):
+        for k, role in enumerate(("bat", "bowl")):
             r = BTP.loc[role]
-            ax.bar(k - 0.2, r[cs], 0.38, color=PINK, edgecolor="white", zorder=2, label="Clutch score top 10" if k == 0 else None)
-            ax.bar(k + 0.2, r[cn], 0.38, color=BLUE, hatch="///", edgecolor="white", linewidth=0.0, zorder=2, label="Naive top 10 (strike rate / economy)" if k == 0 else None)
-            if HAS_BASE and cs == "score_hit_rate_excl" and pd.notna(r.base_rate_random_pick):
-                ax.hlines(r.base_rate_random_pick, k - 0.42, k + 0.42, color=INK, linestyles="--", linewidth=1.3, zorder=4, label="Random pick" if k == 0 else None)
-            ax.text(k - 0.2, r[cs] + 1.5, f"{f1(r[cs])}%", ha="center", fontsize=9.5, fontweight="bold", color=INK)
-            ax.text(k + 0.2, r[cn] + 1.5, f"{f1(r[cn])}%", ha="center", fontsize=9.5, fontweight="bold", color=INK)
-        ax.set_xticks(xs); ax.set_xticklabels(["Batters", "Bowlers"], fontsize=10)
+            bars = [(r[cs], PINK, "", "Clutch score top 10"), (r[cn], BLUE, "///", "Naive top 10 (strike rate / economy)")]
+            if with_base and HAS_BASE and pd.notna(r.base_rate_random_pick):
+                bars.append((r.base_rate_random_pick, "#C9CED8", "xx", "Random pick"))
+            off = np.linspace(-0.27, 0.27, 3) if len(bars) == 3 else np.array([-0.2, 0.2])
+            for (v, c, h, lab), o in zip(bars, off):
+                ax.bar(k + o, v, 0.25 if len(bars) == 3 else 0.36, color=c, hatch=h, edgecolor=INK if c == "#C9CED8" else "white", linewidth=0.5 if c == "#C9CED8" else 0.0, zorder=2, label=lab if k == 0 else None)
+                ax.text(k + o, v + 1.5, f"{f1(v)}%", ha="center", fontsize=8.5, fontweight="bold", color=INK)
+        ax.set_xticks([0, 1]); ax.set_xticklabels(["Batters", "Bowlers"], fontsize=10)
         ax.set_ylim(0, 100); ax.set_yticks(range(0, 101, 20))
         ax.yaxis.grid(True, color="#E3E6EC", zorder=0); ax.set_axisbelow(True)
         ax.set_title(title, fontsize=9, color=INK, pad=6)
@@ -345,7 +355,7 @@ def chart_pressure(path, figsize):
 
 CH = {}
 CH["short_deck"] = TMP / "short_deck.png"; chart_shortlist(CH["short_deck"], (6.9, 4.1))
-CH["short_cs"] = TMP / "short_cs.png"; chart_shortlist(CH["short_cs"], (7.4, 2.75), fs=8.5)
+CH["short_cs"] = TMP / "short_cs.png"; chart_shortlist(CH["short_cs"], (7.4, 2.3), fs=8.0)
 CH["backtest"] = TMP / "backtest.png"; chart_backtest(CH["backtest"], (6.6, 3.6))
 CH["pressure"] = TMP / "pressure.png"; chart_pressure(CH["pressure"], (6.6, 4.1))
 
@@ -401,16 +411,16 @@ footer{position:absolute;left:44px;right:44px;bottom:12px;display:flex;justify-c
 .cols{display:flex;gap:26px}.col{flex:1;min-width:0}
 h2{font-size:14.5px;font-weight:800;margin:0 0 6px 0;color:var(--ink)}
 .small{font-size:11.5px;color:var(--muted);line-height:1.3}
-ol.ex{padding-left:22px;font-size:15px;line-height:1.32}ol.ex li{margin-bottom:9px}
-.card{border:1.5px solid var(--line);border-radius:8px;padding:9px 12px;margin-bottom:9px;background:#fff}
+ol.ex{padding-left:24px;font-size:17px;line-height:1.35}ol.ex li{margin-bottom:12px}
+.card{border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:12px;background:#fff}
 .card.mb{border-left:6px solid var(--pink)}
-.card .nm{font-size:16px;font-weight:800}.card .sc{font-size:13px;color:var(--ink)}
+.card .nm{font-size:18px;font-weight:800}.card .sc{font-size:14.5px;color:var(--ink)}.card .small{font-size:12.5px}
 .step{display:flex;gap:10px;align-items:flex-start;margin-bottom:7px}
 .step .num{flex:none;width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}
 .step div{font-size:13px;line-height:1.3}
 .formula{background:var(--tint);border-radius:6px;padding:7px 10px;font-size:12.5px;line-height:1.35;margin-bottom:8px}
 .tbl{font-size:12.5px}.tbl td,.tbl th{padding:3px 6px}
-.dense{font-size:11.8px}.dense td,.dense th{padding:2px 5px}
+.dense{font-size:12.5px}.dense td,.dense th{padding:2.5px 5px}
 img.chart{display:block;width:100%;height:auto}
 .neg{color:#B00020;font-weight:700}.pos{color:#0B6B3A;font-weight:700}
 ul.lim{padding-left:17px;font-size:12px;line-height:1.28}ul.lim li{margin-bottom:3.5px}
@@ -431,7 +441,7 @@ def deck_html():
             f"<div class='small'>The three ranges overlap in every pair: {'too close to call' if mb_sep == 0 else 'see slide 5'}. Wide range = less sure.</div></div></div>")
     sl.append(slide(1, "Executive summary",
                     f"RR Clutch Index: back {names(list(must.player_name))} first, and treat the score as a record, not a forecast.", body,
-                    f"Pursue these three only if they reach the auction pool; every price and availability here is an assumption to recheck before 16 Dec."))
+                    f"Pursue these three only if they reach the auction pool; every price and availability here is an assumption to recheck before the auction ({AUCTION_DATE}, REPORTED only, F1-002)."))
     # ---- 2 method
     steps = "".join(f"<div class='step'><div class='num'>{i + 1}</div><div>{inline(s)}</div></div>" for i, s in enumerate(METHOD["flow"]))
     meaning = {"S": "Skill under pressure: runs above (batters) or saved (bowlers) versus an average player in the same spot",
@@ -448,13 +458,13 @@ def deck_html():
     body = (f"<div class='cols'><div class='col' style='flex:1.05'><h2>Six steps, in plain words</h2>{steps}"
             f"<h2 style='margin-top:10px'>Why not a simple average?</h2><ul class='lim' style='font-size:12.5px'>"
             + "".join(f"<li>{inline(x)}</li>" for x in METHOD["why_not_average"]) + "</ul></div>"
-            f"<div class='col' style='flex:1'><h2>The score</h2><div class='formula'>{inline(METHOD['formula'])}</div>"
+            f"<div class='col' style='flex:1'><h2>The score</h2><div class='formula'>{inline(FORMULA)}</div>"
             + table(whead, wrows, "tbl", wal)
-            + f"<p class='small' style='margin-top:6px'>Effective weights are the weights actually at work. Components {esc(inf_txt)} showed no detectable difference between players at these sample sizes (D30), so they carry no information. {'Batters and bowlers get the same weights. ' if SAME_W else ''}Pre-registration frozen before any ranking: sha256 {esc(PARAM['sha'][:12])}&hellip; (D29).</p>"
+            + f"<p class='small' style='margin-top:6px'>Effective weights are the weights actually at work. Components with no detectable difference between players at these sample sizes carry no information (D30): {esc(inf_txt)}. {'Batters and bowlers get the same weights. ' if SAME_W else ''}Pre-registration frozen before any ranking: sha256 {esc(PARAM['sha'][:12])}&hellip; (D29).</p>"
             f"<p class='small' style='margin-top:6px'>Sample rules: batters need {PARAM['min_bat']}+ High-pressure balls faced, bowlers {PARAM['min_bowl']}+ legal balls bowled. Others are shown as Not Scorable ({S['not_scorable']} of {S['in_scope']} players in scope).</p></div></div>")
     sl.append(slide(2, "Method",
                     f"Six steps turn {S['ipl_balls']:,} balls into one score per player, then test it honestly.", body,
-                    f"In effect the score is {eff_phrase()}; the weights were fixed before any ranking existed, so they cannot be tuned to flatter a player."))
+                    f"What actually drives the ranking is the effective weights ({eff_phrase()}); the planned weights were fixed before any ranking existed, so they cannot be tuned to flatter a player."))
     # ---- 3 pressure index
     seas_rows = []
     for r in shares.itertuples():
@@ -474,39 +484,41 @@ def deck_html():
                     f"A ball is High pressure when it can swing the match: {f0(high_min)}\u2013{f0(high_max)}% of balls each season.", body,
                     f"RR should judge players on the {PARAM['high_cut']}+ balls, where a single over moves the result, and read first-innings pressure labels with more caution than chase labels."))
     # ---- 4 leaderboard
-    def lb(df, role, n=8):
+    def lb(df, role, n=10):
         rows = []
         for r in df.head(n).itertuples():
-            nv = LB_NAIVE.get(r.player_id)
+            nv = LB_NAIVE[role].get(r.player_id)
             nvs = "\u2014" if nv is None else (f1(nv) if role == "bat" else f2(nv))
             rows.append([str(int(r.rank)), esc(r.player_name), f"<b>{f1(r.score)}</b> ({rng(r.score_lo80, r.score_hi80)})", f0(r.hi_qual_n), nvs, esc(short_avail(LB_AV.get(r.player_id, "")))])
         return rows
-    bsep = sep_pairs([(r.score_lo80, r.score_hi80) for r in sb.head(8).itertuples()]); wsep = sep_pairs([(r.score_lo80, r.score_hi80) for r in sw.head(8).itertuples()])
+    bsep = sep_pairs([(r.score_lo80, r.score_hi80) for r in sb.head(10).itertuples()]); wsep = sep_pairs([(r.score_lo80, r.score_hi80) for r in sw.head(10).itertuples()])
+    if TCC is not None:   # cross-check against the pipeline's own table
+        tc = TCC.set_index("role")
+        assert (int(tc.loc["bat", "pairs_separated_by_80pct_ranges"]), int(tc.loc["bat", "top10_pairs"])) == bsep and (int(tc.loc["bowl", "pairs_separated_by_80pct_ranges"]), int(tc.loc["bowl", "top10_pairs"])) == wsep, "too-close-to-call table differs from my count"
     ar_txt = "; ".join(f"{esc(r.player_name)} {f1(r.score)} ({rng(r.score_lo80, r.score_hi80)})" for r in sa.head(3).itertuples())
     hdr_b = ["#", "Batter", "Score (80% range)", "High balls", "SR*", "Availability"]; hdr_w = ["#", "Bowler", "Score (80% range)", "High balls", "Econ*", "Availability"]
     al = ["r", "l", "r", "r", "r", "l"]
-    body = (f"<div class='cols'><div class='col'><h2>Top 8 batters (of {S['scorable_bat']})</h2>{table(hdr_b, lb(sb, 'bat'), 'tbl dense', al, raw=True)}</div>"
-            f"<div class='col'><h2>Top 8 bowlers (of {S['scorable_bowl']})</h2>{table(hdr_w, lb(sw, 'bowl'), 'tbl dense', al, raw=True)}</div></div>"
+    body = (f"<div class='cols'><div class='col'><h2>Top 10 batters (of {S['scorable_bat']})</h2>{table(hdr_b, lb(sb, 'bat'), 'tbl dense', al, raw=True)}</div>"
+            f"<div class='col'><h2>Top 10 bowlers (of {S['scorable_bowl']})</h2>{table(hdr_w, lb(sw, 'bowl'), 'tbl dense', al, raw=True)}</div></div>"
             f"<p class='small' style='margin-top:8px'>All-rounders (top 3 of {S['scorable_ar']}): {ar_txt}.<br>"
-            f"Pairs of top-8 players with clearly separate ranges: batters {bsep[0]} of {bsep[1]}; bowlers {wsep[0]} of {wsep[1]}. Every other pair is too close to call.<br>"
+            f"Top-10 pairs with clearly separate 80% ranges: batters {bsep[0]} of {bsep[1]}; bowlers {wsep[0]} of {wsep[1]}. Every other pair is too close to call.<br>"
             f"* Strike rate (batters) or economy (bowlers) over High- and Low-pressure balls, shown for comparison. Availability tags: A1 RR squad (RR decides retention), A2 pool membership UNKNOWN, A3 likely retained = assumption (each team's six most-involved players).</p>")
     sl.append(slide(4, "Leaderboard",
-                    f"{sb.iloc[0].player_name} and {sw.iloc[0].player_name} lead their lists, but most ranges are wide and overlap.", body,
-                    "Use the board to build a long list, not a strict order: only pairs with separate ranges are really ranked, and several of the top names are RR already or likely to be retained."))
+                    f"{sb.iloc[0].player_name} and {sw.iloc[0].player_name} lead their lists, but {'no two of the top 10 are clearly apart' if bsep[0] + wsep[0] == 0 else 'most ranges are wide and overlap'}.", body,
+                    "Use the board to build a long list, not a strict order: " + ("no top-10 pair has separate ranges, so every order within the top 10 is too close to call" if bsep[0] + wsep[0] == 0 else "only pairs with separate ranges are really ranked") + ", and several of the top names are RR already or likely to be retained."))
     # ---- 5 shortlist
     rows = []
     for r in short.itertuples():
         t = {"Must-Back": "t-mb", "Value Pick": "t-vp", "Hidden Gem": "t-hg"}[r.tier]
         g = gap_short(r.fills_gaps)
-        rows.append([f"<b>{esc(r.player_name)}</b><br><span class='small'>{esc(r.sub_role)} &middot; {esc(nat_short(r._asdict()))}</span>",
-                     f"{esc(r.price_band)}<br><span class='small'>walk away above Rs {r.walk_away_cr:g} cr</span>", esc(clean_risk(r.risk_tags)), esc(g) if g else "<span class='small'>No measured gap</span>"])
+        rows.append([f"<b>{esc(r.player_name)}</b> <span class='small'>{esc(r.sub_role)}, {esc(nat_short(r._asdict()).replace(' [A7]', ''))}</span>",
+                     f"<span style='white-space:nowrap'>{esc(pb_short(r.price_band))}</span>", esc(clean_risk(r.risk_tags)), esc(g) if g else "<span class='small'>No measured gap</span>"])
     body = (f"<div class='cols'><div class='col' style='flex:0.98'><img class='chart' src='{b64(CH['short_deck'])}'>"
-            f"<p class='small' style='margin-top:2px'>Tiers: Must-Back = lower end of range at or above 50, best gap fit. Value Pick = score 60+ at a Regular or Emerging price. Hidden Gem = score 60+, smallest samples. All of them: age and injury UNKNOWN [A8]; pool membership UNKNOWN [A2].</p></div>"
+            f"<p class='small' style='margin-top:2px'>Tiers: Must-Back = lower end of range at or above 50, best gap fit. Value Pick = score 60+ at a Regular or Emerging price. Hidden Gem = score 60+, smallest samples. All of them: age and injury UNKNOWN [A8]; pool membership UNKNOWN [A2]; nationality inferred [A7]; walk-away price = top of the price band [A6].</p></div>"
             f"<div class='col' style='flex:1.1'>{table(['Player', 'Price band', 'Main risk', 'Gap it fills'], rows, 'tbl dense', ['l', 'l', 'l', 'l'], raw=True)}</div></div>")
     sl.append(slide(5, "Shortlist",
-                    f"Nine names to chase, in three tiers; {names(list(must.player_name))} come first.", body,
-                    f"Pathirana has the tightest range, so he is the safest pay-up case; Ashutosh Sharma and Cummins have wide ranges, so hold to the walk-away prices."
-                    if "Matheesha Pathirana" in set(must.player_name) else "Hold to the walk-away prices."))
+                    f"{NUMW[len(short)].capitalize()} names to chase, in three tiers; {names(list(must.player_name))} come first.", body,
+                    (lambda t: f"{t.player_name} has the tightest range of the three ({rng(t.score_lo80, t.score_hi80)}), so he is the safest pay-up case; the others have wider ranges, so hold to the walk-away prices.")(must.assign(w=must.score_hi80 - must.score_lo80).sort_values("w").iloc[0])))
     # ---- 6 squad fit
     def trow(label, key):
         b, a, pb_, lg = SQ["before"], SQ["planA"], SQ["planB"], SQ["league"]
@@ -533,18 +545,19 @@ def deck_html():
             f"{placeholder_box(True)}</div></div>")
     worse = [f for f in FIT if not f["better"]]
     sw_text = (f"Plan A lifts death-overs batting but does not fix middle-overs batting on the numbers above, so the middle-overs gap is still open."
-               if worse and any(f["better"] for f in FIT) else ("Plan A improves both measured batting gaps." if not worse else "Plan A improves neither measured batting gap."))
+               if worse and any(f["better"] for f in FIT) else (("Plan A improves both measured batting gaps" + ("" if all(f["closes"] for f in FIT) else ", but not all the way to the league level") + ", on only a few added High-pressure balls, so treat it as a direction, not proof.") if not worse else "Plan A improves neither measured batting gap."))
     sl.append(slide(6, "Squad fit",
-                    "Squad fit: RR's measured weakness is middle-overs batting under pressure, and Plan A does not clearly fix it." if any(not f["better"] and f["phase"] == "Middle" for f in FIT) else "Squad fit: Plan A targets RR's measured batting gaps.",
-                    body, sw_text + " Treat bowling as a strength to protect, not the place to spend."))
+                    ("Squad fit: RR's measured weakness is middle-overs batting under pressure, and Plan A does not clearly fix it." if any(not f["better"] and f["phase"] == "Middle" for f in FIT)
+                     else "Squad fit: Plan A lifts both of RR's measured batting gaps, but only on small added samples."),
+                    body, sw_text + (" Treat bowling as a strength to protect, not the place to spend." if rr_bowl_above_all else "")))
     # ---- 7 risks and limits
     lim = "".join(f"<li>{inline(x)}</li>" for x in LIMITS)
     nfacts = pd.Series([f["status"] for f in METHOD["facts"]]).value_counts()
     ver = int(sum(v for k, v in nfacts.items() if k.startswith("VERIFIED")))
     body = (f"<div class='cols'><div class='col' style='flex:0.95'><h2>Backtest: did the top 10 stay above average next season?</h2><img class='chart' src='{b64(CH['backtest'])}'>"
-            f"<p class='small'>Pooled 2024\u201326 folds. {esc(hit_line(bat_p, 'Batters'))} ({esc(CLAIM_BAT)}). {esc(hit_line(bowl_p, 'Bowlers'))} ({esc(CLAIM_BOWL)}). Only {cnt(bat_p.score_top10_assessable)} batter and {cnt(bowl_p.score_top10_assessable)} bowler player-seasons in the score's top 10 could be assessed, so every rate is noisy.</p></div>"
+            f"<p class='small'>Pooled 2024\u201326 folds. {esc(hit_line(bat_p, 'Batters'))} ({esc(CLAIM_BAT)}). {esc(hit_line(bowl_p, 'Bowlers'))} ({esc(CLAIM_BOWL)}). Only {cnt(bat_p.score_top10_assessable)} batter and {cnt(bowl_p.score_top10_assessable)} bowler player-seasons in the score's top 10 could be assessed (expected counts under random tie-breaks, D31), so every rate is noisy.</p></div>"
             f"<div class='col' style='flex:1.05'><h2>Limits, in plain words</h2><ul class='lim'>{lim}</ul>"
-            f"<p class='small'>External facts checked: {ver} VERIFIED of {len(METHOD['facts'])} ({nfacts.to_dict()}). Full detail: Methodology and Limitations note.</p>{placeholder_box(True)}</div></div>")
+            f"<p class='small'>External facts: {ver} VERIFIED of {len(METHOD['facts'])} ({'; '.join(f'{v} {k}' for k, v in nfacts.items())}). Full detail: Methodology and Limitations note.</p>{placeholder_box(True)}</div></div>")
     sl.append(slide(7, "Risks and limits",
                     "The score describes the past: " + ("it did not clearly beat a naive ranking at predicting next season." if not BEAT else "it beat a naive ranking in the backtest, but the samples are tiny."), body,
                     "Use the score to shortlist and to question prices, never as a forecast" + ("; for bowlers, check overall economy next to the score before bidding." if bowl_p.spearman_naive_outcome > bowl_p.spearman_score_outcome else ".")))
@@ -556,14 +569,14 @@ CS_CSS = BASE_CSS + """
 .page{width:794px;height:1123px;padding:26px 30px 18px 30px;position:relative;overflow:hidden;font-size:10.4px;line-height:1.3}
 .top{border-bottom:3px solid var(--pink);padding-bottom:6px;margin-bottom:7px}
 .top .k{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);font-weight:700}
-.top h1{font-size:19px;line-height:1.15;margin-top:2px}
-.honest{background:#FFF4D6;border:1.5px solid #E0B100;border-radius:6px;padding:6px 9px;font-size:10px;line-height:1.3;margin-bottom:8px}
+.top h1{font-size:17px;line-height:1.15;margin-top:2px}
+.honest{background:#FFF4D6;border:1.5px solid #E0B100;border-radius:6px;padding:5px 8px;font-size:9.6px;line-height:1.28;margin-bottom:5px}
 h2{font-size:11.5px;font-weight:800;margin:7px 0 3px 0}
-.tbl{font-size:9.4px}.tbl td,.tbl th{padding:2.5px 4px}
+.tbl{font-size:9.2px}.tbl td,.tbl th{padding:1.8px 4px}
 img.chart{display:block;width:100%;height:auto;margin-top:2px}
 .sw{background:var(--pinkt);border-left:5px solid var(--pink);padding:4px 8px;margin:4px 0;font-size:10px;border-radius:0 5px 5px 0}
 .two{display:flex;gap:12px}.two>div{flex:1;min-width:0}
-.foot{position:absolute;left:30px;right:30px;bottom:12px;font-size:8.3px;color:var(--muted);line-height:1.25}
+.foot{margin-top:5px;font-size:8.3px;color:var(--muted);line-height:1.25}
 .small{font-size:9px;color:var(--muted);line-height:1.28}
 """
 
@@ -572,33 +585,31 @@ def cheat_html():
     for r in short.itertuples():
         t = {"Must-Back": "t-mb", "Value Pick": "t-vp", "Hidden Gem": "t-hg"}[r.tier]
         g = gap_short(r.fills_gaps)
-        rows.append([f"<span class='tag {t}'>{r.tier}</span>", f"<b>{esc(r.player_name)}</b><br><span class='small'>{esc(r.sub_role)}, {esc(nat_short(r._asdict()))}</span>",
+        rows.append([f"<span class='tag {t}'>{r.tier}</span>", f"<b>{esc(r.player_name)}</b><br><span class='small'>{esc(r.sub_role)}{', ' + esc(nat_short(r._asdict()).replace(' [A7]', '')) if str(r.nationality).startswith('Overseas') else ''}</span>",
                      f"<b>{f1(r.score)}</b><br><span class='small'>{rng(r.score_lo80, r.score_hi80)}</span>", f"{esc(pb_short(r.price_band))}",
                      esc(clean_risk(r.risk_tags)), esc(g) if g else "<span class='small'>None measured</span>"])
     pbr = planb.iloc[0]
     av = avoid
-    av_txt = "; ".join(f"{esc(r.player_name)} {f1(r.score)} ({rng(r.score_lo80, r.score_hi80)}), {esc(pb_short(r.price_band))}" for r in av.itertuples())
+    av_txt = "; ".join(f"{esc(r.player_name)} {f1(r.score)} ({rng(r.score_lo80, r.score_hi80)})" for r in av.itertuples())
     ct_txt = "; ".join(f"{esc(r.player_name)} {f1(r.score)} ({rng(r.score_lo80, r.score_hi80)})" for r in contr.itertuples())
     bowl_note = "RR bowling is above league in all three High-pressure phases, so bowlers fill no measured gap; they add quality and depth." if rr_bowl_above_all else ""
     fit_note = " ".join(f"{f['phase']} batting: RR {neg(f['before'])} \u2192 {neg(f['after'])} with Plan A (league {neg(f['league'])})." for f in FIT)
     return f"""<!doctype html><html><head><meta charset='utf-8'><title>RR Clutch Index cheat sheet</title><style>{CS_CSS}</style></head><body><div class="page">
 <div class="top"><div class="k">RR Clutch Index &middot; IPL 2027 auction cheat sheet &middot; data to {esc(META['last_match'])}</div>
-<h1>Back {esc(names(list(must.player_name)))} first. Chase the other {len(short) - len(must)} only at the walk-away price (top of the price band) or below.</h1></div>
-<div class="honest"><b>Honesty line.</b> {esc(HONESTY)}</div>
+<h1>Back {esc(names(list(must.player_name)))} first; chase the other {NUMW[len(short) - len(must)]} only at or below walk-away price.</h1></div>
+<div class="honest"><b>Honesty line.</b> {esc(HONESTY_SHORT)}</div>
 <h2>Top picks by tier (score 0&ndash;100 within role, with 80% range; ranges that overlap are too close to call)</h2>
 {table(['Tier', 'Player', 'Score, 80% range', 'Price band', 'Risk', 'Gap it fills'], rows, 'tbl', ['l', 'l', 'r', 'l', 'l', 'l'], raw=True)}
-<p class='small' style='margin-top:3px'>All nine: age and injury UNKNOWN [A8]; whether they reach the auction pool is UNKNOWN [A2]. Pursue only if they are on the official list. {esc(bowl_note)}</p>
+<p class='small' style='margin-top:3px'>All {NUMW[len(short)]}: age and injury UNKNOWN [A8]; whether they reach the auction pool is UNKNOWN [A2]. Pursue only if they are on the official list. {esc(bowl_note)}</p>
 <h2>One chart: the shortlist with its uncertainty</h2>
 <img class="chart" src="{b64(CH['short_cs'])}">
-<div class="sw"><b>So what for RR:</b> the ranges are wide and the three Must-Backs overlap, so use the score to build a shortlist and set walk-away prices, not to rank them to the decimal.</div>
+<div class="sw"><b>So what for RR:</b> the ranges are wide{" and the Must-Back ranges overlap" if mb_sep == 0 else ""}, so use the score to build a shortlist and set walk-away prices, not to rank them to the decimal.</div>
 <div class="two"><div><h2>Budget plans (assumed Rs {purse:g} cr [A4], {slots} slots)</h2>
 <p><b>Plan A</b> (assumed Rs {purse_used_A:.1f} cr): {esc(names(list(PA.player_name)))}.<br><b>Plan B</b> (assumed Rs {purse_used_B:.1f} cr): {esc(names(list(PB.player_name)))}.<br>
-<span class='small'>Switch rule: if {esc(pbr.if_player)} goes past Rs {pbr.goes_past_cr:g} cr, take {esc(pbr.switch_to)}; RR loses {esc(str(pbr.rr_loses))}. {esc(fit_note)} Middle-overs batting stays RR's open gap.</span></p></div>
-<div><h2>Do not chase at these prices</h2><p class='small' style='color:var(--ink)'><b>Low score, high price band:</b> {av_txt}.<br><b>Popular but low score:</b> {ct_txt}.</p></div></div>
-<h2>How to read it</h2>
-<p class='small' style='color:var(--ink)'><b>Clutch Reliability Score</b> = how well a player did when a ball could swing the match, IPL {esc(seasons_scored)}, against an average player in the same situation, pulled toward average for small samples. Effective weights: {esc(eff_phrase())}. <b>80% range</b> = where we are 80% sure the true value sits. Pressure = balls rated {PARAM['high_cut']}+ on the 0&ndash;100 Pressure Index.</p>
+<span class='small'>Switch rule: if {esc(pbr.if_player)} goes past Rs {pbr.goes_past_cr:g} cr, take {esc(pbr.switch_to)}; RR loses {esc(str(pbr.rr_loses))}. {esc(fit_note)}{esc(OPEN_GAP)}</span></p></div>
+<div><h2>Do not chase</h2><p class='small' style='color:var(--ink)'><b>Lowest scores in the assumed pool [A2, A3]:</b> {av_txt}.<br><b>Popular but low score:</b> {ct_txt}.</p></div></div>
 {placeholder_box(True)}
-<div class="foot">Price bands are rule-based assumptions [A6], not market data; walk-away = top of band. Purse, slots and overseas limit are assumptions [A4, A5]. Nationality is inferred from the data [A7]. None of the external facts could be VERIFIED (network blocked): recheck before the auction. Source: outputs/tables/*.csv; build {esc(META['build'])}.</div>
+<div class="foot"><b>How to read it.</b> Score = how well a player did on balls that could swing the match (Pressure Index {PARAM['high_cut']}+), IPL {esc(seasons_scored)}, against an average player in the same spot, pulled toward average for small samples. Effective weights: {esc(eff_phrase())}. 80% range = where we are 80% sure the true value sits. Price bands are rule-based assumptions [A6], not market data; walk-away = top of band. Purse, slots and overseas limit are assumptions [A4, A5]. Nationality (shown for overseas players only) is inferred from the data [A7]. None of the external facts could be VERIFIED (network blocked): recheck before the auction. Source: outputs/tables/*.csv; build {esc(META['build'])}.</div>
 </div></body></html>"""
 
 # ------------------------------------------------------------------------------------------ D: methodology note + data dictionary (one block model, two renderers)
@@ -675,8 +686,8 @@ def build_method():
     d.p(f"Samples: a batter needs at least {PARAM['min_bat']} High-pressure balls faced, a bowler at least {PARAM['min_bowl']} legal balls bowled in High pressure; an all-rounder needs both. "
         f"High pressure means a Pressure Index of {PARAM['high_cut']} or more; Medium is {PARAM['med_cut']} to {PARAM['high_cut']}; Low is below {PARAM['med_cut']}.")
     d.h2("3. The formula and the weights")
-    d.p(f"`{METHOD['formula']}`")
-    d.p(f"Each component is shrunk toward the role average (Empirical Bayes; k floored at {PARAM['k_floor']} balls; consistency uses a prior strength of {PARAM['prior_seasons']} seasons). Recent seasons count more: {PARAM['recency']} (decay {PARAM['decay']} a season). "
+    d.p(FORMULA)
+    d.p(f"Each component is shrunk toward the role average (Empirical Bayes using each player's own sampling variance and a Kish effective sample size, D31; shrinkage strength floored at {PARAM['k_floor']} balls; consistency uses a prior strength of {PARAM['prior_seasons']} seasons). Recent seasons count more: {PARAM['recency']} (decay {PARAM['decay']} a season). "
         f"Intervals: {PARAM['boots']} bootstrap draws over the player's matches, seed {SEED}; the 80% range is the 10th to 90th percentile. All-rounders: 0.5 x batting score + 0.5 x bowling score.")
     meaning = {"S": "Skill under pressure (runs above expected for batters, runs saved vs expected for bowlers, per ball in High pressure)",
                "I": "Match impact (win probability added per ball in High pressure)",
@@ -687,7 +698,7 @@ def build_method():
         inf = bool(r.informative)
         wr.append([{"bat": "Batters", "bowl": "Bowlers"}[r.role], f"**{r.component}**: {meaning[r.component]}", f"{r.weight:.2f}",
                    "yes" if inf else "no: no detectable difference between players (weight moved to the other components)", f"{r.prior_mean:.4f}", f"{r.prior_k:.4g}" if inf else "n/a (no between-player spread)", f"**{r.effective_weight:.3f}**"])
-    d.table(["Role", "Component", "Planned weight", "Informative?", "Prior mean", "Prior strength k", "Effective weight"], wr, ["l", "l", "r", "l", "r", "r", "r"])
+    d.table(["Role", "Component", "Planned weight", "Informative?", "Prior mean", "Prior spread (S, I, H: between-player variance; C: prior strength in seasons)", "Effective weight"], wr, ["l", "l", "r", "l", "r", "r", "r"])
     d.p(f"**What this means.** Components with no detectable between-player differences at these sample sizes: {NO_INFO_TXT} (D30). With nothing to separate players, every player is shrunk to the mean and the component's z-score is set to 0. "
         f"The effective weights are therefore {eff_phrase()}. The planned weights were frozen before any player number existed (pre-registration sha256 {PARAM['sha']}, D29) and were never tuned on the backtest (D6, D16).")
     d.h2("4. Why not a simple average?")
@@ -724,10 +735,11 @@ def build_method():
         f"Rank correlation with next-season outcome: batters {sgn(bat_p.spearman_score_outcome, 2)} (naive {sgn(bat_p.spearman_naive_outcome, 2)}), bowlers {sgn(bowl_p.spearman_score_outcome, 2)} (naive {sgn(bowl_p.spearman_naive_outcome, 2)}).")
     d.p("The random-pick hit rate is the share of all assessable players who were above average next season: it is what picking at random would score." if HAS_BASE else "")
     d.p(f"**Caution.** Only {cnt(bat_p.score_top10_assessable)} batter and {cnt(bowl_p.score_top10_assessable)} bowler player-seasons in the score's top 10 could be assessed across the three folds, so every hit rate is very noisy. "
-        "Counting players who could not be assessed as misses lowers every rate (see the table). The result is published as it came out; no weight or metric was changed after seeing it. A pre-fix run is kept for the record in `step4_backtest_summary_prefix_bug.csv` (D30); its conclusion is the same.")
+        "Counting players who could not be assessed as misses lowers every rate (see the table). The result is published as it came out; no weight or metric was changed after seeing it. Earlier runs are kept for the record in `step4_backtest_summary_prefix_bug.csv` (D30) and `step4_backtest_summary_v1_preD31.csv` (before the D31 corrections).")
     d.h2("7. Sensitivity: do the weights matter?")
     wsens = sens[sens.component.isin(list("SIHC"))]
     sp = wsens.pivot_table(index=["role", "component"], columns="change", values="top10_overlap_pct").reset_index()
+    sp["o"] = sp.component.map({c: i for i, c in enumerate("SIHC")}); sp = sp.sort_values(["role", "o"], ascending=[False, True]).drop(columns="o")
     sr_ = [[{"bat": "Batters", "bowl": "Bowlers"}[r.role], r.component] + [f"{r[c]:.0f}%" for c in sp.columns[2:]] for _, r in sp.iterrows()]
     d.table(["Role", "Weight changed", *[f"{sgn(c * 100, 0)}%" for c in sp.columns[2:]]], sr_, ["l", "l", "r", "r"])
     d.p(f"Each planned weight moved by plus or minus 10% (others renormalised): the top-10 overlap with the main ranking never drops below {wsens.top10_overlap_pct.min():.0f}%. "
@@ -735,10 +747,11 @@ def build_method():
     osens = sens[~sens.component.isin(list("SIHC"))]
     if len(osens):
         d.p("Alternative weightings (D31): " + "; ".join(sorted(osens.component.unique())) + ".")
-        d.table([c.replace("_", " ") for c in osens.columns], [[("\u2014" if pd.isna(v) else (f"{v:.1f}" if isinstance(v, float) else v)) for v in row] for row in osens.itertuples(index=False)], ["l"] * 2 + ["r"] * (len(osens.columns) - 2))
+        scen = {"skill_only": "Only skill under pressure (S)", "consistency_only": "Only consistency (C)", "equal_weights": "All informative components equal"}
+        d.table(["Role", "Alternative weighting", "Top-10 overlap with main"], [[{"bat": "Batters", "bowl": "Bowlers"}[r.role], scen.get(r.component, r.component), f"{r.top10_overlap_pct:.0f}%"] for r in osens.itertuples()], ["l", "l", "r"])
     if TCC is not None:
         d.p("Top-10 pairs separated by their 80% ranges (`step4_too_close_to_call.csv`); every other pair is too close to call.")
-        d.table([c.replace("_", " ") for c in TCC.columns], [[("\u2014" if pd.isna(v) else (f"{v:.1f}" if isinstance(v, float) else v)) for v in row] for row in TCC.head(40).itertuples(index=False)], ["l"] * len(TCC.columns))
+        d.table(["Role", "Top-10 pairs", "Pairs separated by 80% ranges", "Pairs too close to call"], [[{"bat": "Batters", "bowl": "Bowlers"}.get(r.role, r.role), int(r.top10_pairs), int(r.pairs_separated_by_80pct_ranges), int(r.pairs_too_close_to_call)] for r in TCC.itertuples()], ["l", "r", "r", "r"])
     d.h2("8. Robustness: other definitions of pressure")
     vmeaning = {"leverage_only": "Pressure = leverage only, no context boosts", "rule_based": "Pressure from rules (chase, death, etc.) instead of leverage",
                 "with_close_game": "Adds the hindsight close-game boost (comparison only, D8)", "d18_strict_buckets": "Pressure scale from earlier seasons only (strict D18, comparison)",
@@ -751,7 +764,7 @@ def build_method():
     d.h2("9. Season level: expected runs trail scoring jumps")
     orow = [[str(int(r.season)), f"{int(r.balls):,}", f"{r.mean_rae_per_ball:+.3f}".replace("-", MINUS), f"{r.actual_rpb:.3f}", f"{r.expected_rpb:.3f}"] for r in offs.itertuples()]
     d.table(["Season", "Balls", "Mean runs above expected per ball", "Actual runs per ball", "Expected runs per ball"], orow, ["l", "r", "r", "r", "r"])
-    d.p("Expected runs come from earlier matches only and trail scoring jumps (D28). The season-centred check leaves the top 20 unchanged (100% for batters and bowlers).")
+    d.p("Expected runs come from earlier matches only and trail scoring jumps (D28). Season-centred check (comparison only): top-20 overlap with the main list is " + " and ".join(f"{r.top20_overlap_pct:.0f}% for {'batters' if r.role == 'bat' else 'bowlers'}" for r in rob[rob.variant == "season_centred"].itertuples()) + ".")
     d.h2("10. Limitations, stated plainly")
     d.ol(LIMITS)
     d.h2("11. External facts and assumptions")
@@ -771,7 +784,7 @@ def build_dictionary():
     d.p("Part A lists every column of the ball table. Part B lists every metric. Part C gives the shared definitions the numbers rely on. Sources: `outputs/tables/step0_ball_columns.csv`, `dashboard_payload.json` (glossary), `logs/DEFINITIONS.md`.")
     d.h2("Part A. Ball table columns")
     d.p(f"{len(bcols)} columns: {int((bcols.kind == 'raw column').sum())} raw columns (unchanged from the source) and {int((bcols.kind == 'derived').sum())} derived columns. One row = one delivery (wides and no-balls included).")
-    d.table(["Column", "Kind", "Meaning", "Rule"], [[f"`{r.column}`", r.kind, r.meaning, r.rule] for r in bcols.itertuples()], ["l", "l", "l", "l"])
+    d.table(["Column", "Kind", "Meaning", "Rule"], [[f"`{r.column}`", r.kind.replace(" column", ""), r.meaning, r.rule] for r in bcols.itertuples()], ["l", "l", "l", "l"])
     d.h2("Part B. Metrics")
     d.h3("B1. Glossary (shown in the dashboard and the deliverables)")
     d.table(["Term", "Plain meaning"], [[f"**{g['term']}**", g["meaning"]] for g in P["glossary"]], ["l", "l"])
@@ -834,10 +847,10 @@ def render(jobs):
     if r.returncode:
         print(r.stderr); sys.exit(1)
 
-def previews(pdf, stem):
+def previews(pdf, stem, dpi=70):
     for old in PREV.glob(f"{stem}_p*.png"):
         old.unlink()
-    subprocess.run(["pdftoppm", "-png", "-r", "70", str(pdf), str(PREV / f"{stem}_p")], check=True)
+    subprocess.run(["pdftoppm", "-png", "-r", str(dpi), str(pdf), str(PREV / f"{stem}_p")], check=True)
     # normalise names to <stem>_p1.png
     for f in sorted(PREV.glob(f"{stem}_p*.png")):
         m = re.search(r"_p-?0*(\d+)\.png$", f.name)
@@ -860,7 +873,7 @@ def main():
     render([{"html": str(deck), "pdf": str(outs["B"]), "kind": "deck"}, {"html": str(cs), "pdf": str(outs["C"]), "kind": "a4"},
             {"html": str(dh), "pdf": str(outs["D"]), "kind": "a4flow"}])
     for k, stem in (("B", "B_deck"), ("C", "C_cheat_sheet"), ("D", "D_methodology")):
-        previews(outs[k], stem)
+        previews(outs[k], stem, 80 if k == "B" else 100)
         print(f"{outs[k].name}: {pages(outs[k])} page(s)")
     shutil.rmtree(TMP, ignore_errors=True)
 
