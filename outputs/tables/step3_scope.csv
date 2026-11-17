@@ -1,0 +1,258 @@
+player_id,player_name,hi_balls_faced,hi_legal_bowled,bat_scorable,bowl_scorable,role
+1071,Jaydev Unadkat,12.0,76.0,False,True,Bowler
+1077,David Miller,157.0,0.0,True,False,Batter
+1205,Jonny Bairstow,74.0,0.0,False,False,Not scorable on IPL data (sample)
+126,Rohit Sharma,199.0,0.0,True,False,Batter
+1318,Andre Russell,91.0,97.0,False,True,Bowler
+1440,Rahul Tripathi,64.0,0.0,False,False,Not scorable on IPL data (sample)
+1487,Adam Milne,2.0,13.0,False,False,Not scorable on IPL data (sample)
+152,Ravindra Jadeja,195.0,198.0,True,True,All-rounder
+1556,David Payne,5.0,3.0,False,False,Not scorable on IPL data (sample)
+1566,Mohammed Shami,21.0,157.0,False,True,Bowler
+1596,Moeen Ali,21.0,58.0,False,False,Not scorable on IPL data (sample)
+1612,Yuzvendra Chahal,0.0,256.0,False,True,Bowler
+167,Ajinkya Rahane,97.0,0.0,False,False,Not scorable on IPL data (sample)
+1699,Suryakumar Yadav,189.0,0.0,True,False,Batter
+1758,Patrick Cummins,35.0,125.0,False,True,Bowler
+1813,Deepak Chahar,9.0,198.0,False,True,Bowler
+19312,Nuwan Thushara,0.0,37.0,False,False,Not scorable on IPL data (sample)
+19316,Maheesh Theekshana,4.0,133.0,False,True,Bowler
+1941,Devon Conway,94.0,0.0,False,False,Not scorable on IPL data (sample)
+19714,Abishek Porel,61.0,0.0,False,False,Not scorable on IPL data (sample)
+19781,Mitchell Owen,0.0,0.0,False,False,Not scorable on IPL data (sample)
+198,Manish Pandey,55.0,0.0,False,False,Not scorable on IPL data (sample)
+20005,Arshad Khan,17.0,52.0,False,False,Not scorable on IPL data (sample)
+20006,Ramandeep Singh,35.0,0.0,False,False,Not scorable on IPL data (sample)
+20702,Tristan Stubbs,177.0,4.0,True,False,Batter
+2101,Quinton de Kock,40.0,0.0,False,False,Not scorable on IPL data (sample)
+2258,Sanju Samson,174.0,0.0,True,False,Batter
+2261,Harshal Patel,26.0,178.0,False,True,Bowler
+22920,Jacob Duffy,0.0,6.0,False,False,Not scorable on IPL data (sample)
+2315,Reece Topley,0.0,14.0,False,False,Not scorable on IPL data (sample)
+2320,Trent Boult,4.0,182.0,False,True,Bowler
+23311,Jacob Bethell,45.0,0.0,False,False,Not scorable on IPL data (sample)
+23450,Sai Sudharsan,287.0,0.0,True,False,Batter
+23467,Gurjapneet Singh,0.0,11.0,False,False,Not scorable on IPL data (sample)
+2367,Travis Head,62.0,0.0,False,False,Not scorable on IPL data (sample)
+2382,Jamie Overton,28.0,15.0,False,False,Not scorable on IPL data (sample)
+2399,Dushmantha Chameera,1.0,33.0,False,False,Not scorable on IPL data (sample)
+2411,Sandeep Sharma,0.0,262.0,False,True,Bowler
+2417,Akeal Hosein,10.0,33.0,False,False,Not scorable on IPL data (sample)
+2436,Dasun Shanaka,27.0,6.0,False,False,Not scorable on IPL data (sample)
+25132,Praful Hinge,1.0,28.0,False,False,Not scorable on IPL data (sample)
+25138,Harsh Dubey,4.0,20.0,False,False,Not scorable on IPL data (sample)
+25139,Shubham Dubey,61.0,0.0,False,False,Not scorable on IPL data (sample)
+25213,Dewald Brevis,42.0,0.0,False,False,Not scorable on IPL data (sample)
+25669,Priyansh Arya,99.0,0.0,False,False,Not scorable on IPL data (sample)
+25679,Salil Arora,11.0,0.0,False,False,Not scorable on IPL data (sample)
+2633,Jason Holder,12.0,61.0,False,True,Bowler
+2636,Adam Zampa,1.0,47.0,False,False,Not scorable on IPL data (sample)
+2639,Marcus Stoinis,136.0,64.0,True,True,All-rounder
+26663,Kwena Maphaka,0.0,0.0,False,False,Not scorable on IPL data (sample)
+26830,Nishant Kumar Sindhu,9.0,0.0,False,False,Not scorable on IPL data (sample)
+26834,Raj Bawa,13.0,18.0,False,False,Not scorable on IPL data (sample)
+26906,Angkrish Raghuvanshi,53.0,0.0,False,False,Not scorable on IPL data (sample)
+26913,Shaik Rasheed,6.0,0.0,False,False,Not scorable on IPL data (sample)
+2756,Shashank Singh,98.0,11.0,False,False,Not scorable on IPL data (sample)
+2790,Praveen Dubey,3.0,1.0,False,False,Not scorable on IPL data (sample)
+27960,Mayank Yadav,1.0,30.0,False,False,Not scorable on IPL data (sample)
+27964,Anshul Kamboj,11.0,125.0,False,True,Bowler
+28,Ishant Sharma,0.0,66.0,False,True,Bowler
+28018,Ashok Sharma,1.0,36.0,False,False,Not scorable on IPL data (sample)
+28021,Saurabh Dubey,0.0,20.0,False,False,Not scorable on IPL data (sample)
+2847,Shardul Thakur,35.0,171.0,False,True,Bowler
+2876,Axar Patel,146.0,150.0,True,True,All-rounder
+2877,Vijay Shankar,91.0,0.0,False,False,Not scorable on IPL data (sample)
+2878,Mohit Sharma,4.0,122.0,False,True,Bowler
+2933,Jasprit Bumrah,2.0,210.0,False,True,Bowler
+29888,Harshit Rana,10.0,122.0,False,True,Bowler
+305,Ravichandran Ashwin,22.0,120.0,False,True,Bowler
+3125,Nicholas Pooran,136.0,0.0,True,False,Batter
+31518,Akshat Raghuwanshi,0.0,0.0,False,False,Not scorable on IPL data (sample)
+31529,Robin Minz,6.0,0.0,False,False,Not scorable on IPL data (sample)
+3174,Matt Henry,0.0,34.0,False,False,Not scorable on IPL data (sample)
+32244,Tripurana Vijay,0.0,0.0,False,False,Not scorable on IPL data (sample)
+32862,Allah Ghazanfar,0.0,56.0,False,False,Not scorable on IPL data (sample)
+3297,Shimron Hetmyer,175.0,0.0,True,False,Batter
+3298,Jofra Archer,24.0,135.0,False,True,Bowler
+33067,Ravichandran Smaran,4.0,0.0,False,False,Not scorable on IPL data (sample)
+3330,Hardik Pandya,131.0,99.0,True,True,All-rounder
+34969,Manav Suthar,0.0,11.0,False,False,Not scorable on IPL data (sample)
+35071,Kunal Rathore,0.0,0.0,False,False,Not scorable on IPL data (sample)
+35072,Ramakrishna Ghosh,0.0,0.0,False,False,Not scorable on IPL data (sample)
+35318,Sakib Hussain,0.0,46.0,False,False,Not scorable on IPL data (sample)
+360,Bhuvneshwar Kumar,20.0,336.0,False,True,Bowler
+3605,Aiden Markram,95.0,28.0,False,False,Not scorable on IPL data (sample)
+3628,Kagiso Rabada,27.0,149.0,False,True,Bowler
+3629,Corbin Bosch,4.0,59.0,False,False,Not scorable on IPL data (sample)
+3641,Ben Dwarshuis,0.0,6.0,False,False,Not scorable on IPL data (sample)
+3644,Kuldeep Yadav,20.0,224.0,False,True,Bowler
+3645,Sarfaraz Khan,45.0,0.0,False,False,Not scorable on IPL data (sample)
+3647,Shreyas Iyer,201.0,0.0,True,False,Batter
+3648,Deepak Hooda,18.0,0.0,False,False,Not scorable on IPL data (sample)
+3653,Avesh Khan,6.0,287.0,False,True,Bowler
+3672,Kusal Mendis,0.0,0.0,False,False,Not scorable on IPL data (sample)
+3697,Kyle Jamieson,0.0,27.0,False,False,Not scorable on IPL data (sample)
+36982,Suyash Sharma,0.0,129.0,False,True,Bowler
+3700,Tim Seifert,6.0,0.0,False,False,Not scorable on IPL data (sample)
+37052,Naman Dhir,67.0,12.0,False,False,Not scorable on IPL data (sample)
+3727,Matthew Short,65.0,1.0,False,False,Not scorable on IPL data (sample)
+37731,Musheer Khan,0.0,0.0,False,False,Not scorable on IPL data (sample)
+3782,M Shahrukh Khan,85.0,0.0,False,False,Not scorable on IPL data (sample)
+3916,Jitesh Sharma,144.0,0.0,True,False,Batter
+3926,Rahul Tewatia,84.0,0.0,False,False,Not scorable on IPL data (sample)
+395,Karn Sharma,15.0,58.0,False,False,Not scorable on IPL data (sample)
+39657,Eshan Malinga,0.0,77.0,False,True,Bowler
+4007,Ryan Rickelton,60.0,0.0,False,False,Not scorable on IPL data (sample)
+4101,Mitchell Santner,11.0,85.0,False,True,Bowler
+4117,Ishan Kishan,208.0,0.0,True,False,Batter
+41503,Yash Punja,0.0,32.0,False,False,Not scorable on IPL data (sample)
+4211,Vishnu Vinod,10.0,0.0,False,False,Not scorable on IPL data (sample)
+4219,Krunal Pandya,140.0,170.0,True,True,All-rounder
+4229,George Linde,4.0,0.0,False,False,Not scorable on IPL data (sample)
+4246,Nitish Rana,157.0,10.0,True,False,Batter
+4260,Heinrich Klaasen,207.0,0.0,True,False,Batter
+4265,T Natarajan,0.0,124.0,False,True,Bowler
+42845,Arshin Kulkarni,0.0,0.0,False,False,Not scorable on IPL data (sample)
+4288,Navdeep Saini,0.0,21.0,False,False,Not scorable on IPL data (sample)
+4373,Mustafizur Rahman,1.0,83.0,False,True,Bowler
+43798,Lhuan Pretorius,0.0,0.0,False,False,Not scorable on IPL data (sample)
+4391,Liam Livingstone,51.0,31.0,False,False,Not scorable on IPL data (sample)
+43917,Krish Bhagat,1.0,5.0,False,False,Not scorable on IPL data (sample)
+4409,Sam Curran,113.0,161.0,True,True,All-rounder
+4487,Vyshak Kumar,2.0,87.0,False,True,Bowler
+4489,Prasidh Krishna,0.0,88.0,False,True,Bowler
+4494,Abhinav Manohar,58.0,0.0,False,False,Not scorable on IPL data (sample)
+45381,PV Satyanarayan Raju,1.0,11.0,False,False,Not scorable on IPL data (sample)
+45749,Mukul Choudhary,37.0,0.0,False,False,Not scorable on IPL data (sample)
+45966,Prashant Veer,31.0,0.0,False,False,Not scorable on IPL data (sample)
+46066,Vipraj Nigam,29.0,44.0,False,False,Not scorable on IPL data (sample)
+46137,Kartik Sharma,19.0,0.0,False,False,Not scorable on IPL data (sample)
+4641,Lungi Ngidi,1.0,62.0,False,True,Bowler
+4692,Lockie Ferguson,1.0,55.0,False,False,Not scorable on IPL data (sample)
+47,Virat Kohli,258.0,0.0,True,False,Batter
+4703,Rishabh Pant,111.0,0.0,True,False,Batter
+4708,Rinku Singh,158.0,0.0,True,False,Batter
+4722,Rashid Khan,50.0,141.0,False,True,Bowler
+4736,Josh Inglis,68.0,0.0,False,False,Not scorable on IPL data (sample)
+47370,Aniket Verma,44.0,0.0,False,False,Not scorable on IPL data (sample)
+4755,Shivam Dube,190.0,3.0,True,False,Batter
+4779,Pieter Willem Mulder,9.0,0.0,False,False,Not scorable on IPL data (sample)
+4816,Khaleel Ahmed,0.0,186.0,False,True,Bowler
+4823,Washington Sundar,79.0,21.0,False,False,Not scorable on IPL data (sample)
+4824,Zeeshan Ansari,0.0,0.0,False,False,Not scorable on IPL data (sample)
+4847,Finn Allen,18.0,0.0,False,False,Not scorable on IPL data (sample)
+48504,Ayush Mhatre,37.0,0.0,False,False,Not scorable on IPL data (sample)
+4853,Glenn Phillips,17.0,2.0,False,False,Not scorable on IPL data (sample)
+4854,Rachin Ravindra,47.0,0.0,False,False,Not scorable on IPL data (sample)
+48557,Vignesh Puthur,0.0,8.0,False,False,Not scorable on IPL data (sample)
+48575,Sahil Parakh,0.0,0.0,False,False,Not scorable on IPL data (sample)
+48953,Danish Malewar,0.0,0.0,False,False,Not scorable on IPL data (sample)
+4900,Wanindu Hasaranga,13.0,111.0,False,True,Bowler
+4904,Kamindu Mendis,24.0,0.0,False,False,Not scorable on IPL data (sample)
+4986,Rovman Powell,82.0,0.0,False,False,Not scorable on IPL data (sample)
+50284,Vaibhav Sooryavanshi,108.0,0.0,True,False,Batter
+5039,Rajat Patidar,73.0,0.0,False,False,Not scorable on IPL data (sample)
+5041,Mukesh Kumar,0.0,170.0,False,True,Bowler
+5553,Phil Salt,94.0,0.0,False,False,Not scorable on IPL data (sample)
+5562,Richard Gleeson,2.0,24.0,False,False,Not scorable on IPL data (sample)
+5577,Sai Kishore,5.0,43.0,False,False,Not scorable on IPL data (sample)
+56817,Shivang Kumar,11.0,35.0,False,False,Not scorable on IPL data (sample)
+56830,Madhav Tiwari,8.0,9.0,False,False,Not scorable on IPL data (sample)
+5738,Xavier Bartlett,11.0,63.0,False,True,Bowler
+5808,Karim Janat,0.0,0.0,False,False,Not scorable on IPL data (sample)
+58134,Digvesh Rathi,0.0,115.0,False,True,Bowler
+58135,Tejasvi Dahiya,2.0,0.0,False,False,Not scorable on IPL data (sample)
+58246,Prince Yadav,1.0,88.0,False,True,Bowler
+58727,Abhinandan Singh,0.0,7.0,False,False,Not scorable on IPL data (sample)
+5939,Cameron Green,107.0,99.0,True,True,All-rounder
+5944,Mohammed Siraj,1.0,241.0,False,True,Bowler
+6059,Ruturaj Gaikwad,127.0,0.0,True,False,Batter
+60700,Ravi Singh,0.0,0.0,False,False,Not scorable on IPL data (sample)
+6161,Rahul Chahar,0.0,123.0,False,True,Bowler
+6162,Kulwant Khejroliya,0.0,1.0,False,False,Not scorable on IPL data (sample)
+6237,Manimaran Siddharth,0.0,22.0,False,False,Not scorable on IPL data (sample)
+6256,Varun Chakravarthy,1.0,166.0,False,True,Bowler
+6272,William Jacks,42.0,26.0,False,False,Not scorable on IPL data (sample)
+6281,Abhishek Sharma,123.0,65.0,True,True,All-rounder
+6284,Anukul Roy,22.0,56.0,False,False,Not scorable on IPL data (sample)
+6287,Yash Thakur,0.0,117.0,False,True,Bowler
+6288,Shubman Gill,283.0,0.0,True,False,Batter
+6314,Devdutt Padikkal,137.0,0.0,True,False,Batter
+6342,Matthew Breetzke,0.0,0.0,False,False,Not scorable on IPL data (sample)
+6354,Spencer Johnson,1.0,41.0,False,False,Not scorable on IPL data (sample)
+6359,Raghu Sharma,0.0,0.0,False,False,Not scorable on IPL data (sample)
+6396,Tim David,128.0,0.0,True,False,Batter
+6423,Riyan Parag,189.0,14.0,True,False,Batter
+6450,Mujeeb Ur Rahman,0.0,1.0,False,False,Not scorable on IPL data (sample)
+6457,Urvil Patel,25.0,0.0,False,False,Not scorable on IPL data (sample)
+6460,Ayush Badoni,133.0,0.0,True,False,Batter
+6461,,0.0,0.0,False,False,Not scorable on IPL data (sample)
+6464,Arshdeep Singh,1.0,322.0,False,True,Bowler
+6466,Atharwa Taide,18.0,0.0,False,False,Not scorable on IPL data (sample)
+6523,Blessing Muzarabani,0.0,4.0,False,False,Not scorable on IPL data (sample)
+6526,Himmat Singh,30.0,0.0,False,False,Not scorable on IPL data (sample)
+6628,Gerald Coetzee,9.0,35.0,False,False,Not scorable on IPL data (sample)
+6669,Mohsin Khan,0.0,107.0,False,True,Bowler
+6674,Rahmanullah Gurbaz,56.0,0.0,False,False,Not scorable on IPL data (sample)
+6676,Azmatullah Omarzai,22.0,83.0,False,True,Bowler
+6683,Mayank Markande,2.0,51.0,False,False,Not scorable on IPL data (sample)
+67036,Brijesh Sharma,0.0,75.0,False,True,Bowler
+6725,Sherfane Rutherford,108.0,0.0,True,False,Batter
+6726,Romario Shepherd,35.0,49.0,False,False,Not scorable on IPL data (sample)
+6806,Tushar Deshpande,5.0,219.0,False,True,Bowler
+6819,Yashasvi Jaiswal,309.0,0.0,True,False,Batter
+6931,Pathum Nissanka,78.0,0.0,False,False,Not scorable on IPL data (sample)
+7059,Nehal Wadhera,129.0,0.0,True,False,Batter
+7060,Arjun Tendulkar,5.0,13.0,False,False,Not scorable on IPL data (sample)
+7216,Prabhsimran Singh,277.0,0.0,True,False,Batter
+7240,FazalHaq Farooqi,0.0,5.0,False,False,Not scorable on IPL data (sample)
+7250,Mukesh Choudhary,0.0,53.0,False,False,Not scorable on IPL data (sample)
+7260,Dhruv Jurel,250.0,0.0,True,False,Batter
+7269,Sushant Mishra,0.0,0.0,False,False,Not scorable on IPL data (sample)
+7270,Anrich Nortje,4.0,84.0,False,True,Bowler
+7312,Nandre Burger,3.0,65.0,False,True,Bowler
+7322,Yash Dayal,1.0,141.0,False,True,Bowler
+7325,Harpreet Brar,42.0,138.0,False,True,Bowler
+7327,Rasikh Salam,3.0,59.0,False,False,Not scorable on IPL data (sample)
+7341,Jake McGurk,36.0,0.0,False,False,Not scorable on IPL data (sample)
+7446,Abdul Samad,111.0,0.0,True,False,Batter
+7472,Shahbaz Ahmed,75.0,61.0,False,True,Bowler
+7473,Akash Deep,4.0,31.0,False,False,Not scorable on IPL data (sample)
+7503,Ravi Bishnoi,13.0,220.0,False,True,Bowler
+7533,Simarjeet Singh,4.0,19.0,False,False,Not scorable on IPL data (sample)
+7544,Venkatesh Iyer,105.0,0.0,True,False,Batter
+7574,Kumar Kartikeya Singh,1.0,6.0,False,False,Not scorable on IPL data (sample)
+7625,Suryansh Shedge,1.0,2.0,False,False,Not scorable on IPL data (sample)
+7689,Dilshan Madushanka,0.0,0.0,False,False,Not scorable on IPL data (sample)
+7808,Marco Jansen,34.0,191.0,False,True,Bowler
+781,Sunil Narine,26.0,191.0,False,True,Bowler
+7896,Akash Singh,0.0,25.0,False,False,Not scorable on IPL data (sample)
+7897,Namboori Tilak Varma,200.0,0.0,True,False,Batter
+7920,Nathan Ellis,2.0,90.0,False,True,Bowler
+7967,Noor Ahmad,5.0,177.0,False,True,Bowler
+8,Mahendra Singh Dhoni,115.0,0.0,True,False,Batter
+8101,Ashutosh Sharma,115.0,0.0,True,False,Batter
+813,Jos Buttler,196.0,0.0,True,False,Batter
+8141,Auqib Nabi,2.0,6.0,False,False,Not scorable on IPL data (sample)
+8177,Akash Madhwal,1.0,61.0,False,True,Bowler
+818,Mitchell Marsh,81.0,41.0,False,False,Not scorable on IPL data (sample)
+8182,Donovan Ferreira,40.0,6.0,False,False,Not scorable on IPL data (sample)
+8221,Nitish Reddy,74.0,59.0,False,False,Not scorable on IPL data (sample)
+8238,Sameer Rizvi,99.0,0.0,False,False,Not scorable on IPL data (sample)
+8251,Kumar Kushagra,8.0,0.0,False,False,Not scorable on IPL data (sample)
+829,Mitchell Starc,8.0,131.0,False,True,Bowler
+830,Josh Hazlewood,0.0,172.0,False,True,Bowler
+838,Glenn Maxwell,34.0,38.0,False,False,Not scorable on IPL data (sample)
+8530,Kartik Tyagi,4.0,102.0,False,True,Bowler
+8580,Yudhvir Singh,3.0,25.0,False,False,Not scorable on IPL data (sample)
+8614,William ORourke,0.0,18.0,False,False,Not scorable on IPL data (sample)
+8634,Ashwani Kumar,0.0,52.0,False,False,Not scorable on IPL data (sample)
+8647,Sediqullah Atal,3.0,0.0,False,False,Not scorable on IPL data (sample)
+8654,Cooper Connolly,62.0,0.0,False,False,Not scorable on IPL data (sample)
+8661,Matheesha Pathirana,0.0,179.0,False,True,Bowler
+8746,Vaibhav Arora,10.0,153.0,False,True,Bowler
+88,Faf du Plessis,137.0,0.0,True,False,Batter
+930,Karun Nair,47.0,0.0,False,False,Not scorable on IPL data (sample)
+953,Lokesh Rahul,262.0,0.0,True,False,Batter
+992,Mayank Agarwal,36.0,0.0,False,False,Not scorable on IPL data (sample)

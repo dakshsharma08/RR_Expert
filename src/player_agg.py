@@ -66,9 +66,10 @@ def _eb(xbar, n, within_var):
     mu = np.average(xbar[ok], weights=n[ok])
     v_obs = np.average((xbar[ok] - mu) ** 2, weights=n[ok])
     v_noise = np.average(within_var / n[ok], weights=n[ok])
+    informative = (v_obs - v_noise) > 0
     v_between = max(v_obs - v_noise, 1e-12)
     k = max(within_var / v_between, K_FLOOR)
-    return (n * xbar + k * mu) / (n + k), mu, k
+    return (n * xbar + k * mu) / (n + k), mu, k, informative
 
 
 def components(pm, last_season):
@@ -105,11 +106,15 @@ class RoleScorer:
         nH = (g.wn_hi * g.wn_lo / (g.wn_hi + g.wn_lo)).fillna(0)
         H, self.prior["H"] = self._shrink(raw.H, nH, self.var_rae + self.var_rae_lo)
         cmu = g.c_pos.sum() / max(g.c_n.sum(), 1)
-        self.prior["C"] = (cmu, C_PRIOR_SEASONS)
+        self.prior["C"] = (cmu, C_PRIOR_SEASONS, True)
         C = (g.c_pos + C_PRIOR_SEASONS * cmu) / (g.c_n + C_PRIOR_SEASONS)
         comp = pd.DataFrame({"S": S, "I": I, "H": H, "C": C})
         self.mean, self.sd = comp.mean(), comp.std(ddof=0).replace(0, 1)
-        Z = sum(self.weights[c] * (comp[c] - self.mean[c]) / self.sd[c] for c in self.weights)
+        # D30: a component whose between-player variance is not identifiable (Empirical Bayes shrinks everyone to
+        # the mean) carries no information -> its z-score is 0. Without this guard, the residual 1e-10-scale
+        # differences rank players by total volume (n * excess), which is not the pre-registered quantity.
+        self.informative = {c: bool(self.prior[c][2]) and comp[c].std(ddof=0) > 1e-9 for c in comp}
+        Z = sum(self.weights[c] * ((comp[c] - self.mean[c]) / self.sd[c] if self.informative[c] else 0.0) for c in self.weights)
         self.zsd = float(Z.std(ddof=0)) or 1.0
         self.comp = comp.assign(Z=Z, score=100 * norm.cdf(Z / self.zsd), n_hi_w=g.wn_hi, n_lo_w=g.wn_lo,
                                 seasons_assessed=g.c_n, seasons_positive=g.c_pos,
@@ -125,15 +130,15 @@ class RoleScorer:
 
     @staticmethod
     def _shrink(x, n, var):
-        s, mu, k = _eb(x.values, n.values, var)
-        return pd.Series(s, index=x.index), (mu, k)
+        s, mu, k, inf = _eb(x.values, n.values, var)
+        return pd.Series(s, index=x.index), (mu, k, inf)
 
     def score_from_raw(self, S, I, H, wn_hi, nH, c_pos, c_n, weights=None):
         w = weights or self.weights
         sh = lambda x, n, key: (n * x + self.prior[key][1] * self.prior[key][0]) / (n + self.prior[key][1])
         comp = {"S": sh(S, wn_hi, "S"), "I": sh(I, wn_hi, "I"), "H": sh(H, nH, "H"),
                 "C": (c_pos + C_PRIOR_SEASONS * self.prior["C"][0]) / (c_n + C_PRIOR_SEASONS)}
-        Z = sum(w[c] * (comp[c] - self.mean[c]) / self.sd[c] for c in w)
+        Z = sum(w[c] * ((comp[c] - self.mean[c]) / self.sd[c] if self.informative[c] else 0.0) for c in w)
         return 100 * norm.cdf(Z / self.zsd)
 
     def bootstrap(self, rng, n_boot=1000):

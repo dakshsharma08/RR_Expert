@@ -1,0 +1,17 @@
+role,component,change,top10_overlap_pct
+bat,S,-0.1,100.0
+bat,S,0.1,100.0
+bat,I,-0.1,100.0
+bat,I,0.1,100.0
+bat,H,-0.1,100.0
+bat,H,0.1,100.0
+bat,C,-0.1,100.0
+bat,C,0.1,100.0
+bowl,S,-0.1,100.0
+bowl,S,0.1,100.0
+bowl,I,-0.1,100.0
+bowl,I,0.1,100.0
+bowl,H,-0.1,100.0
+bowl,H,0.1,100.0
+bowl,C,-0.1,100.0
+bowl,C,0.1,100.0

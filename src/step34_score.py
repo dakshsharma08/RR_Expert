@@ -125,6 +125,10 @@ if __name__ == "__main__":
     # ------------------------------------------------ main scores (cut-off: end of IPL 2026, D20)
     sb, scb = role_scores(bat_s, "bat", 2026, MIN_HI_BAT)
     sw, scw = role_scores(bowl_s, "bowl", 2026, MIN_HI_BOWL)
+    pd.DataFrame([dict(role=r, component=c, informative=sc.informative[c], prior_mean=sc.prior[c][0], prior_k=sc.prior[c][1],
+                       weight=P.WEIGHTS[c], effective_weight=(P.WEIGHTS[c] if sc.informative[c] else 0.0) /
+                       sum(P.WEIGHTS[x] for x in P.WEIGHTS if sc.informative[x]))
+                  for r, sc in (("bat", scb), ("bowl", scw)) for c in P.WEIGHTS]).to_csv(TABLES / "step4_component_info.csv", index=False)
     for df in (sb, sw):
         df["player_name"] = names.reindex(df.index)
         df["rank"] = df.score.rank(ascending=False, method="min").astype(int)
