@@ -22,10 +22,18 @@ These are changes and clarifications to how the master prompt is carried out. Th
 | D15 | 2026-11-17 | **Framing.** The Clutch Reliability Score is described as a **historical pressure-performance indicator**. Say clearly that its ability to predict IPL 2027 performance is **not established**, and never overstate its predictive power | Honesty (Golden Rule 6) | Step 4–8, all deliverables |
 | D16 | 2026-11-17 | **The backtest is kept completely separate from weight selection and metric tuning.** It is run only after the pre-registration is frozen, and its results never feed back into weights or metrics | Prevents tuning to the test | Step 4 |
 | D17 | 2026-11-17 | Reaffirms D9: keep the original master prompt and record every decision in this file | Traceability | All |
+| D18 | 2026-11-17 | **U4 approved, with a clarification.** The 0–100 Pressure Index scale and the Low/Medium/High cut-offs use earlier seasons as the yardstick: 2024 balls are ranked against 2023, 2025 against 2023–24, 2026 against 2023–25. **2023 is ranked against 2022 balls.** Those 2022 reference scores come from **chronological expanding-window predictions only**: a 2022 match is scored by a model trained solely on 2022 matches played **before** it. If there is not enough earlier history, those first matches stay **unscored**, and the coverage is disclosed. The 2022 reference scores never evaluate players | Earlier-data-only rule (D11) | Step 1B |
+| D19 | 2026-11-17 | **U5 approved as proposed.** Logistic regression scores every season. A more complex model may replace it from season *s* only if it beat logistic regression on the seasons before *s*; otherwise it is reported only as a comparison | No leakage through model choice | Step 1A |
+| D20 | 2026-11-17 | **U6 approved as proposed.** Player summaries (shrinkage, intervals, recency, consistency, 0–100 score) use only balls up to a cut-off date: the end of IPL 2026 for the final leaderboard, and the end of season N-1 for each backtest fold | Makes D11 exact for pooled figures | Step 3–4 |
+| D21 | 2026-11-17 | **The plan in `docs/FRAMEWORK_REVIEW.md` (revision 3) is approved for execution**, including the proposals C1–C14, G1–G15 and W1–W11, as amended by D1–D20. Standing approval runs through the master-prompt checkpoints. Checkpoints still stop for GO as Golden Rule 4 requires | Execution approval | All |
 
-## Clarifications awaiting approval
+## Clarifications (now resolved)
 
-These follow from D4 and D11. They are proposed and **not yet in force**.
+U4, U5 and U6 below were approved as D18, D19 and D20. They are kept here for the record.
+
+### Original proposals
+
+These follow from D4 and D11. **Superseded by D18–D20.**
 
 | ID | Proposal | Why it is needed |
 |---|---|---|
@@ -33,4 +41,4 @@ These follow from D4 and D11. They are proposed and **not yet in force**.
 | U5 | Logistic regression scores every season. A more complex model may replace it from season *s* onward **only if it beat logistic regression on the folds before *s***. Otherwise it appears only as a reported comparison | Choosing a model on later seasons' results and then using it to score earlier seasons would leak future information |
 | U6 | Player-level summaries (shrinkage, intervals, recency, consistency, 0–100 score) are computed **as of a cut-off date**, using only balls up to that date. For the final leaderboard the cut-off is the end of the data (IPL 2026). For each backtest fold it is the end of season N-1 | Makes D11 precise for player aggregates, which pool many matches |
 
-Proposals in `docs/FRAMEWORK_REVIEW.md` (C1–C14, G1–G15, W1–W11) that are not listed above are still **pending**. They take effect only once the revised plan is approved.
+Proposals C1–C14, G1–G15 and W1–W11 in `docs/FRAMEWORK_REVIEW.md` are approved by D21. C3 is superseded by D4.

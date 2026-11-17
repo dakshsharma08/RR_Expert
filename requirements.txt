@@ -1,0 +1,15 @@
+# Pinned dependencies for the RR Clutch Index pipeline (Python 3.13). Installed 2026-11-17.
+# Install: pip install -r requirements.txt
+numpy==2.5.3
+pandas==3.0.5
+scipy==1.18.1
+scikit-learn==1.9.1
+statsmodels==0.15.0
+matplotlib==3.11.2
+pyarrow==26.0.1
+nbformat==5.11.1
+nbclient==0.11.0
+ipykernel==7.4.0
+qrcode==8.2
+reportlab==5.0.1
+pillow==12.3.0
