@@ -1,0 +1,368 @@
+match_id,season,par,par_source
+14094,2022,,"undefined (<5 earlier matches, no prior season)"
+14095,2022,,"undefined (<5 earlier matches, no prior season)"
+14096,2022,,"undefined (<5 earlier matches, no prior season)"
+14097,2022,,"undefined (<5 earlier matches, no prior season)"
+14098,2022,,"undefined (<5 earlier matches, no prior season)"
+14099,2022,176.2,earlier 5 matches of 2022
+14100,2022,168.16666666666666,earlier 6 matches of 2022
+14101,2022,174.14285714285714,earlier 7 matches of 2022
+14102,2022,169.5,earlier 8 matches of 2022
+14103,2022,172.11111111111111,earlier 9 matches of 2022
+14104,2022,172.0,earlier 10 matches of 2022
+14105,2022,172.72727272727272,earlier 11 matches of 2022
+14106,2022,172.41666666666666,earlier 12 matches of 2022
+14107,2022,172.15384615384616,earlier 13 matches of 2022
+14108,2022,171.35714285714286,earlier 14 matches of 2022
+14109,2022,169.86666666666667,earlier 15 matches of 2022
+14110,2022,171.0625,earlier 16 matches of 2022
+14111,2022,170.05882352941177,earlier 17 matches of 2022
+14112,2022,169.0,earlier 18 matches of 2022
+14113,2022,171.42105263157896,earlier 19 matches of 2022
+14114,2022,171.1,earlier 20 matches of 2022
+14115,2022,170.66666666666666,earlier 21 matches of 2022
+14116,2022,172.72727272727272,earlier 22 matches of 2022
+14117,2022,173.82608695652175,earlier 23 matches of 2022
+14118,2022,174.58333333333334,earlier 24 matches of 2022
+14119,2022,174.6,earlier 25 matches of 2022
+14120,2022,175.53846153846155,earlier 26 matches of 2022
+14121,2022,176.03703703703704,earlier 27 matches of 2022
+14122,2022,175.14285714285714,earlier 28 matches of 2022
+14123,2022,174.93103448275863,earlier 29 matches of 2022
+14124,2022,176.33333333333334,earlier 30 matches of 2022
+14125,2022,176.48387096774192,earlier 31 matches of 2022
+14126,2022,174.5625,earlier 32 matches of 2022
+14127,2022,173.96969696969697,earlier 33 matches of 2022
+14128,2022,175.38235294117646,earlier 34 matches of 2022
+14129,2022,174.82857142857142,earlier 35 matches of 2022
+14130,2022,171.86111111111111,earlier 36 matches of 2022
+14131,2022,171.86111111111111,earlier 36 matches of 2022
+14132,2022,172.27027027027026,earlier 37 matches of 2022
+14133,2022,171.52631578947367,earlier 38 matches of 2022
+14134,2022,172.12820512820514,earlier 39 matches of 2022
+14135,2022,171.475,earlier 40 matches of 2022
+14136,2022,171.02439024390245,earlier 41 matches of 2022
+14137,2022,171.0,earlier 42 matches of 2022
+14139,2022,170.69767441860466,earlier 43 matches of 2022
+14140,2022,171.25,earlier 44 matches of 2022
+14141,2022,171.93333333333334,earlier 45 matches of 2022
+14142,2022,171.5,earlier 46 matches of 2022
+14143,2022,170.89361702127658,earlier 47 matches of 2022
+14144,2022,170.9375,earlier 48 matches of 2022
+14145,2022,171.6734693877551,earlier 49 matches of 2022
+14146,2022,171.78,earlier 50 matches of 2022
+14147,2022,172.11764705882354,earlier 51 matches of 2022
+14148,2022,172.19230769230768,earlier 52 matches of 2022
+14149,2022,172.56603773584905,earlier 53 matches of 2022
+14150,2022,173.22222222222223,earlier 54 matches of 2022
+14151,2022,173.07272727272726,earlier 55 matches of 2022
+14152,2022,172.55357142857142,earlier 56 matches of 2022
+14153,2022,172.33333333333334,earlier 57 matches of 2022
+14154,2022,171.0344827586207,earlier 58 matches of 2022
+14155,2022,171.67796610169492,earlier 59 matches of 2022
+14156,2022,171.76666666666668,earlier 60 matches of 2022
+14157,2022,171.13114754098362,earlier 61 matches of 2022
+14158,2022,171.24193548387098,earlier 62 matches of 2022
+14159,2022,171.04761904761904,earlier 63 matches of 2022
+14160,2022,171.390625,earlier 64 matches of 2022
+14161,2022,171.98461538461538,earlier 65 matches of 2022
+14162,2022,171.92424242424244,earlier 66 matches of 2022
+14163,2022,171.59701492537314,earlier 67 matches of 2022
+14164,2022,171.41176470588235,earlier 68 matches of 2022
+15187,2022,171.41176470588235,earlier 68 matches of 2022
+15188,2022,171.65217391304347,earlier 69 matches of 2022
+15189,2022,172.15714285714284,earlier 70 matches of 2022
+15190,2022,171.94366197183098,earlier 71 matches of 2022
+20181,2023,171.36111111111111,blend: 0 earlier 2023 matches + prior 2022 mean (k=10)
+20182,2023,171.96464646464645,blend: 1 earlier 2023 matches + prior 2022 mean (k=10)
+20183,2023,171.96464646464645,blend: 1 earlier 2023 matches + prior 2022 mean (k=10)
+20184,2023,173.7175925925926,blend: 2 earlier 2023 matches + prior 2022 mean (k=10)
+20185,2023,175.97008547008548,blend: 3 earlier 2023 matches + prior 2022 mean (k=10)
+20186,2023,175.61507936507937,blend: 4 earlier 2023 matches + prior 2022 mean (k=10)
+20187,2023,178.3740740740741,blend: 5 earlier 2023 matches + prior 2022 mean (k=10)
+20188,2023,177.35069444444446,blend: 6 earlier 2023 matches + prior 2022 mean (k=10)
+20189,2023,178.50653594771242,blend: 7 earlier 2023 matches + prior 2022 mean (k=10)
+20190,2023,179.92283950617286,blend: 8 earlier 2023 matches + prior 2022 mean (k=10)
+20191,2023,176.8216374269006,blend: 9 earlier 2023 matches + prior 2022 mean (k=10)
+20192,2023,177.93055555555557,blend: 10 earlier 2023 matches + prior 2022 mean (k=10)
+20193,2023,176.93386243386243,blend: 11 earlier 2023 matches + prior 2022 mean (k=10)
+20194,2023,178.16414141414143,blend: 12 earlier 2023 matches + prior 2022 mean (k=10)
+20195,2023,176.6352657004831,blend: 13 earlier 2023 matches + prior 2022 mean (k=10)
+20196,2023,178.1087962962963,blend: 14 earlier 2023 matches + prior 2022 mean (k=10)
+20197,2023,177.86444444444444,blend: 15 earlier 2023 matches + prior 2022 mean (k=10)
+20198,2023,177.7542735042735,blend: 16 earlier 2023 matches + prior 2022 mean (k=10)
+20199,2023,176.83744855967078,blend: 17 earlier 2023 matches + prior 2022 mean (k=10)
+20200,2023,178.66468253968256,blend: 18 earlier 2023 matches + prior 2022 mean (k=10)
+20201,2023,178.50383141762453,blend: 19 earlier 2023 matches + prior 2022 mean (k=10)
+20202,2023,177.8537037037037,blend: 20 earlier 2023 matches + prior 2022 mean (k=10)
+20203,2023,178.084229390681,blend: 21 earlier 2023 matches + prior 2022 mean (k=10)
+20204,2023,178.05034722222223,blend: 22 earlier 2023 matches + prior 2022 mean (k=10)
+20205,2023,179.503367003367,blend: 23 earlier 2023 matches + prior 2022 mean (k=10)
+20206,2023,179.87091503267973,blend: 24 earlier 2023 matches + prior 2022 mean (k=10)
+20207,2023,179.13174603174605,blend: 25 earlier 2023 matches + prior 2022 mean (k=10)
+20208,2023,178.9891975308642,blend: 26 earlier 2023 matches + prior 2022 mean (k=10)
+20209,2023,177.58408408408408,blend: 27 earlier 2023 matches + prior 2022 mean (k=10)
+20210,2023,176.43713450292398,blend: 28 earlier 2023 matches + prior 2022 mean (k=10)
+20211,2023,175.37464387464388,blend: 29 earlier 2023 matches + prior 2022 mean (k=10)
+20212,2023,176.34027777777777,blend: 30 earlier 2023 matches + prior 2022 mean (k=10)
+20213,2023,176.64905149051492,blend: 31 earlier 2023 matches + prior 2022 mean (k=10)
+20214,2023,178.0383597883598,blend: 32 earlier 2023 matches + prior 2022 mean (k=10)
+20215,2023,177.2467700258398,blend: 33 earlier 2023 matches + prior 2022 mean (k=10)
+20216,2023,177.9229797979798,blend: 34 earlier 2023 matches + prior 2022 mean (k=10)
+20217,2023,178.4135802469136,blend: 35 earlier 2023 matches + prior 2022 mean (k=10)
+20218,2023,178.92632850241546,blend: 36 earlier 2023 matches + prior 2022 mean (k=10)
+20219,2023,180.58747044917257,blend: 37 earlier 2023 matches + prior 2022 mean (k=10)
+20220,2023,180.55439814814815,blend: 38 earlier 2023 matches + prior 2022 mean (k=10)
+20221,2023,180.89002267573696,blend: 39 earlier 2023 matches + prior 2022 mean (k=10)
+20222,2023,181.27222222222224,blend: 40 earlier 2023 matches + prior 2022 mean (k=10)
+20223,2023,181.8747276688453,blend: 41 earlier 2023 matches + prior 2022 mean (k=10)
+20224,2023,180.80021367521368,blend: 42 earlier 2023 matches + prior 2022 mean (k=10)
+20226,2023,179.84171907756814,blend: 43 earlier 2023 matches + prior 2022 mean (k=10)
+20225,2023,179.84171907756814,blend: 43 earlier 2023 matches + prior 2022 mean (k=10)
+20227,2023,180.47427983539094,blend: 44 earlier 2023 matches + prior 2022 mean (k=10)
+20228,2023,180.3020202020202,blend: 45 earlier 2023 matches + prior 2022 mean (k=10)
+20229,2023,179.18948412698413,blend: 46 earlier 2023 matches + prior 2022 mean (k=10)
+20230,2023,178.48440545808967,blend: 47 earlier 2023 matches + prior 2022 mean (k=10)
+20231,2023,178.52777777777777,blend: 48 earlier 2023 matches + prior 2022 mean (k=10)
+20232,2023,179.34934086629002,blend: 49 earlier 2023 matches + prior 2022 mean (k=10)
+20233,2023,179.92685185185186,blend: 50 earlier 2023 matches + prior 2022 mean (k=10)
+20234,2023,179.91165755919855,blend: 51 earlier 2023 matches + prior 2022 mean (k=10)
+20235,2023,180.21953405017922,blend: 52 earlier 2023 matches + prior 2022 mean (k=10)
+20236,2023,180.00970017636683,blend: 53 earlier 2023 matches + prior 2022 mean (k=10)
+20237,2023,179.52517361111111,blend: 54 earlier 2023 matches + prior 2022 mean (k=10)
+20238,2023,180.11709401709402,blend: 55 earlier 2023 matches + prior 2022 mean (k=10)
+20239,2023,180.1456228956229,blend: 56 earlier 2023 matches + prior 2022 mean (k=10)
+20240,2023,179.94941956882255,blend: 57 earlier 2023 matches + prior 2022 mean (k=10)
+20241,2023,179.81781045751634,blend: 58 earlier 2023 matches + prior 2022 mean (k=10)
+20242,2023,179.29871175523348,blend: 59 earlier 2023 matches + prior 2022 mean (k=10)
+20243,2023,179.42301587301588,blend: 60 earlier 2023 matches + prior 2022 mean (k=10)
+20244,2023,179.38888888888889,blend: 61 earlier 2023 matches + prior 2022 mean (k=10)
+20245,2023,179.85570987654322,blend: 62 earlier 2023 matches + prior 2022 mean (k=10)
+20246,2023,179.93987823439878,blend: 63 earlier 2023 matches + prior 2022 mean (k=10)
+20247,2023,180.03528528528528,blend: 64 earlier 2023 matches + prior 2022 mean (k=10)
+20248,2023,180.60814814814816,blend: 65 earlier 2023 matches + prior 2022 mean (k=10)
+20249,2023,180.54751461988303,blend: 66 earlier 2023 matches + prior 2022 mean (k=10)
+20250,2023,180.8001443001443,blend: 67 earlier 2023 matches + prior 2022 mean (k=10)
+21583,2023,181.00783475783476,blend: 68 earlier 2023 matches + prior 2022 mean (k=10)
+21584,2023,180.89381153305203,blend: 69 earlier 2023 matches + prior 2022 mean (k=10)
+21585,2023,180.9076388888889,blend: 70 earlier 2023 matches + prior 2022 mean (k=10)
+21586,2023,181.55075445816186,blend: 71 earlier 2023 matches + prior 2022 mean (k=10)
+30056,2024,182.98591549295776,blend: 0 earlier 2024 matches + prior 2023 mean (k=10)
+30057,2024,182.07810499359795,blend: 1 earlier 2024 matches + prior 2023 mean (k=10)
+30058,2024,181.4049295774648,blend: 2 earlier 2024 matches + prior 2023 mean (k=10)
+30059,2024,183.45070422535213,blend: 3 earlier 2024 matches + prior 2023 mean (k=10)
+30060,2024,184.13279678068412,blend: 4 earlier 2024 matches + prior 2023 mean (k=10)
+30061,2024,183.05727699530516,blend: 5 earlier 2024 matches + prior 2023 mean (k=10)
+30062,2024,182.6161971830986,blend: 6 earlier 2024 matches + prior 2023 mean (k=10)
+30063,2024,183.9917149958575,blend: 7 earlier 2024 matches + prior 2023 mean (k=10)
+30064,2024,189.15884194053208,blend: 8 earlier 2024 matches + prior 2023 mean (k=10)
+30065,2024,188.93995552260935,blend: 9 earlier 2024 matches + prior 2023 mean (k=10)
+30066,2024,188.59295774647887,blend: 10 earlier 2024 matches + prior 2023 mean (k=10)
+30067,2024,189.08853118712273,blend: 11 earlier 2024 matches + prior 2023 mean (k=10)
+30068,2024,187.85723431498081,blend: 12 earlier 2024 matches + prior 2023 mean (k=10)
+30069,2024,187.993876301286,blend: 13 earlier 2024 matches + prior 2023 mean (k=10)
+30070,2024,185.36913145539907,blend: 14 earlier 2024 matches + prior 2023 mean (k=10)
+30071,2024,185.19436619718311,blend: 15 earlier 2024 matches + prior 2023 mean (k=10)
+30072,2024,188.53304442036838,blend: 16 earlier 2024 matches + prior 2023 mean (k=10)
+30073,2024,188.9207094418362,blend: 17 earlier 2024 matches + prior 2023 mean (k=10)
+30074,2024,188.06639839034207,blend: 18 earlier 2024 matches + prior 2023 mean (k=10)
+30075,2024,187.89169499757165,blend: 19 earlier 2024 matches + prior 2023 mean (k=10)
+30076,2024,189.4286384976526,blend: 20 earlier 2024 matches + prior 2023 mean (k=10)
+31240,2024,188.57610177192186,blend: 21 earlier 2024 matches + prior 2023 mean (k=10)
+31241,2024,186.9643485915493,blend: 22 earlier 2024 matches + prior 2023 mean (k=10)
+31242,2024,186.81391378574477,blend: 23 earlier 2024 matches + prior 2023 mean (k=10)
+31243,2024,187.08409279204642,blend: 24 earlier 2024 matches + prior 2023 mean (k=10)
+31244,2024,187.33883299798794,blend: 25 earlier 2024 matches + prior 2023 mean (k=10)
+31245,2024,186.77386541471049,blend: 26 earlier 2024 matches + prior 2023 mean (k=10)
+31246,2024,185.69889607917779,blend: 27 earlier 2024 matches + prior 2023 mean (k=10)
+31247,2024,185.04892512972575,blend: 28 earlier 2024 matches + prior 2023 mean (k=10)
+31248,2024,185.5861321776815,blend: 29 earlier 2024 matches + prior 2023 mean (k=10)
+31250,2024,188.12147887323945,blend: 30 earlier 2024 matches + prior 2023 mean (k=10)
+31249,2024,188.97217451047752,blend: 31 earlier 2024 matches + prior 2023 mean (k=10)
+31251,2024,186.59188464118043,blend: 32 earlier 2024 matches + prior 2023 mean (k=10)
+31252,2024,186.71765476580413,blend: 33 earlier 2024 matches + prior 2023 mean (k=10)
+31253,2024,186.47407170294494,blend: 34 earlier 2024 matches + prior 2023 mean (k=10)
+31254,2024,188.24131455399063,blend: 35 earlier 2024 matches + prior 2023 mean (k=10)
+31255,2024,188.9751990202082,blend: 36 earlier 2024 matches + prior 2023 mean (k=10)
+31256,2024,187.9757267006293,blend: 37 earlier 2024 matches + prior 2023 mean (k=10)
+31257,2024,187.7887323943662,blend: 38 earlier 2024 matches + prior 2023 mean (k=10)
+31258,2024,188.24202356999137,blend: 39 earlier 2024 matches + prior 2023 mean (k=10)
+31259,2024,188.95718309859157,blend: 40 earlier 2024 matches + prior 2023 mean (k=10)
+31260,2024,189.29135597901134,blend: 41 earlier 2024 matches + prior 2023 mean (k=10)
+31261,2024,190.67036836403034,blend: 42 earlier 2024 matches + prior 2023 mean (k=10)
+31262,2024,191.9218708477279,blend: 43 earlier 2024 matches + prior 2023 mean (k=10)
+31263,2024,191.99739175795514,blend: 44 earlier 2024 matches + prior 2023 mean (k=10)
+31264,2024,192.14289372599234,blend: 45 earlier 2024 matches + prior 2023 mean (k=10)
+31265,2024,192.49748490945674,blend: 46 earlier 2024 matches + prior 2023 mean (k=10)
+31266,2024,191.8045465777119,blend: 47 earlier 2024 matches + prior 2023 mean (k=10)
+31267,2024,190.9803302574065,blend: 48 earlier 2024 matches + prior 2023 mean (k=10)
+31268,2024,190.4891382191454,blend: 49 earlier 2024 matches + prior 2023 mean (k=10)
+31269,2024,190.6643192488263,blend: 50 earlier 2024 matches + prior 2023 mean (k=10)
+31270,2024,190.30916647425536,blend: 51 earlier 2024 matches + prior 2023 mean (k=10)
+31271,2024,189.61063153112224,blend: 52 earlier 2024 matches + prior 2023 mean (k=10)
+31272,2024,189.2517326179298,blend: 53 earlier 2024 matches + prior 2023 mean (k=10)
+31273,2024,189.96654929577466,blend: 54 earlier 2024 matches + prior 2023 mean (k=10)
+31274,2024,189.70552546045505,blend: 55 earlier 2024 matches + prior 2023 mean (k=10)
+31275,2024,190.17968416559967,blend: 56 earlier 2024 matches + prior 2023 mean (k=10)
+31276,2024,189.80386798402355,blend: 57 earlier 2024 matches + prior 2023 mean (k=10)
+31277,2024,190.55675227837614,blend: 58 earlier 2024 matches + prior 2023 mean (k=10)
+31278,2024,191.1428863033272,blend: 59 earlier 2024 matches + prior 2023 mean (k=10)
+31279,2024,191.1428863033272,blend: 59 earlier 2024 matches + prior 2023 mean (k=10)
+31280,2024,190.42655935613683,blend: 60 earlier 2024 matches + prior 2023 mean (k=10)
+31282,2024,190.3782979567546,blend: 61 earlier 2024 matches + prior 2023 mean (k=10)
+31283,2024,190.62304381846636,blend: 62 earlier 2024 matches + prior 2023 mean (k=10)
+31285,2024,189.98437198533668,blend: 63 earlier 2024 matches + prior 2023 mean (k=10)
+31286,2024,190.30890749904836,blend: 64 earlier 2024 matches + prior 2023 mean (k=10)
+31287,2024,190.6781220657277,blend: 65 earlier 2024 matches + prior 2023 mean (k=10)
+31289,2024,190.98498888065234,blend: 66 earlier 2024 matches + prior 2023 mean (k=10)
+31290,2024,190.56959941466985,blend: 67 earlier 2024 matches + prior 2023 mean (k=10)
+31291,2024,190.33152762730228,blend: 68 earlier 2024 matches + prior 2023 mean (k=10)
+31292,2024,190.13745765733643,blend: 69 earlier 2024 matches + prior 2023 mean (k=10)
+40694,2025,190.05714285714285,blend: 0 earlier 2025 matches + prior 2024 mean (k=10)
+40695,2025,188.59740259740258,blend: 1 earlier 2025 matches + prior 2024 mean (k=10)
+40696,2025,196.7142857142857,blend: 2 earlier 2025 matches + prior 2024 mean (k=10)
+40697,2025,193.50549450549448,blend: 3 earlier 2025 matches + prior 2024 mean (k=10)
+40698,2025,194.6122448979592,blend: 4 earlier 2025 matches + prior 2024 mean (k=10)
+40699,2025,197.83809523809524,blend: 5 earlier 2025 matches + prior 2024 mean (k=10)
+40700,2025,194.91071428571428,blend: 6 earlier 2025 matches + prior 2024 mean (k=10)
+40701,2025,194.6218487394958,blend: 7 earlier 2025 matches + prior 2024 mean (k=10)
+40702,2025,194.69841269841268,blend: 8 earlier 2025 matches + prior 2024 mean (k=10)
+40703,2025,194.76691729323306,blend: 9 earlier 2025 matches + prior 2024 mean (k=10)
+40704,2025,193.17857142857142,blend: 10 earlier 2025 matches + prior 2024 mean (k=10)
+40705,2025,192.64625850340136,blend: 11 earlier 2025 matches + prior 2024 mean (k=10)
+40706,2025,189.16233766233765,blend: 12 earlier 2025 matches + prior 2024 mean (k=10)
+40707,2025,188.3726708074534,blend: 13 earlier 2025 matches + prior 2024 mean (k=10)
+40708,2025,187.56547619047618,blend: 14 earlier 2025 matches + prior 2024 mean (k=10)
+40709,2025,188.06285714285713,blend: 15 earlier 2025 matches + prior 2024 mean (k=10)
+40710,2025,188.63736263736263,blend: 16 earlier 2025 matches + prior 2024 mean (k=10)
+40711,2025,188.42857142857142,blend: 17 earlier 2025 matches + prior 2024 mean (k=10)
+40713,2025,189.0204081632653,blend: 18 earlier 2025 matches + prior 2024 mean (k=10)
+40714,2025,187.74384236453201,blend: 19 earlier 2025 matches + prior 2024 mean (k=10)
+40712,2025,188.85238095238094,blend: 20 earlier 2025 matches + prior 2024 mean (k=10)
+40715,2025,190.43778801843317,blend: 21 earlier 2025 matches + prior 2024 mean (k=10)
+40716,2025,191.33035714285714,blend: 22 earlier 2025 matches + prior 2024 mean (k=10)
+40717,2025,192.1082251082251,blend: 23 earlier 2025 matches + prior 2024 mean (k=10)
+40718,2025,191.25210084033614,blend: 24 earlier 2025 matches + prior 2024 mean (k=10)
+40719,2025,188.73061224489797,blend: 25 earlier 2025 matches + prior 2024 mean (k=10)
+40720,2025,188.48809523809524,blend: 26 earlier 2025 matches + prior 2024 mean (k=10)
+40721,2025,190.01544401544402,blend: 27 earlier 2025 matches + prior 2024 mean (k=10)
+40722,2025,189.56766917293234,blend: 28 earlier 2025 matches + prior 2024 mean (k=10)
+40723,2025,189.96336996336996,blend: 29 earlier 2025 matches + prior 2024 mean (k=10)
+40724,2025,189.3642857142857,blend: 30 earlier 2025 matches + prior 2024 mean (k=10)
+40725,2025,187.45296167247386,blend: 31 earlier 2025 matches + prior 2024 mean (k=10)
+40726,2025,187.46598639455783,blend: 32 earlier 2025 matches + prior 2024 mean (k=10)
+40727,2025,186.87375415282392,blend: 33 earlier 2025 matches + prior 2024 mean (k=10)
+40728,2025,186.87375415282392,blend: 33 earlier 2025 matches + prior 2024 mean (k=10)
+40729,2025,187.24025974025972,blend: 34 earlier 2025 matches + prior 2024 mean (k=10)
+40730,2025,187.07936507936506,blend: 35 earlier 2025 matches + prior 2024 mean (k=10)
+40731,2025,186.4254658385093,blend: 36 earlier 2025 matches + prior 2024 mean (k=10)
+40732,2025,186.20364741641336,blend: 37 earlier 2025 matches + prior 2024 mean (k=10)
+40733,2025,186.44940476190473,blend: 38 earlier 2025 matches + prior 2024 mean (k=10)
+40734,2025,185.88921282798833,blend: 39 earlier 2025 matches + prior 2024 mean (k=10)
+40735,2025,185.03142857142856,blend: 40 earlier 2025 matches + prior 2024 mean (k=10)
+40736,2025,185.42296918767505,blend: 41 earlier 2025 matches + prior 2024 mean (k=10)
+40737,2025,184.81868131868129,blend: 42 earlier 2025 matches + prior 2024 mean (k=10)
+40738,2025,184.81868131868129,blend: 42 earlier 2025 matches + prior 2024 mean (k=10)
+40739,2025,185.38814016172506,blend: 43 earlier 2025 matches + prior 2024 mean (k=10)
+40740,2025,184.95502645502643,blend: 44 earlier 2025 matches + prior 2024 mean (k=10)
+40741,2025,185.39220779220778,blend: 45 earlier 2025 matches + prior 2024 mean (k=10)
+40742,2025,185.72448979591834,blend: 46 earlier 2025 matches + prior 2024 mean (k=10)
+40743,2025,185.79949874686716,blend: 47 earlier 2025 matches + prior 2024 mean (k=10)
+40744,2025,186.3374384236453,blend: 48 earlier 2025 matches + prior 2024 mean (k=10)
+40745,2025,186.97578692493946,blend: 49 earlier 2025 matches + prior 2024 mean (k=10)
+40746,2025,187.4095238095238,blend: 50 earlier 2025 matches + prior 2024 mean (k=10)
+40747,2025,187.7142857142857,blend: 51 earlier 2025 matches + prior 2024 mean (k=10)
+40748,2025,188.49308755760367,blend: 52 earlier 2025 matches + prior 2024 mean (k=10)
+40749,2025,188.49308755760367,blend: 52 earlier 2025 matches + prior 2024 mean (k=10)
+40750,2025,188.49308755760367,blend: 52 earlier 2025 matches + prior 2024 mean (k=10)
+40751,2025,188.3424036281179,blend: 53 earlier 2025 matches + prior 2024 mean (k=10)
+40760,2025,188.3424036281179,blend: 53 earlier 2025 matches + prior 2024 mean (k=10)
+40755,2025,188.82142857142856,blend: 54 earlier 2025 matches + prior 2024 mean (k=10)
+40763,2025,188.97802197802196,blend: 55 earlier 2025 matches + prior 2024 mean (k=10)
+40756,2025,189.2207792207792,blend: 56 earlier 2025 matches + prior 2024 mean (k=10)
+40759,2025,189.1876332622601,blend: 57 earlier 2025 matches + prior 2024 mean (k=10)
+40758,2025,189.05252100840335,blend: 58 earlier 2025 matches + prior 2024 mean (k=10)
+40757,2025,189.71842650103517,blend: 59 earlier 2025 matches + prior 2024 mean (k=10)
+43057,2025,190.30816326530612,blend: 60 earlier 2025 matches + prior 2024 mean (k=10)
+40762,2025,190.5291750503018,blend: 61 earlier 2025 matches + prior 2024 mean (k=10)
+40753,2025,191.07738095238093,blend: 62 earlier 2025 matches + prior 2024 mean (k=10)
+40754,2025,192.26810176125244,blend: 63 earlier 2025 matches + prior 2024 mean (k=10)
+40752,2025,192.15637065637065,blend: 64 earlier 2025 matches + prior 2024 mean (k=10)
+40764,2025,192.62095238095236,blend: 65 earlier 2025 matches + prior 2024 mean (k=10)
+40765,2025,191.41541353383457,blend: 66 earlier 2025 matches + prior 2024 mean (k=10)
+40766,2025,191.89053803339516,blend: 67 earlier 2025 matches + prior 2024 mean (k=10)
+40767,2025,192.032967032967,blend: 68 earlier 2025 matches + prior 2024 mean (k=10)
+50125,2026,192.28985507246378,blend: 0 earlier 2026 matches + prior 2025 mean (k=10)
+50126,2026,193.08168642951253,blend: 1 earlier 2026 matches + prior 2025 mean (k=10)
+50127,2026,195.32487922705317,blend: 2 earlier 2026 matches + prior 2025 mean (k=10)
+50128,2026,190.0691192865106,blend: 3 earlier 2026 matches + prior 2025 mean (k=10)
+50129,2026,188.064182194617,blend: 4 earlier 2026 matches + prior 2025 mean (k=10)
+50130,2026,184.9265700483092,blend: 5 earlier 2026 matches + prior 2025 mean (k=10)
+50131,2026,187.49365942028987,blend: 6 earlier 2026 matches + prior 2025 mean (k=10)
+50132,2026,188.7587382779199,blend: 7 earlier 2026 matches + prior 2025 mean (k=10)
+50133,2026,187.27214170692434,blend: 8 earlier 2026 matches + prior 2025 mean (k=10)
+50134,2026,188.46834477498095,blend: 9 earlier 2026 matches + prior 2025 mean (k=10)
+50135,2026,186.8449275362319,blend: 10 earlier 2026 matches + prior 2025 mean (k=10)
+50136,2026,189.85231193926847,blend: 11 earlier 2026 matches + prior 2025 mean (k=10)
+50137,2026,189.85231193926847,blend: 11 earlier 2026 matches + prior 2025 mean (k=10)
+50138,2026,189.85231193926847,blend: 11 earlier 2026 matches + prior 2025 mean (k=10)
+50139,2026,190.768115942029,blend: 12 earlier 2026 matches + prior 2025 mean (k=10)
+50140,2026,190.34341524889732,blend: 13 earlier 2026 matches + prior 2025 mean (k=10)
+50141,2026,190.78743961352657,blend: 14 earlier 2026 matches + prior 2025 mean (k=10)
+50142,2026,191.9159420289855,blend: 15 earlier 2026 matches + prior 2025 mean (k=10)
+50143,2026,192.68840579710147,blend: 16 earlier 2026 matches + prior 2025 mean (k=10)
+50144,2026,191.62587224906068,blend: 17 earlier 2026 matches + prior 2025 mean (k=10)
+50342,2026,193.35351966873708,blend: 18 earlier 2026 matches + prior 2025 mean (k=10)
+50343,2026,194.13443278360822,blend: 19 earlier 2026 matches + prior 2025 mean (k=10)
+50344,2026,194.0632850241546,blend: 20 earlier 2026 matches + prior 2025 mean (k=10)
+50345,2026,192.51285647498833,blend: 21 earlier 2026 matches + prior 2025 mean (k=10)
+50346,2026,192.59057971014494,blend: 22 earlier 2026 matches + prior 2025 mean (k=10)
+50347,2026,192.2090469916557,blend: 23 earlier 2026 matches + prior 2025 mean (k=10)
+50348,2026,191.70289855072465,blend: 24 earlier 2026 matches + prior 2025 mean (k=10)
+50349,2026,191.76853002070393,blend: 25 earlier 2026 matches + prior 2025 mean (k=10)
+50350,2026,190.7471819645733,blend: 26 earlier 2026 matches + prior 2025 mean (k=10)
+50351,2026,192.45671758715238,blend: 27 earlier 2026 matches + prior 2025 mean (k=10)
+50352,2026,192.62890922959573,blend: 28 earlier 2026 matches + prior 2025 mean (k=10)
+50353,2026,193.89483463396508,blend: 29 earlier 2026 matches + prior 2025 mean (k=10)
+50354,2026,193.02246376811595,blend: 30 earlier 2026 matches + prior 2025 mean (k=10)
+50355,2026,193.36337928596677,blend: 31 earlier 2026 matches + prior 2025 mean (k=10)
+50356,2026,193.64044168391996,blend: 32 earlier 2026 matches + prior 2025 mean (k=10)
+50357,2026,195.27671048196834,blend: 33 earlier 2026 matches + prior 2025 mean (k=10)
+50358,2026,196.02042160737813,blend: 34 earlier 2026 matches + prior 2025 mean (k=10)
+50359,2026,195.1755233494364,blend: 35 earlier 2026 matches + prior 2025 mean (k=10)
+50360,2026,194.30214240705735,blend: 36 earlier 2026 matches + prior 2025 mean (k=10)
+50361,2026,191.76379895158803,blend: 37 earlier 2026 matches + prior 2025 mean (k=10)
+50362,2026,192.3937198067633,blend: 38 earlier 2026 matches + prior 2025 mean (k=10)
+50363,2026,193.42650103519668,blend: 39 earlier 2026 matches + prior 2025 mean (k=10)
+50364,2026,192.65797101449277,blend: 40 earlier 2026 matches + prior 2025 mean (k=10)
+50365,2026,193.29212844558114,blend: 41 earlier 2026 matches + prior 2025 mean (k=10)
+50366,2026,192.63266443701227,blend: 42 earlier 2026 matches + prior 2025 mean (k=10)
+50367,2026,192.11129340989882,blend: 43 earlier 2026 matches + prior 2025 mean (k=10)
+50368,2026,191.5721953837896,blend: 44 earlier 2026 matches + prior 2025 mean (k=10)
+50369,2026,192.2345191040843,blend: 45 earlier 2026 matches + prior 2025 mean (k=10)
+50370,2026,191.56961697722568,blend: 46 earlier 2026 matches + prior 2025 mean (k=10)
+50371,2026,192.33155352148486,blend: 47 earlier 2026 matches + prior 2025 mean (k=10)
+50372,2026,192.33155352148486,blend: 47 earlier 2026 matches + prior 2025 mean (k=10)
+50373,2026,191.46376811594203,blend: 48 earlier 2026 matches + prior 2025 mean (k=10)
+50374,2026,192.09997543601082,blend: 49 earlier 2026 matches + prior 2025 mean (k=10)
+50375,2026,192.2816425120773,blend: 50 earlier 2026 matches + prior 2025 mean (k=10)
+50376,2026,191.85079591351865,blend: 51 earlier 2026 matches + prior 2025 mean (k=10)
+50377,2026,192.1435250116877,blend: 52 earlier 2026 matches + prior 2025 mean (k=10)
+50378,2026,191.76029445594662,blend: 53 earlier 2026 matches + prior 2025 mean (k=10)
+50379,2026,191.76403985507247,blend: 54 earlier 2026 matches + prior 2025 mean (k=10)
+50380,2026,191.8907469342252,blend: 55 earlier 2026 matches + prior 2025 mean (k=10)
+50381,2026,191.81664470794905,blend: 56 earlier 2026 matches + prior 2025 mean (k=10)
+50382,2026,192.64027687648712,blend: 57 earlier 2026 matches + prior 2025 mean (k=10)
+50383,2026,193.07203751065643,blend: 58 earlier 2026 matches + prior 2025 mean (k=10)
+50384,2026,193.07099348876287,blend: 59 earlier 2026 matches + prior 2025 mean (k=10)
+50385,2026,192.88426501035198,blend: 60 earlier 2026 matches + prior 2025 mean (k=10)
+50386,2026,193.26617677076956,blend: 61 earlier 2026 matches + prior 2025 mean (k=10)
+50387,2026,192.62359098228663,blend: 62 earlier 2026 matches + prior 2025 mean (k=10)
+50388,2026,193.12189795513203,blend: 63 earlier 2026 matches + prior 2025 mean (k=10)
+50389,2026,193.95808852330592,blend: 64 earlier 2026 matches + prior 2025 mean (k=10)
+50390,2026,193.98531400966183,blend: 65 earlier 2026 matches + prior 2025 mean (k=10)
+50391,2026,194.13024408848207,blend: 66 earlier 2026 matches + prior 2025 mean (k=10)
+50942,2026,194.2454357236966,blend: 67 earlier 2026 matches + prior 2025 mean (k=10)
+50943,2026,195.0115198810851,blend: 68 earlier 2026 matches + prior 2025 mean (k=10)
+50944,2026,195.6189689965144,blend: 69 earlier 2026 matches + prior 2025 mean (k=10)
+50945,2026,195.84873188405797,blend: 70 earlier 2026 matches + prior 2025 mean (k=10)

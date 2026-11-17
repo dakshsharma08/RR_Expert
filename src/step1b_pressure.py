@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
+from loaders import load_balls
 from config import SEED, WORK, TABLES
 import wp_model as W  # noqa: F401  (needed to unpickle the models)
 
@@ -31,7 +32,7 @@ O_RUNS = {"dot": 0, "r1": 1, "r2": 2, "r3": 3, "r4": 4, "r6": 6, "wicket": 0, "e
 O_BALL = {o: (0 if o == "extra" else 1) for o in OUTCOMES}
 O_WKT = {o: (1 if o == "wicket" else 0) for o in OUTCOMES}
 
-balls = pd.read_parquet(WORK / "balls_ipl.parquet")
+balls = load_balls()
 matches = pd.read_csv(WORK / "matches_ipl.csv")
 elig = pd.read_csv(WORK / "wp_eligibility.csv")
 par = pd.read_csv(WORK / "par_by_match.csv")
@@ -165,28 +166,56 @@ b["pi_raw_lev"] = b.leverage
 b["pi_raw_rule"] = b.chase_pressure + b.below_par + b.death + b.playoff + b.collapse + ((10 - b.wickets_before) <= 4).astype(float)
 b["pi_raw_close"] = b.leverage * (1 + boost_sum + CLOSE_GAME_W * b.close_game_last5)
 
-# ---------------------------------------------------------------- 0-100 scale vs earlier-season reference (D18)
-REF_SEASONS = {2023: "ref2022", 2024: [2023], 2025: [2023, 2024], 2026: [2023, 2024, 2025]}
+# ---------------------------------------------------------------- 0-100 scale (D18 + D27)
+# D27: each ball is ranked against (a) the earlier-season reference (2023 <- 2022 expanding-window reference balls;
+# 2024 <- 2023; 2025 <- 2023-24; 2026 <- 2023-25), weighted as K_REF_BALLS balls in total, plus (b) every ball of
+# EARLIER matches of the same season, scored by that season's out-of-sample model. Only earlier data is used.
+# K_REF_BALLS = 240 (about one match): with 2,400 the 2024 High share was still 10.5% because the earlier-season scale did not transfer.
+# Reason: each season's model has its own leverage scale, so a yardstick from earlier seasons alone gave
+# High shares of 4.8%-17.6% (kept as the 'd18_strict' comparison).
+K_REF_BALLS = 240   # one match's worth: earlier seasons are only the start-of-season fallback (D27)
 main = ~b.reference_only
-for col, out in [("pi_raw", "pi"), ("pi_raw_lev", "pi_lev"), ("pi_raw_rule", "pi_rule"), ("pi_raw_close", "pi_close")]:
+mord = matches.sort_values(["first_ball_ts", "match_id"]).match_id.tolist()
+
+
+def scale(col, out, strict=False):
     b[out] = np.nan
-    for s, refs in REF_SEASONS.items():
-        refvals = np.sort(b.loc[b.reference_only, col].values) if refs == "ref2022" else np.sort(b.loc[main & b.season.isin(refs), col].values)
-        sel = main & (b.season == s)
-        b.loc[sel, out] = 100.0 * np.searchsorted(refvals, b.loc[sel, col].values, side="right") / len(refvals)
+    for s in [2023, 2024, 2025, 2026]:
+        prev = b.reference_only if s == 2023 else (main & b.season.isin(range(2023, s)))
+        prev_vals = np.sort(b.loc[prev, col].values)
+        w_prev = K_REF_BALLS / len(prev_vals)
+        cur_vals = np.array([])
+        sm = b[main & (b.season == s)]
+        groups = sm.groupby("match_id").groups
+        for mid in [x for x in mord if x in groups]:
+            idx = groups[mid]
+            v = b.loc[idx, col].values
+            if strict:
+                b.loc[idx, out] = 100.0 * np.searchsorted(prev_vals, v, side="right") / len(prev_vals)
+            else:
+                c = np.searchsorted(prev_vals, v, side="right") * w_prev + np.searchsorted(cur_vals, v, side="right")
+                b.loc[idx, out] = 100.0 * c / (K_REF_BALLS + len(cur_vals))
+                cur_vals = np.sort(np.concatenate([cur_vals, v]))
     b[out + "_bucket"] = np.select([b[out] >= 80, b[out] >= 50], ["High", "Medium"], "Low")
     b.loc[~main, out + "_bucket"] = "reference"
+
+
+for col, out in [("pi_raw", "pi"), ("pi_raw_lev", "pi_lev"), ("pi_raw_rule", "pi_rule"), ("pi_raw_close", "pi_close")]:
+    scale(col, out)
+scale("pi_raw", "pi_d18strict", strict=True)
 
 keep = ["match_id", "innings", "innings_ball_num", "season", "reference_only", "wp_model", "wp_before", "wp_after", "leverage",
         "chase_pressure", "below_par", "death", "playoff", "collapse", "close_game_last5",
         "pi_raw", "pi", "pi_bucket", "pi_lev", "pi_lev_bucket", "pi_rule", "pi_rule_bucket", "pi_close", "pi_close_bucket",
+        "pi_d18strict", "pi_d18strict_bucket",
         "wpa_ball", "wpa_batter", "wpa_bowler", "wpa_nonstriker_out"]
 pb = b[keep]
 pb.to_parquet(WORK / "pressure_ball.parquet", index=False)
 
 # ---------------------------------------------------------------- summary tables
 m2 = b[main]
-shares = m2.groupby("season").pi_bucket.value_counts(normalize=True).unstack().reset_index()
+shares = m2.groupby("season").pi_bucket.value_counts(normalize=True).unstack().add_prefix("D27_").join(
+    m2.groupby("season").pi_d18strict_bucket.value_counts(normalize=True).unstack().add_prefix("D18strict_")).reset_index()
 shares["balls"] = m2.groupby("season").size().values
 shares.to_csv(TABLES / "step1b_bucket_shares.csv", index=False)
 ov = []

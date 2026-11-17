@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
+from loaders import load_balls
 from config import SEED, WORK, TABLES
 import wp_model as W
 
@@ -23,7 +24,7 @@ PAR_K = 10            # prior strength (matches) of previous season's mean in th
 REF2022_MIN_PRIOR = 20  # D18: a 2022 match is scored for the reference only if >= 20 eligible earlier 2022 matches exist
 rng = np.random.default_rng(SEED)
 
-balls = pd.read_parquet(WORK / "balls_ipl.parquet")
+balls = load_balls()
 matches = pd.read_csv(WORK / "matches_ipl.csv")
 elig = pd.read_csv(WORK / "wp_eligibility.csv")          # match_id, wp_eligible, label_y_batting_first, reason
 matches = matches.merge(elig, on="match_id", how="left", validate="1:1")

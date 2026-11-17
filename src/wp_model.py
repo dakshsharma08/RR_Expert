@@ -13,8 +13,8 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-INN1_FEATURES = ["runs_vs_par", "balls_left", "wkts_in_hand", "wk_x_balls", "par"]
-INN2_FEATURES = ["runs_needed", "balls_left", "wkts_in_hand", "req_rate", "wk_x_balls", "log_needed", "par"]
+INN1_FEATURES = ["runs_vs_par", "balls_left", "wkts_in_hand", "wk_x_balls"]   # D26: separate par feature removed
+INN2_FEATURES = ["runs_needed", "balls_left", "wkts_in_hand", "req_rate", "wk_x_balls", "log_needed"]
 
 
 def features(state: pd.DataFrame) -> pd.DataFrame:
@@ -43,7 +43,7 @@ class WPModel:
 
     def _p(self, part, X):
         sc, lr = part
-        return lr.predict_proba(sc.transform(X))[:, 1]
+        return lr.predict_proba(sc.transform(np.asarray(X, dtype=float)))[:, 1]
 
     def predict(self, state: pd.DataFrame) -> np.ndarray:
         state = state.reset_index(drop=True)

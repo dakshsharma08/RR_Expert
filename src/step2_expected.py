@@ -3,8 +3,8 @@
 Expected runs for a batter on a ball faced = cell rate x season factor x opposition-bowling factor
   cell   = innings x phase x wickets-lost band x batting-position group x (innings 2: required-rate band),
            using bat runs per ball faced in IPL matches played BEFORE this match; shrunk toward innings x phase (k = 100 balls).
-  season = runs-per-ball level of earlier matches in this season, shrunk toward the previous season's level (k = 2,000 balls),
-           relative to the level of the benchmark data -> captures scoring inflation (e.g. 2023+) without future data.
+  season = phase-specific (innings x phase) runs-per-ball level of earlier matches this season, shrunk toward the previous
+           season's level (k = 200 balls, D28), relative to all earlier data -> scoring inflation by phase, no future data.
   opposition = the bowling team's runs conceded per ball in earlier matches of this season relative to league,
            shrunk toward 1.0 (half-weighted toward last season's team ratio; k = 600 balls), capped to [0.85, 1.15].
   venue  = not used: all venues UNKNOWN (D23).
@@ -17,11 +17,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np
 import pandas as pd
+from loaders import load_balls
 from config import WORK, TABLES
 
-K_CELL, K_SEASON, K_OPP = 100, 2000, 600
+K_CELL, K_OPP = 100, 600
 
-balls = pd.read_parquet(WORK / "balls_ipl.parquet")
+balls = load_balls()
 matches = pd.read_csv(WORK / "matches_ipl.csv")
 matches["first_ball_ts"] = matches.match_date + " " + matches.first_ball_recorded
 order = matches.sort_values(["first_ball_ts", "match_id"]).match_id.tolist()
@@ -59,22 +60,27 @@ def prior_rate(df, keys, num, den, k, parent_keys):
     return df.merge(pr[["mpos"] + keys + ["rate", "prior_n"]], on=["mpos"] + keys, how="left")[["rate", "prior_n"]].values
 
 
-def season_factor(df, num, den):
-    """Level of earlier matches this season, shrunk toward previous season, relative to all earlier data."""
-    per_m = df.groupby("mpos").agg(n=(num, "sum"), d=(den, "sum"), season=("season", "first")).reindex(range(NPOS))
-    per_m["season"] = per_m.season.ffill().bfill()
-    out = np.full(NPOS, np.nan)
-    cum_n = per_m.n.fillna(0).cumsum() - per_m.n.fillna(0)
-    cum_d = per_m.d.fillna(0).cumsum() - per_m.d.fillna(0)
-    for p in range(NPOS):
-        s = per_m.season.iloc[p]
-        cur = per_m.iloc[:p][per_m.season.iloc[:p] == s]
-        prev = per_m[per_m.season == s - 1]
-        base = cum_n.iloc[p] / cum_d.iloc[p] if cum_d.iloc[p] > 0 else np.nan
-        prev_lvl = prev.n.sum() / prev.d.sum() if prev.d.sum() > 0 else base
-        lvl = (cur.n.sum() + K_SEASON * prev_lvl) / (cur.d.sum() + K_SEASON) if not np.isnan(prev_lvl) else np.nan
-        out[p] = lvl / base if base and not np.isnan(base) else np.nan
-    return pd.Series(out).reindex(df.mpos.values).values
+def season_factor(df, num, den, group_cols=("innings", "phase"), k=200):
+    """Phase-specific scoring level of earlier matches this season, shrunk toward the previous season's level for the
+    same innings x phase (k balls), relative to all earlier data for that innings x phase. Earlier matches only (D11).
+    Phase-specific because scoring inflation differs by phase (powerplay rose fastest; a single factor biased RAE by phase)."""
+    out = np.full(len(df), np.nan)
+    gc = list(group_cols)
+    for key, g in df.groupby(gc):
+        per_m = g.groupby("mpos").agg(n=(num, "sum"), d=(den, "sum"), season=("season", "first"))
+        cum = per_m[["n", "d"]].cumsum() - per_m[["n", "d"]]
+        res = {}
+        for p, r in per_m.iterrows():
+            s = r.season
+            cur = per_m[(per_m.index < p) & (per_m.season == s)]
+            prev = per_m[per_m.season == s - 1]
+            base = cum.loc[p, "n"] / cum.loc[p, "d"] if cum.loc[p, "d"] > 0 else np.nan
+            prev_lvl = prev.n.sum() / prev.d.sum() if prev.d.sum() > 0 else base
+            lvl = (cur.n.sum() + k * prev_lvl) / (cur.d.sum() + k) if prev_lvl == prev_lvl else np.nan
+            res[p] = lvl / base if base == base and base > 0 else np.nan
+        idx = g.index
+        out[df.index.get_indexer(idx)] = g.mpos.map(res).values
+    return out
 
 
 def team_factor(df, team_col, num, den):
@@ -138,9 +144,9 @@ exp = b[["match_id", "innings", "innings_ball_num", "season"]].merge(out_b, how=
 exp.to_parquet(WORK / "expected_ball.parquet", index=False)
 
 # ---------------------------------------------------------------- checks: offsets per season (R14) and coverage
-fb = f.groupby("season").agg(balls=("rae_bat", "size"), missing=("xr_bat", lambda x: int(x.isna().sum())),
+fb = f.groupby("season").agg(balls=("rae_bat", "size"), missing_bat=("xr_bat", lambda x: int(x.isna().sum())),
                              mean_rae_per_ball=("rae_bat", "mean"), actual_rpb=("bat_runs_f", "mean"), expected_rpb=("xr_bat", "mean"))
-db = d.groupby("season").agg(deliveries=("rse_bowl", "size"), missing=("xrc_bowl", lambda x: int(x.isna().sum())),
+db = d.groupby("season").agg(deliveries=("rse_bowl", "size"), missing_bowl=("xrc_bowl", lambda x: int(x.isna().sum())),
                              mean_rse_per_delivery=("rse_bowl", "mean"), actual_rpd=("bowl_runs", "mean"), expected_rpd=("xrc_bowl", "mean"),
                              mean_wae=("wae_bowl", "mean"))
 summ = fb.join(db).reset_index()

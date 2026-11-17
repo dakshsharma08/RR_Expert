@@ -9,6 +9,7 @@ plus match-bootstrap 80% intervals with the shrinkage priors and standardisation
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
+from loaders import load_balls
 from config import WORK
 
 WEIGHTS = {"S": 0.40, "I": 0.25, "H": 0.15, "C": 0.20}
@@ -19,7 +20,7 @@ C_MIN_SEASON_BALLS = 30
 
 
 def load_ball_frames(bucket_col="pi_bucket"):
-    balls = pd.read_parquet(WORK / "balls_ipl.parquet")
+    balls = load_balls()
     pres = pd.read_parquet(WORK / "pressure_ball.parquet")
     exp = pd.read_parquet(WORK / "expected_ball.parquet")
     key = ["match_id", "innings", "innings_ball_num"]
