@@ -57,6 +57,7 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     return { sw: d.scrollWidth, cw: d.clientWidth, over };
   });
   const notes = {};
+  const uniqS = a => [...new Set(a)].join(',');
 
   /* ---------- screenshots + layout checks ---------- */
   for (const [w, h] of [[380, 800], [1280, 900]]) {
@@ -106,11 +107,58 @@ const r0 = v => String(Math.round(v) + 0);          // same rounding as the dash
     await ctx.close();
   }
 
+  /* ---------- cold-reader fixes: how_to_use, codes, tabs, top-15, picks chart ---------- */
+  {
+    const hw = payload.meta.how_to_use || [];
+    const { ctx, page } = await newPage(380, 800);
+    for (const tab of ['summary', 'auction', 'method']) {
+      await page.goto(url('#tab=' + tab)); await page.waitForSelector('#view .lead');
+      const txt = await page.evaluate(() => (document.querySelector('#view .howto') || {}).innerText || '');
+      check(`[380] how_to_use shown on ${tab} under the title "How to use this score"`, /How to use this score/.test(txt) && hw.length === 3 && hw.every(l => txt.replace(/\s+/g, ' ').includes(l.split(':').slice(1).join(':').trim().slice(0, 40))), txt.slice(0, 60).replace(/\s+/g, ' '));
+    }
+    await page.goto(url('#tab=summary')); await page.waitForSelector('#view .howto');
+    const order = await page.evaluate(() => { const a = [...document.querySelectorAll('#view .card')]; const i5 = a.findIndex(c => /5-line summary/.test(c.innerText)); const ih = a.findIndex(c => c.classList.contains('howto')); return [i5, ih]; });
+    check('[380] How to use this score sits directly under the 5-line summary', order[0] >= 0 && order[1] === order[0] + 1, order.join(','));
+    // tab labels not clipped on a phone
+    const tabs = await page.evaluate(() => { const c = document.documentElement.clientWidth; return [...document.querySelectorAll('#tabs button')].map(b => { const r = b.getBoundingClientRect(); const lab = b.querySelector('.short'); const lr = lab.getBoundingClientRect(); return { t: b.dataset.tab, l: Math.round(r.left), r: Math.round(r.right), ok: r.left >= 0 && r.right <= c + 0.5 && lr.right <= r.right + 0.5 && lab.scrollWidth <= lab.clientWidth + 1 && lr.width > 0, label: lab.textContent }; }); });
+    check('[380] all 7 phone tab labels are fully visible (no clipping)', tabs.length === 7 && tabs.every(x => x.ok), JSON.stringify(tabs.filter(x => !x.ok)));
+    await page.screenshot({ path: path.join(SHOTS, 'tabs_380.png'), clip: { x: 0, y: 0, width: 380, height: 360 } });
+    // Simple mode hides internal codes
+    for (const tab of ['summary', 'leaderboard', 'auction', 'squad']) {
+      await page.goto(url('#tab=' + tab)); await page.waitForSelector('#view .lead');
+      const vis = await page.evaluate(() => document.querySelector('#view').innerText + ' ' + document.querySelector('#honest').innerText + ' ' + document.querySelector('footer').innerText);
+      const codes = vis.match(/\b(D\d{2}|F\d-\d{3}|A\d{1,2}|ASSUMPTION A\d|step\d\w*)\b/g);
+      check(`[380] Simple mode shows no internal codes on ${tab}`, !codes, codes ? uniqS(codes) : '');
+    }
+    // leaderboard top 15 + Show all
+    await page.goto(url('#tab=leaderboard')); await page.waitForSelector('#lbtable');
+    const c1 = await page.evaluate(() => ({ shown: document.querySelectorAll('#lbtable tbody tr').length, n: +document.querySelector('#lbcount').dataset.n }));
+    check('Simple mode lists the top 15 per role with a Show-all button', c1.shown === 15 && c1.n > 15, JSON.stringify(c1));
+    await page.click('[data-act=lbshowall]'); await page.waitForTimeout(100);
+    const c2 = await page.evaluate(() => document.querySelectorAll('#lbtable tbody tr').length);
+    check('Show all N lists every player', c2 === c1.n, c2 + ' vs ' + c1.n);
+    await page.click('#mode-detail'); await page.waitForTimeout(100);
+    const dcodes = await page.evaluate(() => document.querySelector('#view').innerText);
+    check('Detailed mode still shows codes (e.g. A8)', /\bA8\b/.test(dcodes));
+    // picks chart on squad
+    await page.click('#mode-simple');
+    await page.goto(url('#tab=squad')); await page.waitForSelector('#view .chart');
+    const sq = await page.evaluate(() => document.querySelector('#view').innerText);
+    check('Squad tab asks "Do the Plan A picks have a strong record where RR is weak?" and shows picks_note', /Do the Plan A picks have a strong record where RR is weak\?/.test(sq) && sq.replace(/\s+/g, ' ').includes(payload.squad.picks_note.slice(0, 40)));
+    check('no "lifts" / "after" wording in Plan A sections', !/\blifts?\b/i.test(sq) && !/Before .{0,3} after/i.test(sq));
+    await page.goto(url('#tab=auction')); await page.waitForSelector('.pcard');
+    const au = await page.evaluate(() => document.querySelector('#view').innerText.replace(/\s+/g, ' '));
+    check('every auction card shows its tier reason', payload.auction.tiers.every(t => au.includes(t.tier_reason.slice(0, 40).replace(/\s+/g, ' '))));
+    check('contrarian / unsung / avoid reasons are shown', ['contrarian', 'unsung', 'avoid'].every(k => payload.auction[k].every(x => !x.reason || au.includes(x.reason.slice(0, 40)))));
+    check('batting gap for a bowler reads "(with the bat)"', /\(with the bat\)/.test(au));
+    await ctx.close();
+  }
+
   /* ---------- filters change output ---------- */
   {
     const { ctx, page } = await newPage(1280, 900);
     await page.goto(url('#tab=leaderboard')); await page.waitForSelector('#lbtable');
-    const snap = () => page.evaluate(() => ({ rows: document.querySelectorAll('#lbtable tbody tr').length, text: document.querySelector('#lbtable tbody').innerText.replace(/\s+/g, ' '), first: (document.querySelector('#lbtable tbody tr .plink') || {}).textContent }));
+    const snap = () => page.evaluate(() => ({ rows: +((document.querySelector('#lbcount') || { dataset: { n: 0 } }).dataset.n), shown: document.querySelectorAll('#lbtable tbody tr').length, text: document.querySelector('#lbtable tbody').innerText.replace(/\s+/g, ' '), first: (document.querySelector('#lbtable tbody tr .plink') || {}).textContent }));
     const base = await snap();
     await page.selectOption('#f-season', '2024'); await page.waitForTimeout(100);
     const s1 = await snap();

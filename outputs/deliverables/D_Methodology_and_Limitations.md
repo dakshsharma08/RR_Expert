@@ -2,7 +2,7 @@
 
 Submission to Rajasthan Royals' SupeRR Selector Season 2. Data: 367 IPL matches, 87,687 balls, to 2026-05-31 (build 2026-11-17, seed 2027). Raw data sha256 01e2b4379edfbab6a6e456d304cb3c70f554cb312ef93d9588f3f32a82cb396e.
 
-> **Read this first.** Historical pressure-performance indicator, not a forecast. Its ability to predict IPL 2027 is not established. Backtest, top 10 still above average next season: batters: score 42.9% v naive 46.7%; random pick 50.8%; difference −3.8 points, 80% interval −17.1–3.8 (includes 0) (historical indicator; persistence not demonstrated); bowlers: score 72.8% v naive 75.0%; random pick 59.5%; difference −2.2 points, 80% interval −14.6–4.4 (includes 0) (historical indicator; persistence not demonstrated). Prices, availability, ages and nationality are assumptions or UNKNOWN: nothing external was VERIFIED.
+> **Read this first.** Historical pressure-performance indicator, not a forecast. Its ability to predict IPL 2027 is not established. Backtest, top 10 still above average next season: batters: score 42.9% v simple ranking 46.7%; random pick 50.8%; difference −3.8 points, 80% interval −17.1–3.8 (includes 0) (historical indicator; persistence not demonstrated); bowlers: score 72.8% v simple ranking 75.0%; random pick 59.5%; difference −2.2 points, 80% interval −14.6–4.4 (includes 0) (historical indicator; persistence not demonstrated). Prices, availability, ages and nationality are assumptions or UNKNOWN: nothing external was VERIFIED.
 
 ## 1. What the score is, in one paragraph
 
@@ -87,7 +87,7 @@ Folds 2024, 2025, 2026. For fold N the score is rebuilt from seasons 2023 to N-1
 | Bowlers | 2026 | 77 | 23 | 4.3 / 6 | 79.5% / 100.0% | 60.9% | 34.4% / 60.0% | −0.30 / +0.50 | — | — |
 | Bowlers | **pooled** | 178 | 74 | 16.6 / 20 | 72.8% / 75.0% | 59.5% | 40.3% / 50.0% | −0.05 / +0.29 | −14.6–4.4 | historical indicator; persistence not demonstrated |
 
-**Result.** Batters: score 42.9% v naive 46.7%; random pick 50.8%; difference −3.8 points, 80% interval −17.1–3.8 (includes 0): **historical indicator; persistence not demonstrated**. Bowlers: score 72.8% v naive 75.0%; random pick 59.5%; difference −2.2 points, 80% interval −14.6–4.4 (includes 0): **historical indicator; persistence not demonstrated**. Rank correlation with next-season outcome: batters −0.13 (naive −0.15), bowlers −0.05 (naive +0.29).
+**Result.** Batters: score 42.9% v simple ranking 46.7%; random pick 50.8%; difference −3.8 points, 80% interval −17.1–3.8 (includes 0): **historical indicator; persistence not demonstrated**. Bowlers: score 72.8% v simple ranking 75.0%; random pick 59.5%; difference −2.2 points, 80% interval −14.6–4.4 (includes 0): **historical indicator; persistence not demonstrated**. Rank correlation with next-season outcome: batters −0.13 (naive −0.15), bowlers −0.05 (naive +0.29).
 
 The random-pick hit rate is the share of all assessable players who were above average next season: it is what picking at random would score.
 
@@ -178,7 +178,7 @@ Under Golden Rule 2 every external fact is either VERIFIED or tagged. **None cou
 | A2 | Availability of every other player | UNKNOWN: treated as 'possibly in the auction pool' | Retention and release lists can't be read (D23). Every card says 'pursue only if in the official auction list' |
 | A3 | Likely retained (excluded from shortlist and plans) | Players who appeared in ≥80% of their team's 2026 matches (regulars) | Franchises rarely release regular starters before a mini-auction. A proxy, not a fact; they stay on the leaderboard |
 | A4 | RR auction purse | Rs 15 crore | UNKNOWN (F1-022). Context REPORTED: Rs 2.65 cr left after the 2026 auction (F1-024). Illustrative; adjustable in the dashboard |
-| A5 | RR open slots | 5 slots (25 max − 20 in the 2026 group); 1 overseas (8 max − 7 inferred overseas) | Assumes the whole 2026 group is retained (no releases known). Limits REPORTED (F1-006/007) |
+| A5 | RR open slots | 5 slots (25 max − 20 in the 2026 group); 1 overseas (8 max − 7 inferred overseas) | Assumes only the players who actually appeared in 2026 are retained. REPORTED context conflicts: RR had a 25-player squad (8 overseas) and Rs 2.65 cr left after the 2026 auction (F1-024), which would leave 0 slots until releases are known. Plans are therefore illustrative. Limits REPORTED (F1-006/007) |
 | A6 | Price bands | Rule-based from data: Established (≥3 of 2023–26 seasons with ≥10 matches) Indian Rs 8–14 cr / overseas Rs 6–12 cr; Regular (2 such seasons) Rs 3–8 / 3–7 cr; Emerging Rs 0.3–3 cr. Walk-away = top of band | No market data could be read. Ignores reputation; illustrative only |
 | A7 | Overseas / Indian status | Inferred from T20Is in this dataset (2022–26); UNKNOWN when a player has none. UNKNOWN players count as Indian in the optimiser and XI, which is flagged | Evidence-based, not verified externally |
 | A8 | Age | UNKNOWN for every player | Not in the data and not verifiable here |

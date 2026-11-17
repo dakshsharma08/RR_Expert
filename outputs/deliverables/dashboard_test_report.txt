@@ -1,5 +1,5 @@
 Dashboard file: /home/user/RR_Expert/outputs/deliverables/RR_Clutch_Index_Dashboard.html
-File size: 1,164,910 bytes (1.16 MB)
+File size: 1,173,800 bytes (1.17 MB)
 PASS  file under 5 MB
 PASS  [380] tab summary opens via URL hash  -> summary
 PASS  [380] no horizontal scroll on summary  -> scrollWidth 380 vs clientWidth 380
@@ -25,6 +25,23 @@ PASS  [1280] tab method opens via URL hash  -> method
 PASS  Simple mode is the default and hides deep columns
 PASS  Detailed mode shows deep columns
 PASS  Detailed mode opens deep-dive sections  -> 0 -> 2
+PASS  [380] how_to_use shown on summary under the title "How to use this score"  -> How to use this score What the score is: who has already del
+PASS  [380] how_to_use shown on auction under the title "How to use this score"  -> How to use this score What the score is: who has already del
+PASS  [380] how_to_use shown on method under the title "How to use this score"  -> How to use this score What the score is: who has already del
+PASS  [380] How to use this score sits directly under the 5-line summary  -> 0,1
+PASS  [380] all 7 phone tab labels are fully visible (no clipping)  -> []
+PASS  [380] Simple mode shows no internal codes on summary
+PASS  [380] Simple mode shows no internal codes on leaderboard
+PASS  [380] Simple mode shows no internal codes on auction
+PASS  [380] Simple mode shows no internal codes on squad
+PASS  Simple mode lists the top 15 per role with a Show-all button  -> {"shown":15,"n":47}
+PASS  Show all N lists every player  -> 47 vs 47
+PASS  Detailed mode still shows codes (e.g. A8)
+PASS  Squad tab asks "Do the Plan A picks have a strong record where RR is weak?" and shows picks_note
+PASS  no "lifts" / "after" wording in Plan A sections
+PASS  every auction card shows its tier reason
+PASS  contrarian / unsung / avoid reasons are shown
+PASS  batting gap for a bowler reads "(with the bat)"
 PASS  season filter changes leaderboard output
 PASS  pressure filter changes leaderboard output
 PASS  phase filter changes leaderboard output
@@ -43,41 +60,41 @@ PASS  [380] active filter chips and reset are shown  -> Active filters: Season: 
 PASS  [380] no horizontal scroll with filters applied  -> 380/380
 PASS  [380] no horizontal scroll with profile card open  -> 380/380
 PASS  [380] profile card panel does not scroll sideways  -> 378/378
-PASS  random card Sandeep Sharma: name matches  -> Sandeep Sharma
-PASS  random card Sandeep Sharma: score 69 matches payload  -> 69
-PASS  random card Sandeep Sharma: 80% range 19–96 matches payload  -> 19–96
-PASS  random card Sandeep Sharma: rank 22 of 71 shown
-PASS  random card Sandeep Sharma: High-pressure legal balls 266 shown
-PASS  random card Sandeep Sharma: price band text shown
-PASS  random card Sandeep Sharma: age tagged UNKNOWN
-PASS  random card Avesh Khan: name matches  -> Avesh Khan
-PASS  random card Avesh Khan: score 69 matches payload  -> 69
-PASS  random card Avesh Khan: 80% range 26–96 matches payload  -> 26–96
-PASS  random card Avesh Khan: rank 21 of 71 shown
-PASS  random card Avesh Khan: High-pressure legal balls 294 shown
-PASS  random card Avesh Khan: price band text shown
-PASS  random card Avesh Khan: age tagged UNKNOWN
-PASS  random card Ayush Badoni: name matches  -> Ayush Badoni
-PASS  random card Ayush Badoni: score 7 matches payload  -> 7
-PASS  random card Ayush Badoni: 80% range 2–22 matches payload  -> 2–22
-PASS  random card Ayush Badoni: rank 43 of 47 shown
-PASS  random card Ayush Badoni: High-pressure balls 136 shown
-PASS  random card Ayush Badoni: price band text shown
-PASS  random card Ayush Badoni: age tagged UNKNOWN
-PASS  random card Patrick Cummins: name matches  -> Patrick Cummins
-PASS  random card Patrick Cummins: score 97 matches payload  -> 97
-PASS  random card Patrick Cummins: 80% range 61–100 matches payload  -> 61–100
-PASS  random card Patrick Cummins: rank 4 of 71 shown
-PASS  random card Patrick Cummins: High-pressure legal balls 123 shown
-PASS  random card Patrick Cummins: price band text shown
-PASS  random card Patrick Cummins: age tagged UNKNOWN
-PASS  random card Matheesha Pathirana: name matches  -> Matheesha Pathirana
-PASS  random card Matheesha Pathirana: score 98 matches payload  -> 98
-PASS  random card Matheesha Pathirana: 80% range 84–100 matches payload  -> 84–100
-PASS  random card Matheesha Pathirana: rank 3 of 71 shown
-PASS  random card Matheesha Pathirana: High-pressure legal balls 180 shown
-PASS  random card Matheesha Pathirana: price band text shown
-PASS  random card Matheesha Pathirana: age tagged UNKNOWN
+PASS  random card Sameer Rizvi: name matches  -> Sameer Rizvi
+PASS  random card Sameer Rizvi: score 80 matches payload  -> 80
+PASS  random card Sameer Rizvi: 80% range 45–95 matches payload  -> 45–95
+PASS  random card Sameer Rizvi: rank 8 of 47 shown
+PASS  random card Sameer Rizvi: High-pressure balls 101 shown
+PASS  random card Sameer Rizvi: price band text shown
+PASS  random card Sameer Rizvi: age tagged UNKNOWN
+PASS  random card Virat Kohli: name matches  -> Virat Kohli
+PASS  random card Virat Kohli: score 88 matches payload  -> 88
+PASS  random card Virat Kohli: 80% range 58–98 matches payload  -> 58–98
+PASS  random card Virat Kohli: rank 5 of 47 shown
+PASS  random card Virat Kohli: High-pressure balls 255 shown
+PASS  random card Virat Kohli: price band text shown
+PASS  random card Virat Kohli: age tagged UNKNOWN
+PASS  random card Ruturaj Gaikwad: name matches  -> Ruturaj Gaikwad
+PASS  random card Ruturaj Gaikwad: score 66 matches payload  -> 66
+PASS  random card Ruturaj Gaikwad: 80% range 24–81 matches payload  -> 24–81
+PASS  random card Ruturaj Gaikwad: rank 16 of 47 shown
+PASS  random card Ruturaj Gaikwad: High-pressure balls 129 shown
+PASS  random card Ruturaj Gaikwad: price band text shown
+PASS  random card Ruturaj Gaikwad: age tagged UNKNOWN
+PASS  random card Shivam Dube: name matches  -> Shivam Dube
+PASS  random card Shivam Dube: score 8 matches payload  -> 8
+PASS  random card Shivam Dube: 80% range 2–35 matches payload  -> 2–35
+PASS  random card Shivam Dube: rank 42 of 47 shown
+PASS  random card Shivam Dube: High-pressure balls 193 shown
+PASS  random card Shivam Dube: price band text shown
+PASS  random card Shivam Dube: age tagged UNKNOWN
+PASS  random card Mohammed Shami: name matches  -> Mohammed Shami
+PASS  random card Mohammed Shami: score 49 matches payload  -> 49
+PASS  random card Mohammed Shami: 80% range 17–86 matches payload  -> 17–86
+PASS  random card Mohammed Shami: rank 29 of 71 shown
+PASS  random card Mohammed Shami: High-pressure legal balls 155 shown
+PASS  random card Mohammed Shami: price band text shown
+PASS  random card Mohammed Shami: age tagged UNKNOWN
 PASS  match explorer: choosing a ball shows its situation and WPA
 PASS  match explorer: switching match redraws
 PASS  pressure map: innings toggle works
@@ -95,13 +112,13 @@ PASS  no external network requests
 Blocked/recorded request attempts: 0
 
 Per-tab notes (measured at 380px, automatic):
-  summary: lead="Back players whose quality has held up when the match was on the line, and know how sure w..." charts=1 svgs=20 tables=0 deep-sections=0 so-what-lines=2 page-height=6338px
-  pressure: lead="Pressure means how much one ball can swing the match. A ball with the match on a knife-edg..." charts=3 svgs=16 tables=5 deep-sections=1 so-what-lines=4 page-height=6588px
-  leaderboard: lead="Top batter on historical pressure performance: Vaibhav Sooryavanshi (99, range 92–100). 45..." charts=2 svgs=61 tables=3 deep-sections=2 so-what-lines=3 page-height=24626px
-  compare: lead="Ashutosh Sharma (99) and Patrick Cummins (97): too close to call. Their 80% ranges overlap..." charts=2 svgs=6 tables=1 deep-sections=0 so-what-lines=2 page-height=5813px
-  squad: lead="RR’s measured weakness is batting under pressure: middle: RR sits 7.3 runs per 100 High-pr..." charts=2 svgs=18 tables=2 deep-sections=1 so-what-lines=2 page-height=5954px
-  auction: lead="Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price r..." charts=1 svgs=14 tables=2 deep-sections=1 so-what-lines=2 page-height=8525px
-  method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict IP..." charts=1 svgs=4 tables=10 deep-sections=2 so-what-lines=1 page-height=4528px
+  summary: lead="Back players whose quality has held up when the match was on the line, and know how sure w..." charts=1 svgs=20 tables=0 deep-sections=0 so-what-lines=2 page-height=7338px
+  pressure: lead="Pressure means how much one ball can swing the match. A ball with the match on a knife-edg..." charts=3 svgs=16 tables=5 deep-sections=1 so-what-lines=4 page-height=6916px
+  leaderboard: lead="Top batter on historical pressure performance: Vaibhav Sooryavanshi (99, range 92–100). 45..." charts=2 svgs=29 tables=3 deep-sections=2 so-what-lines=3 page-height=10340px
+  compare: lead="Ashutosh Sharma (99) and Patrick Cummins (97): too close to call. Their 80% ranges overlap..." charts=2 svgs=6 tables=1 deep-sections=0 so-what-lines=2 page-height=5971px
+  squad: lead="RR’s measured weakness is batting under pressure: middle: RR sits 7.3 runs per 100 High-pr..." charts=2 svgs=37 tables=2 deep-sections=1 so-what-lines=2 page-height=7557px
+  auction: lead="Pursue the Must-Back names if they reach the auction, and fall back on Plan B if a price r..." charts=1 svgs=14 tables=2 deep-sections=1 so-what-lines=2 page-height=10927px
+  method: lead="The Clutch Score is a historical pressure-performance indicator. Its ability to predict IP..." charts=1 svgs=4 tables=10 deep-sections=2 so-what-lines=1 page-height=5222px
 
 Manual review notes (screenshots read by the builder):
   summary: thesis, 5-line summary, KPI tiles, honest backtest note, Must-Back cards, whisker hero chart, before/after strips; all numbers filled from the payload.
