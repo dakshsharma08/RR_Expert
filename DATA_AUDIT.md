@@ -1,5 +1,7 @@
 # Data audit — `ball_by_ball.csv` (rebuilt from Parts 1–5)
 
+> **Status: not yet validated for analysis.** Parts 2 and 4 contain damage. See `DATA_RECOVERY_REPORT.md`. Clutch Index work is paused until a replacement passes `scripts/validate_replacement.py`.
+
 ## 1. Merge and validation
 
 `scripts/merge_parts.py` glues Part 1 → Part 5 together byte for byte. It keeps one header and changes no values.
@@ -24,18 +26,16 @@ Checks:
 
 ## 2. Damage: two blocks of null bytes
 
-In Parts 2 and 4, a block of about 735 KB of null bytes replaces about 3,600 balls each. The damaged line in each part (file lines 67127 and 130504) is the start of one row joined to the end of a different row. Neither can be read as a 33-field record. `scripts/load.py` keeps both lines aside in `corrupted_rows()` and leaves them out of the analysis frame.
+> **Superseded.** For exact byte offsets, rows, matches, what can and cannot be verified, and corrections, see `DATA_RECOVERY_REPORT.md`.
 
-The file is sorted by `match_id`, so the loss can be located exactly:
-
-| Gap | Matches with partial data | Matches lost entirely | Relevance |
-|---|---|---|---|
-| Part 2 | 23673 BAN v AFG (2023-07-14): inns 2 stops at ball 43. 25159 ENG v NZ (2023-09-02): inns 1 balls 1–117 missing | Every match between them (mid-July to end of Aug 2023 T20Is) | Not IPL |
-| Part 4 | 40736 CSK v SRH (2025-04-25): only 44 balls of inns 1. 40752 RCB v LSG (2025-05-27): all of inns 1 and inns 2 balls 1–21 missing | **IPL 2025 match ids 40737–40751 (15 matches)** | **IPL 2025 has 59 matches here, not about 73** |
-
-The IPL 2025 gap covers fixtures from 26 Apr to the 8 May suspension. This is inferred from the public fixture list, not from the data. It likely includes RR v GT (28 Apr), RR v MI (1 May) and KKR v RR (4 May).
-
-**A clean copy of Parts 2 and 4 would restore this data.** Without one, every IPL 2025 figure is short by about 20%.
+In brief:
+- Part 2 holds 737,858 zero bytes, and Part 4 holds 732,429.
+- In each, one line is damaged: merged file lines 67127 and 130504. These lines are kept as they are, and the loader leaves them out of the analysis frame.
+- **Block 1** cuts short 23673 BAN v AFG and 25159 NZ v ENG. It also covers every match whose id falls between those two. None are IPL.
+- **Block 2** cuts short 40736 CSK v SRH and 40752 LSG v RCB. It also covers every match whose id falls between those two.
+- IPL 2025 in this file is missing 15 league fixtures. That count is verified against the league format.
+- How many of the 15 are inside Block 2, and which fixtures they are, cannot be determined from this file. The one exception: MI v RR and DC v KKR each have at least one absent fixture.
+- My earlier date windows and named fixtures were inferences. They are withdrawn (recovery report, section 9).
 
 ## 3. Coverage
 
