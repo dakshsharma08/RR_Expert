@@ -1,5 +1,5 @@
 Dashboard file: /home/user/RR_Expert/outputs/deliverables/RR_Clutch_Index_Dashboard.html
-File size: 1,182,132 bytes (1.18 MB)
+File size: 1,183,807 bytes (1.18 MB)
 PASS  file under 5 MB
 PASS  [380] tab summary opens via plain #hash  -> summary
 PASS  [380] no horizontal scroll on summary  -> scrollWidth 380 vs clientWidth 380
@@ -33,7 +33,7 @@ PASS  bat: #11 edge note names Jos Buttler with score, range and "too close to c
 PASS  bat: pairs line shows 0 of 45
 PASS  bowl: 10 rows rendered
 PASS  bowl: names, team chips and ranks in payload order  -> Kuldeep Yadav, Jasprit Bumrah, Matheesha Pathirana, Patrick Cummins, Ravindra Ja
-PASS  bowl: scores (one decimal) and 80% ranges equal the payload  -> 99.7 (96–99.9) | 98.7 (69–99.9) | 98.4 (84–99.9)
+PASS  bowl: scores (one decimal) and 80% ranges equal the payload  -> 99.6 (96–99.9) | 98.7 (69–99.9) | 98.4 (84–99.9)
 PASS  bowl: "why" text equals the payload
 PASS  bowl: #11 edge note names Jofra Archer with score, range and "too close to call"  -> #11 Jofra Archer (85.5, range 67–98): too close to call with #10.
 PASS  bowl: pairs line shows 0 of 45
@@ -46,7 +46,7 @@ PASS  tapping a row expands its "why"
 PASS  tapping a name opens that player’s profile card
 PASS  [380] how_to_use shown on summary under "How to use this score"  -> How to use this score What the score is: a 0–100 rating of h
 PASS  [380] how_to_use shown on method under "How to use this score"  -> How to use this score What the score is: a 0–100 rating of h
-PASS  [380] Summary order: headline, the two top-10 lists, how to use, then 3 KPI tiles  -> {"h1":446.15625,"lists":783.484375,"how":3645.640625,"kpi":4073.1875,"tiles":3}
+PASS  [380] Summary order: headline, the two top-10 lists, how to use, then 3 KPI tiles  -> {"h1":446.15625,"lists":720.765625,"how":3582.921875,"kpi":4010.46875,"tiles":3}
 PASS  [380] the two top-10 cards are stacked on a phone
 PASS  [380] tabs are one row inside their own strip with no page sideways scroll  -> {"rows":1,"ox":"auto","snap":"x","doc":true,"n":5,"fits":false}
 PASS  [380] active tab "summary" is fully visible in the strip  -> {"ok":true,"tab":"summary"}
@@ -87,47 +87,48 @@ PASS  [380] no horizontal scroll with filters applied  -> 380/380
 PASS  [380] no horizontal scroll with the profile card open  -> 380/380
 PASS  [380] profile card panel does not scroll sideways  -> 380/380
 PASS  card Kuldeep Yadav: name matches  -> Kuldeep Yadav
-PASS  card Kuldeep Yadav: score 99.7 (one decimal) matches payload and never reads 100  -> 99.7
+PASS  card Kuldeep Yadav: score 99.6 (one decimal) matches payload and never reads 100  -> 99.6
 PASS  card Kuldeep Yadav: 80% range 96–99.9 matches payload  -> 96–99.9
 PASS  card Kuldeep Yadav: rank 1 of 71 shown
 PASS  card Kuldeep Yadav: High-pressure legal balls 226 shown
 PASS  card Kuldeep Yadav: no age / price / availability / fit fields
-PASS  card Josh Hazlewood: name matches  -> Josh Hazlewood
-PASS  card Josh Hazlewood: score 84.2 (one decimal) matches payload and never reads 100  -> 84.2
-PASS  card Josh Hazlewood: 80% range 26–95 matches payload  -> 26–95
-PASS  card Josh Hazlewood: rank 13 of 71 shown
-PASS  card Josh Hazlewood: High-pressure legal balls 177 shown
-PASS  card Josh Hazlewood: no age / price / availability / fit fields
-PASS  card Suryakumar Yadav: name matches  -> Suryakumar Yadav
-PASS  card Suryakumar Yadav: score 50.7 (one decimal) matches payload and never reads 100  -> 50.7
-PASS  card Suryakumar Yadav: 80% range 8–83 matches payload  -> 8–83
-PASS  card Suryakumar Yadav: rank 21 of 47 shown
-PASS  card Suryakumar Yadav: High-pressure balls 191 shown
-PASS  card Suryakumar Yadav: no age / price / availability / fit fields
-PASS  card Anshul Kamboj: name matches  -> Anshul Kamboj
-PASS  card Anshul Kamboj: score 44.3 (one decimal) matches payload and never reads 100  -> 44.3
-PASS  card Anshul Kamboj: 80% range 14–76 matches payload  -> 14–76
-PASS  card Anshul Kamboj: rank 35 of 71 shown
-PASS  card Anshul Kamboj: High-pressure legal balls 126 shown
-PASS  card Anshul Kamboj: no age / price / availability / fit fields
-PASS  card Jofra Archer: name matches  -> Jofra Archer
-PASS  card Jofra Archer: score 85.5 (one decimal) matches payload and never reads 100  -> 85.5
-PASS  card Jofra Archer: 80% range 67–98 matches payload  -> 67–98
-PASS  card Jofra Archer: rank 11 of 71 shown
-PASS  card Jofra Archer: High-pressure legal balls 133 shown
-PASS  card Jofra Archer: no age / price / availability / fit fields
-PASS  card Venkatesh Iyer: name matches  -> Venkatesh Iyer
-PASS  card Venkatesh Iyer: score 79.6 (one decimal) matches payload and never reads 100  -> 79.6
-PASS  card Venkatesh Iyer: 80% range 31–96 matches payload  -> 31–96
-PASS  card Venkatesh Iyer: rank 10 of 47 shown
-PASS  card Venkatesh Iyer: High-pressure balls 106 shown
-PASS  card Venkatesh Iyer: no age / price / availability / fit fields
+PASS  card Hardik Pandya: name matches  -> Hardik Pandya
+PASS  card Hardik Pandya: score 9.9 (one decimal) matches payload and never reads 100  -> 9.9
+PASS  card Hardik Pandya: 80% range 1–48 matches payload  -> 1–48
+PASS  card Hardik Pandya: rank 8 of 8 shown
+PASS  card Hardik Pandya: High-pressure balls 132 shown
+PASS  card Hardik Pandya: High-pressure legal balls 98 shown
+PASS  card Hardik Pandya: no age / price / availability / fit fields
+PASS  card Shubman Gill: name matches  -> Shubman Gill
+PASS  card Shubman Gill: score 65.0 (one decimal) matches payload and never reads 100  -> 65.0
+PASS  card Shubman Gill: 80% range 30–91 matches payload  -> 30–91
+PASS  card Shubman Gill: rank 17 of 47 shown
+PASS  card Shubman Gill: High-pressure balls 284 shown
+PASS  card Shubman Gill: no age / price / availability / fit fields
+PASS  card Ishant Sharma: name matches  -> Ishant Sharma
+PASS  card Ishant Sharma: score 29.7 (one decimal) matches payload and never reads 100  -> 29.7
+PASS  card Ishant Sharma: 80% range 4–90 matches payload  -> 4–90
+PASS  card Ishant Sharma: rank 52 of 71 shown
+PASS  card Ishant Sharma: High-pressure legal balls 69 shown
+PASS  card Ishant Sharma: no age / price / availability / fit fields
+PASS  card Jos Buttler: name matches  -> Jos Buttler
+PASS  card Jos Buttler: score 79.2 (one decimal) matches payload and never reads 100  -> 79.2
+PASS  card Jos Buttler: 80% range 36–93 matches payload  -> 36–93
+PASS  card Jos Buttler: rank 11 of 47 shown
+PASS  card Jos Buttler: High-pressure balls 191 shown
+PASS  card Jos Buttler: no age / price / availability / fit fields
+PASS  card Sai Sudharsan: name matches  -> Sai Sudharsan
+PASS  card Sai Sudharsan: score 14.7 (one decimal) matches payload and never reads 100  -> 14.7
+PASS  card Sai Sudharsan: 80% range 4–42 matches payload  -> 4–42
+PASS  card Sai Sudharsan: rank 40 of 47 shown
+PASS  card Sai Sudharsan: High-pressure balls 285 shown
+PASS  card Sai Sudharsan: no age / price / availability / fit fields
 PASS  profile card for the #1 bowler lists receipts and similar players
 PASS  match explorer: choosing a ball shows its situation, pressure and WPA
 PASS  match explorer: switching match redraws
 PASS  pressure map: innings toggle works
 PASS  compare: starts with the top three batters
-PASS  compare: shows a verdict sentence with "too close to call" or "clearly ahead"  -> Kuldeep Yadav has the highest score (99.7). Too close to call with Jasprit Bumrah and Matheesha Path
+PASS  compare: shows a verdict sentence with "too close to call" or "clearly ahead"  -> Kuldeep Yadav has the highest score (99.6). Too close to call with Jasprit Bumrah and Matheesha Path
 PASS  compare: the radar and the real-number table are present
 PASS  method: says the score is not a forecast / prediction not established
 PASS  method: backtest shown (score did not beat the plain ranking)
@@ -164,7 +165,7 @@ PASS  no external network requests
 Blocked/recorded request attempts: 0
 
 Per-tab notes (measured at 380px, automatic):
-  summary: lead="Who delivered when the match was on the line: the top 10 batters and top 10 bowlers under..." charts=0 svgs=21 tables=0 deep-sections=0 takeaways=1 page-height=7016px
+  summary: lead="The top 10 batters and top 10 bowlers who delivered when the match was on the line (IPL 20..." charts=0 svgs=21 tables=0 deep-sections=0 takeaways=1 page-height=6954px
   pressure: lead="Pressure means how much one ball can swing the match. A ball with the match on a knife-edg..." charts=3 svgs=16 tables=5 deep-sections=1 takeaways=4 page-height=7030px
   leaderboard: lead="Top batter on historical pressure performance: Vaibhav Sooryavanshi (99.3, range 92–99.9)...." charts=2 svgs=29 tables=3 deep-sections=2 takeaways=3 page-height=8012px
   compare: lead="Vaibhav Sooryavanshi has the highest score (99.3). Too close to call with Ashutosh Sharma..." charts=2 svgs=8 tables=1 deep-sections=0 takeaways=2 page-height=5461px

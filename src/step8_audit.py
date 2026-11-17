@@ -157,10 +157,10 @@ try:
 except ImportError:
     pass
 hits_ = sorted(set(m.group(0).lower() for m in banned.finditer(pdf_txt)))
-add("Answers the Round 1 brief (top 10 batters and bowlers under pressure, no auction advice)", "Pass" if (len(t10["bat"]) == 10 and len(t10["bowl"]) == 10 and not hits_) else "Fail",
-    "Organisers' clarification (17 Nov) applied (D38): both top-10 lists lead every deliverable; auction, price and squad content removed",
+add("Answers the Round 1 brief (top 10 batters and bowlers under pressure, no player-selection advice)", "Pass" if (len(t10["bat"]) == 10 and len(t10["bowl"]) == 10 and not hits_) else "Fail",
+    "Organisers' clarification (17 Nov) applied (D38): both top-10 lists lead every deliverable; recommendation, price and squad content removed",
     ("#11 is too close to call with #10 in both lists (80% ranges overlap), so the edge of each top 10 is soft" if edge_close else "#10/#11 boundary separated"),
-    f"top-10 sizes bat {len(t10['bat'])}, bowl {len(t10['bowl'])}; banned auction words found in PDFs: {hits_ or 'none'}")
+    f"top-10 sizes bat {len(t10['bat'])}, bowl {len(t10['bowl'])}; out-of-brief words found in PDFs: {hits_ or 'none'}")
 
 _crs = sorted((TABLES.parent / "reviews").glob("cold_reader*.csv"), key=lambda f: (f.stem != "cold_reader", f.stem))
 cr = _crs[-1] if _crs else TABLES.parent / "reviews" / "cold_reader.csv"     # latest round (round2 after fixes)

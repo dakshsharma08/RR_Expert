@@ -89,7 +89,7 @@ def score_block(df, pid):
     r = r.iloc[0]
     n = len(df)
     rank = int((df.score > r.score).sum() + 1)
-    blk = dict(score=r1(r.score, 3), lo=r1(r.score_lo80, 3), hi=r1(r.score_hi80, 3), rank=rank, of=n, pct=r1(100 * (1 - (rank - 1) / n), 0))
+    blk = dict(score=r1(r.score, 4), lo=r1(r.score_lo80, 4), hi=r1(r.score_hi80, 4), rank=rank, of=n, pct=r1(100 * (1 - (rank - 1) / n), 0))
     for c in ("S", "C", "S_raw", "I_raw", "H_raw", "seasons_assessed", "seasons_positive", "n_hi_w", "hi_qual_n"):
         if c in r:
             blk[c] = r1(r[c], 4)
@@ -181,7 +181,7 @@ def lb_rows(df, role):
             else:
                 tl = (q.High_legal or 0) + (q.Low_legal or 0)
                 nv = r1(6 * ((q.High_runs or 0) + (q.Low_runs or 0)) / tl, 2) if tl else None
-        out.append(dict(id=r.player_id, score=r1(r.score, 3), lo=r1(r.score_lo80, 3), hi=r1(r.score_hi80, 3), rank=int(r.rank) if hasattr(r, "rank") else None,
+        out.append(dict(id=r.player_id, score=r1(r.score, 4), lo=r1(r.score_lo80, 4), hi=r1(r.score_hi80, 4), rank=int(r.rank) if hasattr(r, "rank") else None,
                         S=r1(r.S * 100, 1), C=r1(r.C * 100, 0), n=int(r.hi_qual_n), naive=nv,
                         caveat=("wide 80% range" if (r.score_hi80 - r.score_lo80) >= 55 else "")))
     return out
@@ -214,11 +214,11 @@ def top10(df, role):
         if sa_:
             why += f"; above expected in {sp_} of {sa_} assessed seasons"
         out.append(dict(rank=i + 1, id=r.player_id, name=r.player_name, team=team, sub_role=sub,
-                        score=r1(r.score, 3), lo=r1(r.score_lo80, 3), hi=r1(r.score_hi80, 3), stats=stats, why=why + "."))
+                        score=r1(r.score, 4), lo=r1(r.score_lo80, 4), hi=r1(r.score_hi80, 4), stats=stats, why=why + "."))
     nxt = d.iloc[10]
     tenth = d.iloc[9]
-    edge = dict(next_name=nxt.player_name, next_id=nxt.player_id, next_score=r1(nxt.score, 3), next_lo=r1(nxt.score_lo80, 3),
-                next_hi=r1(nxt.score_hi80, 3),
+    edge = dict(next_name=nxt.player_name, next_id=nxt.player_id, next_score=r1(nxt.score, 4), next_lo=r1(nxt.score_lo80, 4),
+                next_hi=r1(nxt.score_hi80, 4),
                 overlaps_10th=bool(nxt.score_hi80 >= tenth.score_lo80 and tenth.score_hi80 >= nxt.score_lo80))
     return out, edge
 
@@ -330,7 +330,7 @@ how_to_use = [
     "What it is not: a forecast. Tested one season ahead, it did not beat simple strike-rate or economy rankings.",
 ]
 payload = dict(meta=dict(name="RR Clutch Index", subtitle="Who performs best under pressure · IPL 2023–26", how_to_use=how_to_use,
-                         thesis="Who delivered when the match was on the line: the top 10 batters and top 10 bowlers under pressure in IPL 2023–26, and how sure we are.",
+                         thesis="The top 10 batters and top 10 bowlers who delivered when the match was on the line (IPL 2023–26).",
                          brief="SupeRR Selector Season 2, Round 1: identify the top 10 batters and top 10 bowlers who perform best under pressure, and show the method.",
                          **summary["stamp"] if "stamp" in summary else {}, **method["stamp"], kpi=summary),
                exec=summary["exec_summary"], glossary=[dict(term=a, meaning=b_) for a, b_ in glossary], players=players,
