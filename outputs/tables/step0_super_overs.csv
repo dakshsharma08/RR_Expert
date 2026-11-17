@@ -1,0 +1,3 @@
+match_id,season,match_date,main_innings_score,result_category,so_winner_id,so_winner,so1_team_id,so1_team,so1_balls_all,so1_legal_balls,so1_runs,so1_wickets,so1_bowler_ids,so2_team_id,so2_team,so2_balls_all,so2_legal_balls,so2_runs,so2_wickets,so2_bowler_ids
+40725,2025,2025-04-16,188 v 188,TIE_DECIDED_BY_SUPER_OVER,7,DC,3,RR,6,5,11,2,829,7,DC,4,4,13,0,2411
+50359,2026,2026-04-26,155 v 155,TIE_DECIDED_BY_SUPER_OVER,8,KKR,3509,LSG,3,3,1,2,781,8,KKR,1,1,4,0,58246

@@ -1,0 +1,90 @@
+section,subject,metric,value,conclusion,confidence
+A. profile,None,IPL balls (all innings),82458,,
+A. profile,None,extras1_runs distribution,0:82458,,
+A. profile,None,runs distribution,0:28332|1:31845|2:5029|3:192|4:10909|5:13|6:6138,,
+A. profile,None,extras_2_runs distribution,0:82458,,
+A. profile,None,share of balls with runs > 0,0.6564,,
+A. profile,None,wicket kinds on these balls,none:78028|Caught:3221|Bowled:639|LBW:255|RunOut:235|Stump:66|Hit Wicket:7|Retire Out:5|Obstracting the field:1|Obstructing the field:1,,
+A. profile,wide,IPL balls (all innings),3552,,
+A. profile,wide,extras1_runs distribution,1:3300|2:121|3:8|5:123,,
+A. profile,wide,runs distribution,0:3552,,
+A. profile,wide,extras_2_runs distribution,0:3552,,
+A. profile,wide,share of balls with runs > 0,0.0,,
+A. profile,wide,wicket kinds on these balls,none:3530|Stump:15|RunOut:7,,
+A. profile,Overstep,IPL balls (all innings),257,,
+A. profile,Overstep,extras1_runs distribution,1:257,,
+A. profile,Overstep,runs distribution,0:108|1:78|2:12|4:38|6:21,,
+A. profile,Overstep,extras_2_runs distribution,0:244|1:8|4:5,,
+A. profile,Overstep,share of balls with runs > 0,0.5798,,
+A. profile,Overstep,wicket kinds on these balls,none:254|RunOut:3,,
+A. profile,other,IPL balls (all innings),123,,
+A. profile,other,extras1_runs distribution,1:123,,
+A. profile,other,runs distribution,0:60|1:22|2:4|3:1|4:20|6:16,,
+A. profile,other,extras_2_runs distribution,0:116|1:3|4:4,,
+A. profile,other,share of balls with runs > 0,0.5122,,
+A. profile,other,wicket kinds on these balls,none:121|RunOut:2,,
+A. profile,legbyes,IPL balls (all innings),1109,,
+A. profile,legbyes,extras1_runs distribution,1:958|2:46|4:105,,
+A. profile,legbyes,runs distribution,0:1109,,
+A. profile,legbyes,extras_2_runs distribution,0:1109,,
+A. profile,legbyes,share of balls with runs > 0,0.0,,
+A. profile,legbyes,wicket kinds on these balls,none:1109,,
+A. profile,byes,IPL balls (all innings),188,,
+A. profile,byes,extras1_runs distribution,1:125|2:10|4:53,,
+A. profile,byes,runs distribution,0:188,,
+A. profile,byes,extras_2_runs distribution,0:188,,
+A. profile,byes,share of balls with runs > 0,0.0,,
+A. profile,byes,wicket kinds on these balls,none:187|RunOut:1,,
+A. profile,Penalty,IPL balls (all innings),0,,
+A. profile,Penalty,extras1_runs distribution,,,
+A. profile,Penalty,runs distribution,,,
+A. profile,Penalty,extras_2_runs distribution,,,
+A. profile,Penalty,share of balls with runs > 0,n/a,,
+A. profile,Penalty,wicket kinds on these balls,,,
+A. profile,Penalty,note,0,no Penalty ball exists in the IPL subset (the single raw Penalty row is a non-IPL match); the rule below is coded but untested on IPL data,n/a
+A. profile,all,extras_type == 'None' exactly when extras1_runs == 0,True,,
+A. profile,all,is_four balls with runs != 4,0,,
+A. profile,all,is_six balls with runs != 6,0,,
+A. profile,all,"is_four or is_six balls with an extras_type in (byes, legbyes, wide)",0,"boundaries are never recorded on byes, leg-byes or wides, so runs is off the bat only (confirms `runs` = batter runs)",high
+B. over structure,all,"complete overs tested (innings 1-2, an over followed by another over in the same innings)",13334,,
+B. over structure,wide + Overstep + other not legal (decision),complete overs with exactly 6 legal balls,13331 of 13334,the only hypothesis under which (almost) every over has 6 legal balls,
+B. over structure,wide + Overstep not legal; other legal,complete overs with exactly 6 legal balls,13231 of 13334,,
+B. over structure,wide + other not legal; Overstep legal,complete overs with exactly 6 legal balls,13108 of 13334,,
+B. over structure,Overstep + other not legal; wide legal,complete overs with exactly 6 legal balls,10669 of 13334,,
+B. over structure,only wide not legal,complete overs with exactly 6 legal balls,13011 of 13334,,
+B. over structure,only Overstep not legal,complete overs with exactly 6 legal balls,10603 of 13334,,
+B. over structure,only other not legal,complete overs with exactly 6 legal balls,10513 of 13334,,
+B. over structure,nothing re-bowled (every delivery legal),complete overs with exactly 6 legal balls,10449 of 13334,,
+B. over structure,decision + byes not legal,complete overs with exactly 6 legal balls,13185 of 13334,,
+B. over structure,decision + legbyes not legal,complete overs with exactly 6 legal balls,12327 of 13334,,
+B. over structure,decision,complete overs without exactly 6 legal balls,3,"match/over: 14130/14 (5 legal)|14130/14 (5 legal)|14164/14 (5 legal); both innings of 14130 and one innings of 14164 each have a 5-ball over 14: possible missing ball in the source; flagged, not repaired",
+B. over structure,decision,innings with more than 120 legal balls,0,"none: 6 legal balls per over, 20 overs",high
+B. over structure,other,overs that hold 7 deliveries when the only odd ball is 'other',73,'other' deliveries are re-bowled exactly like no-balls and wides,high
+C. runs fields,Overstep,extras1_runs equals 1 on every ball,True,"Overstep = no-ball: 1 penalty run in extras1_runs, bat runs in `runs`",high
+C. runs fields,other,extras1_runs equals 1 on every ball,True,"'other' behaves like a no-ball: 1 extra run, bat runs (0-6) in `runs`, only run-outs possible, re-bowled",high (behaviour); medium (label)
+C. runs fields,other,share of balls where the batter scored,0.5122,"a wide never carries bat runs (see wide row), so 'other' is not a wide",high
+C. runs fields,wide,balls with runs > 0,0,all wide runs sit in extras1_runs (1 to 5); byes taken off a wide are inside that figure,high
+C. runs fields,byes/legbyes,balls with runs > 0,0,"byes and leg-byes sit entirely in extras1_runs, never in `runs`",high
+C. runs fields,extras_2_runs,IPL balls with extras_2_runs > 0,20,values: 1:11|4:9,
+C. runs fields,extras_2_runs,extras_type on those balls,Overstep:13|other:7,only on no-ball-type deliveries,
+C. runs fields,extras_2_runs,balls where the batter also scored (runs > 0),0,"0 of 20; among no-ball-type balls the batter scores on 56%, so runs here are not off the bat: consistent with byes / leg-byes run off a no-ball",medium
+C. runs fields,extras_2_runs,balls flagged is_four or is_six,0,a 4 here is not a bat boundary,
+D. team-score test,runs + extras1_runs + extras_2_runs (decision),balls bowled after the chase had already reached the target,0,must be 0 if the formula equals the real team score,
+D. team-score test,runs + extras1_runs + extras_2_runs (decision),chases that reach the target,186,,
+D. team-score test,runs + extras1_runs + extras_2_runs (decision),"of those, chases whose last ball is exactly the ball that reaches the target",186,all of them under the decision formula,
+D. team-score test,runs + extras1_runs,balls bowled after the chase had already reached the target,3,,
+D. team-score test,runs + extras1_runs,chases that reach the target,186,,
+D. team-score test,runs + extras1_runs,"of those, chases whose last ball is exactly the ball that reaches the target",184,some chases do not stop on the target ball,
+D. team-score test,runs only,balls bowled after the chase had already reached the target,331,,
+D. team-score test,runs only,chases that reach the target,135,,
+D. team-score test,runs only,"of those, chases whose last ball is exactly the ball that reaches the target",49,some chases do not stop on the target ball,
+E. decision,wide,rule adopted,"is_wide = True; legal ball: NO; ball faced by batter: NO; batter runs 0; wide_runs = extras1_runs (1 to 5), all charged to the bowler",,high
+E. decision,Overstep,rule adopted,no-ball. is_noball = True; legal: NO; ball faced: YES; bat_runs = runs; noball_runs = extras1_runs (always 1); charged to bowler: bat runs + 1,,high
+E. decision,other,rule adopted,"treated as a no-ball-type illegal delivery (is_noball = True, noball_kind = 'other'): re-bowled, 1 extra run, bat runs counted, only run-outs; the exact cricket meaning of 'other' (for example a different kind of no-ball) is NOT in the data",,high that it is re-bowled and not a wide; medium that it is a no-ball
+E. decision,legbyes,rule adopted,"legal ball (unless also wide/no-ball); ball faced: YES; bat runs 0; legbye_runs = extras1_runs; added to team score, NOT charged to bowler",,high
+E. decision,byes,rule adopted,"legal ball; ball faced: YES; bat runs 0; bye_runs = extras1_runs; added to team score, NOT charged to bowler",,high
+E. decision,Penalty,rule adopted,penalty_runs = extras1_runs; added to team score; not charged to bowler; the delivery is not treated as wide or no-ball. Never occurs in IPL data,,untested
+E. decision,None,rule adopted,no extras; legal; bat_runs = runs,,high
+E. decision,extras_2_runs,rule adopted,"second extras amount seen only on no-ball-type balls with no bat runs: read as byes or leg-byes run off the no-ball. Added to team score (confirmed by the chase test), NOT charged to the bowler (assumed, 20 balls); kept in its own column extras2_runs, never split into bye_runs / legbye_runs because the data does not say which",,high that it is added to the score; low on bye vs leg-bye
+E. decision,total_runs,rule adopted,runs + extras1_runs + extras_2_runs (confirmed by the chase test above),,high
+E. decision,bowler_runs_conceded,rule adopted,"bat runs + wide_runs + noball_runs, per Part 5",,high (rule is Part 5)

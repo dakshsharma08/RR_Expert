@@ -1,0 +1,120 @@
+section,metric,scope,value,note
+timestamps,modal first-ball clock times (innings 1 ball 1),season 2022,"19:30 x60, 15:30 x12, 20:11 x1, 20:01 x1",74 matches
+timestamps,share of matches with first ball within 10 min of 15:30 or 19:30 on the recorded clock,season 2022,0.973,IST slots read directly off the clock
+timestamps,share of matches with first ball within 10 min of 10:00 or 14:00 on the recorded clock,season 2022,0.0,the same slots 5h30 earlier: what UTC would show
+timestamps,share within 10 min of 15:30 or 19:30 after treating 2022-23 as IST and 2024+ as UTC (+5h30),season 2022,0.973,derived column ts_ist
+timestamps,modal first-ball clock times (innings 1 ball 1),season 2023,"19:30 x47, 15:30 x14, 19:32 x2, 15:31 x2",74 matches
+timestamps,share of matches with first ball within 10 min of 15:30 or 19:30 on the recorded clock,season 2023,0.9324,IST slots read directly off the clock
+timestamps,share of matches with first ball within 10 min of 10:00 or 14:00 on the recorded clock,season 2023,0.0,the same slots 5h30 earlier: what UTC would show
+timestamps,share within 10 min of 15:30 or 19:30 after treating 2022-23 as IST and 2024+ as UTC (+5h30),season 2023,0.9324,derived column ts_ist
+timestamps,modal first-ball clock times (innings 1 ball 1),season 2024,"14:00 x34, 14:01 x17, 10:00 x9, 14:02 x5",71 matches
+timestamps,share of matches with first ball within 10 min of 15:30 or 19:30 on the recorded clock,season 2024,0.0,IST slots read directly off the clock
+timestamps,share of matches with first ball within 10 min of 10:00 or 14:00 on the recorded clock,season 2024,0.9718,the same slots 5h30 earlier: what UTC would show
+timestamps,share within 10 min of 15:30 or 19:30 after treating 2022-23 as IST and 2024+ as UTC (+5h30),season 2024,0.9718,derived column ts_ist
+timestamps,modal first-ball clock times (innings 1 ball 1),season 2025,"14:00 x31, 14:01 x25, 10:00 x7, 10:01 x5",74 matches
+timestamps,share of matches with first ball within 10 min of 15:30 or 19:30 on the recorded clock,season 2025,0.0,IST slots read directly off the clock
+timestamps,share of matches with first ball within 10 min of 10:00 or 14:00 on the recorded clock,season 2025,0.9595,the same slots 5h30 earlier: what UTC would show
+timestamps,share within 10 min of 15:30 or 19:30 after treating 2022-23 as IST and 2024+ as UTC (+5h30),season 2025,0.9595,derived column ts_ist
+timestamps,modal first-ball clock times (innings 1 ball 1),season 2026,"14:00 x52, 10:00 x10, 14:01 x5, 14:04 x2",74 matches
+timestamps,share of matches with first ball within 10 min of 15:30 or 19:30 on the recorded clock,season 2026,0.0,IST slots read directly off the clock
+timestamps,share of matches with first ball within 10 min of 10:00 or 14:00 on the recorded clock,season 2026,0.9595,the same slots 5h30 earlier: what UTC would show
+timestamps,share within 10 min of 15:30 or 19:30 after treating 2022-23 as IST and 2024+ as UTC (+5h30),season 2026,0.9595,derived column ts_ist
+timestamps,"clock claim (IST for 2022-23, UTC from 2024) supported by modal first-ball times",IPL,yes,"assumes IPL slots of 15:30 and 19:30 IST (external knowledge, ASSUMPTION); the data alone shows a 5h30 shift between 2023 and 2024"
+timestamps,text label after the time in delivery_ist_time,IPL balls,UTC: 87687,"every row carries the same label, whatever the true zone"
+timestamps,balls with a 00:00:00 placeholder time,IPL,0,
+timestamps,balls whose time is earlier than the previous ball in the same innings,IPL,1,matches: 14104
+timestamps,"forward jumps over 20 min reversed by the next ball (one wrong timestamp, not a stoppage)",IPL,1,matches: 14104
+timestamps,gaps over 20 min between consecutive balls of an innings (possible rain or other stoppage),IPL,9,in 8 matches
+timestamps,innings break (last ball of innings 1 to first ball of innings 2): median minutes,IPL,16.2,363 matches with both innings
+timestamps,innings breaks over 30 min,IPL,4,matches: 20182|21586|30056|50942
+coverage,columns in raw file (excluding the added row_id),all,33,"match_id, innings, overid, over_ball_num, innings_ball_num, batting_team_id, bowling_team_id, striker_id, striker_name, non_striker_id, non_striker_name, bowler_id, bowler_name, batting_type, bowling_type, batting_order, runs, is_four, is_six, is_wicket, dismissal_type_id, dismissal_type, dismissed_player_id, extras_type, extras1_runs, extras_2_runs, pace_or_spin, bowl_speed, stroke, delivery_style, over_or_around, on_or_off, delivery_ist_time"
+coverage,balls,all,200999,
+coverage,balls,IPL,87687,
+coverage,balls,non-IPL,113312,excluded from every output; this count is the only trace of them
+coverage,matches,all,867,
+coverage,matches,IPL,367,both teams among the 10 ids of config.IPL_TEAMS
+coverage,matches,non-IPL,500,excluded from every output; this count is the only trace of them
+coverage,matches mixing IPL and non-IPL team ids,all,0,
+coverage,IPL matches,season 2022,74,
+coverage,"first match date (first ball, recorded clock date)",season 2022,2022-03-26,
+coverage,"last match date (first ball, recorded clock date)",season 2022,2022-05-29,
+coverage,IPL matches,season 2023,74,
+coverage,"first match date (first ball, recorded clock date)",season 2023,2023-03-31,
+coverage,"last match date (first ball, recorded clock date)",season 2023,2023-05-29,
+coverage,IPL matches,season 2024,71,
+coverage,"first match date (first ball, recorded clock date)",season 2024,2024-03-22,
+coverage,"last match date (first ball, recorded clock date)",season 2024,2024-05-26,
+coverage,IPL matches,season 2025,74,
+coverage,"first match date (first ball, recorded clock date)",season 2025,2025-03-22,
+coverage,"last match date (first ball, recorded clock date)",season 2025,2025-06-03,
+coverage,IPL matches,season 2026,74,
+coverage,"first match date (first ball, recorded clock date)",season 2026,2026-03-28,
+coverage,"last match date (first ball, recorded clock date)",season 2026,2026-05-31,
+coverage,last IPL match date,IPL,2026-05-31,
+coverage,does the data reach the end of IPL 2026,IPL,"74 matches in 2026, last 2026-05-31","74 matches = 70 league + 4 playoffs is the format seen in 2022 and 2023, so the season looks complete; that the last date is the real final needs external verification"
+coverage,season column in the raw file,all,none,season = calendar year of the first-ball date; dates come from delivery_ist_time (recorded clock)
+coverage,innings values present,IPL,1: 45588|2: 42085|3: 9|4: 5,innings 3 and 4 are super overs
+coverage,balls in innings 1 and 2,IPL,87673,
+coverage,balls in super overs (innings 3 and 4),IPL,14,
+integrity,empty values,column match_id,0,
+integrity,empty values,column innings,0,
+integrity,empty values,column overid,0,
+integrity,empty values,column over_ball_num,0,
+integrity,empty values,column innings_ball_num,0,
+integrity,empty values,column batting_team_id,0,
+integrity,empty values,column bowling_team_id,0,
+integrity,empty values,column striker_id,0,
+integrity,empty values,column striker_name,0,
+integrity,empty values,column non_striker_id,0,
+integrity,empty values,column non_striker_name,0,
+integrity,empty values,column bowler_id,0,
+integrity,empty values,column bowler_name,0,
+integrity,empty values,column batting_type,0,
+integrity,empty values,column bowling_type,0,
+integrity,empty values,column batting_order,0,
+integrity,empty values,column runs,0,
+integrity,empty values,column is_four,0,
+integrity,empty values,column is_six,0,
+integrity,empty values,column is_wicket,0,
+integrity,empty values,column dismissal_type_id,83229,94.92% of IPL rows
+integrity,empty values,column dismissal_type,83229,94.92% of IPL rows
+integrity,empty values,column dismissed_player_id,83225,94.91% of IPL rows
+integrity,empty values,column extras_type,0,
+integrity,empty values,column extras1_runs,0,
+integrity,empty values,column extras_2_runs,0,
+integrity,empty values,column pace_or_spin,0,
+integrity,empty values,column bowl_speed,0,
+integrity,empty values,column stroke,2,0.00% of IPL rows
+integrity,empty values,column delivery_style,1,0.00% of IPL rows
+integrity,empty values,column over_or_around,27,0.03% of IPL rows
+integrity,empty values,column on_or_off,0,
+integrity,empty values,column delivery_ist_time,0,
+integrity,exact duplicate rows,IPL,0,
+integrity,"duplicate keys (match_id, innings, innings_ball_num)",IPL,0,
+integrity,innings whose innings_ball_num runs 1..N with no gap,IPL,734 of 734,
+integrity,innings with exactly one batting team and one bowling team,IPL,734 of 734,
+integrity,innings where batting team equals bowling team,IPL,0,
+integrity,matches where the innings 1 batting team is the innings 2 bowling team and vice versa,IPL,363 of 363,
+integrity,super-over matches where the two super-over innings have opposite batting teams,IPL,2 of 2,
+integrity,balls where striker equals non-striker,IPL,0,
+integrity,is_wicket == (dismissal_type non-empty),IPL,holds on every row,
+integrity,over_ball_num equals the running delivery count within the over (so it counts wides and no-balls),IPL innings 1-2,True,max over_ball_num = 11
+integrity,overs numbered 1..k with no gap in every innings 1-2,IPL,True,max overid = 20
+integrity,bowl_speed == 0,IPL,22694,25.9% of IPL balls: speed not recorded
+integrity,bowl_speed == -1,IPL,1,matches: 14108
+reconciliation,match table vs data/work/ipl_match_keys.csv,IPL,identical,"367 keys rows, 367 match rows; compared columns: match_id, season, order_in_season, match_date, first_ball_recorded, teams, innings ball counts"
+reconciliation,ball table rows == IPL rows in raw,IPL,87687 == 87687,
+reconciliation,innings 1 balls + innings 2 balls + super-over balls == IPL balls,IPL,45588 + 42085 + 14 == 87687,
+reconciliation,"raw columns in the ball table identical to raw (all values, all IPL rows)",IPL,identical,
+results,result categories,IPL matches,CHASING_SIDE_REACHED_TARGET: 186|DEFENDING_SIDE_WON: 167|TIE_DECIDED_BY_SUPER_OVER: 2|UNDETERMINED_FROM_DATA: 12,
+results,suspected reduced overs / DLS,IPL matches,13,
+results,suspected no-result / abandoned,IPL matches,5,
+results,wp_eligible_provisional true,IPL matches,353,
+results,matches with super overs,IPL,2,40725|50359
+results,players (ids) in IPL data,IPL,382,
+results,playoff structure check by season,IPL,2022:True|2023:True|2024:True|2025:True|2026:True,
+results,league matches (all but the last 4 of the season),season 2022,70,"games per team: {'CSK': 14, 'MI': 14, 'RCB': 14, 'LSG': 14, 'RR': 14, 'KKR': 14, 'PBKS': 14, 'GT': 14, 'DC': 14, 'SRH': 14}"
+results,league matches (all but the last 4 of the season),season 2023,70,"games per team: {'CSK': 14, 'PBKS': 14, 'LSG': 14, 'RR': 14, 'MI': 14, 'DC': 14, 'KKR': 14, 'SRH': 14, 'GT': 14, 'RCB': 14}"
+results,league matches (all but the last 4 of the season),season 2024,67,"games per team: {'RCB': 14, 'DC': 14, 'PBKS': 14, 'CSK': 14, 'LSG': 14, 'MI': 14, 'RR': 13, 'SRH': 13, 'KKR': 12, 'GT': 12}"
+results,league matches (all but the last 4 of the season),season 2025,70,"games per team: {'PBKS': 15, 'DC': 15, 'SRH': 14, 'MI': 14, 'LSG': 14, 'RR': 14, 'GT': 14, 'CSK': 14, 'KKR': 13, 'RCB': 13}"
+results,league matches (all but the last 4 of the season),season 2026,70,"games per team: {'SRH': 14, 'KKR': 14, 'CSK': 14, 'GT': 14, 'LSG': 14, 'MI': 14, 'RR': 14, 'RCB': 14, 'PBKS': 14, 'DC': 14}"
