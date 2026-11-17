@@ -1,9 +1,9 @@
-"""Single entry point for the combined ball_by_ball.csv.
+"""Single entry point for the combined ball_by_ball.csv (active version: v2, the validated two-part upload).
 
 load_raw()   -> every well-formed row, all values kept as the original strings.
 load()       -> same rows with analysis-typed helper columns added (originals untouched).
-The 2 corrupted lines (NUL-byte blocks inside Parts 2 and 4) cannot be parsed into
-33 fields; they are returned separately by corrupted_rows() and never silently dropped.
+Any line that is not a clean 33-field row (v1 had 2 NUL-damaged lines; v2 has none) is
+returned separately by corrupted_rows() and never silently dropped.
 """
 import csv, gzip, sys
 from pathlib import Path
@@ -11,8 +11,9 @@ import pandas as pd
 
 csv.field_size_limit(sys.maxsize)
 _D = Path(__file__).resolve().parent.parent / "data"
-DATA = _D / "ball_by_ball.csv"          # rebuilt by merge_parts.py (gitignored)
-DATA_GZ = _D / "ball_by_ball.csv.gz"    # committed, byte-identical once decompressed
+DATA = _D / "ball_by_ball_v2.csv"       # rebuilt by merge_parts.py (gitignored)
+DATA_GZ = _D / "ball_by_ball_v2.csv.gz" # committed, byte-identical once decompressed
+# v1 (five-part upload with two NUL-damaged blocks) is kept read-only in data/backup/.
 
 def _open():
     return open(DATA, newline="", encoding="utf-8") if DATA.exists() else \

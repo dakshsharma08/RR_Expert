@@ -1,0 +1,5 @@
+# v2 dataset (two-part upload). sha256 of the DECOMPRESSED content, then of the .gz file itself. Never edit.
+# content_sha256  content_bytes  gz_sha256  path
+3e43539e57b580870b279c2ee3ca68f025f239ad6f9cfab11e5b1f40b3956544  20511219  371e86b9d2c2da17236b6fdf91b7b1207fbdc998ea7faa6267fe37bb86523bd8  data/source_parts_v2/Part_1.csv.gz
+88ddbd821080a0faf1d57503e06ed7efddf7dd38b7368906630ada6671915748  20561034  d7ba16f3315fcaab69d6aa27bc45856c7bbb32f53dfc45334ba20d84b595cbdb  data/source_parts_v2/Part_2.csv.gz
+01e2b4379edfbab6a6e456d304cb3c70f554cb312ef93d9588f3f32a82cb396e  41071837  49cdfeb6e2df607b5b4eae6cc38a71e46d9490a90490fcbe1dff5c66bb12ac90  data/ball_by_ball_v2.csv.gz

@@ -1,8 +1,8 @@
-"""Rebuild ball_by_ball.csv from its five sequential parts, byte-for-byte.
+"""Rebuild ball_by_ball.csv from its sequential parts, byte-for-byte.
 
-Usage: python3 -I scripts/merge_parts.py P1 P2 P3 P4 P5 OUT
+Usage: python3 -I scripts/merge_parts.py P1 P2 ... Pn OUT   (parts in order; last argument is the output)
 
-* Header kept once (Part 1's); Parts 2-5 headers must match it exactly and are dropped.
+* Header kept once (Part 1's); later parts' headers must match it exactly and are dropped.
 * Every data line of every part is copied verbatim, in order (no parsing, typing,
   trimming, re-quoting or re-encoding), so the merged file is the parts glued together.
 * Validation re-reads parts and merged file with a CSV parser and checks counts,
@@ -13,7 +13,9 @@ from collections import Counter
 from pathlib import Path
 
 csv.field_size_limit(sys.maxsize)
-parts, out = [Path(p) for p in sys.argv[1:6]], Path(sys.argv[6])
+parts, out = [Path(p) for p in sys.argv[1:-1]], Path(sys.argv[-1])
+if len(parts) < 2 or out.exists():
+    sys.exit("usage: merge_parts.py P1 P2 [... Pn] OUT  (OUT must not already exist)")
 
 # ---------- merge ----------
 header = None
@@ -50,9 +52,9 @@ print(f"\nSum of part data rows        : {exp:,}")
 print(f"Merged data rows             : {len(mrows):,}")
 print(f"Merged header columns        : {len(mhdr)}")
 print(f"Header rows inside data      : {sum(r == mhdr for r in mrows)}")
-print(f"Same rows, same order as P1..P5: {mrows == seq}")
-print(f"Merged bytes == sum(parts) - 4 repeated headers: "
-      f"{out.stat().st_size == sum(p.stat().st_size for p in parts) - 4*len(header)}")
+print(f"Same rows, same order as P1..P{len(parts)}: {mrows == seq}")
+print(f"Merged bytes == sum(parts) - {len(parts)-1} repeated headers: "
+      f"{out.stat().st_size == sum(p.stat().st_size for p in parts) - (len(parts)-1)*len(header)}")
 assert len(mhdr) == 33 and len(mrows) == exp and mrows == seq
 
 good = [r for r in mrows if len(r) == 33 and "\x00" not in ",".join(r)]
@@ -63,7 +65,7 @@ full = Counter(tuple(r) for r in good)
 print(f"Exact duplicate rows         : {sum(c-1 for c in full.values() if c > 1)}")
 key = Counter((r[0], r[1], r[4]) for r in good)
 print(f"Duplicate (match_id, innings, innings_ball_num): {sum(c-1 for c in key.values() if c > 1)}")
-for i in range(4):
+for i in range(len(parts) - 1):
     a, b = per_part[i][-1], per_part[i+1][0]
     print(f"Seam P{i+1}->P{i+2}: last=({a[0]},inn {a[1]},ball {a[4]})  next=({b[0]},inn {b[1]},ball {b[4]})")
 print("merged sha256:", hashlib.sha256(out.read_bytes()).hexdigest())

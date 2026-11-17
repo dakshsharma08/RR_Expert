@@ -1,6 +1,40 @@
 # Data recovery report: `ball_by_ball.csv`
 
-**Status: not yet validated for analysis. Clutch Index work is paused.**
+## 0. Resolution (two-part upload)
+
+**Status: resolved.** The two-part upload (`ball_by_ball_part_1.csv` + `ball_by_ball_part_2.csv`) passes every check in section 10, with 0 warnings. It is now the active dataset, v2. The full validator output is in `reports/validation_v2_two_part_upload.md`.
+
+**Size and integrity**
+- 200,999 data rows and 33 columns, matching your expected total.
+- No duplicate rows and no damaged lines.
+- All 193,773 intact v1 rows are present, unchanged and in the same order.
+
+**Byte-level proof**
+- v2 is the v1 file with only the two damaged lines replaced.
+- The replacement bytes are exactly as long as the zero blocks (737,858 and 732,429 bytes). So the blocks had overwritten the data in place, without shifting anything.
+- Each recovered stretch begins and ends with exactly the text that survived next to its block.
+
+**What the two blocks really contained (now verified):**
+
+| Block | Rows | Contents |
+|---|---:|---|
+| 1 | 3,625 | The rest of 23673 BAN v AFG and the start of 25159 NZ v ENG. Plus 15 full T20 internationals: BAN v AFG, IND v WI ×5, NZ v UAE ×3, IND v IRE ×2, SA v AUS ×3, NZ v ENG. Dated 16 Jul – 3 Sep 2023 |
+| 2 | 3,601 | The rest of 40736 CSK v SRH and the start of 40752 LSG v RCB. Plus **15 IPL 2025 league matches, ids 40737–40751, dated 26 Apr – 8 May 2025**. RR's three: RR v GT (28 Apr), MI v RR (1 May), RR v KKR (4 May) |
+
+**How the earlier statements held up**
+- The size estimate in section 7 was close: about 3,626 and 3,598 rows, against 3,625 and 3,601 actual.
+- All 15 absent IPL 2025 league fixtures turned out to be inside Block 2.
+- The fixtures I withdrew in section 9 were in fact correct. Withdrawing them was still right, because at the time the data could not verify them.
+
+**What remains, and is not damage**
+- **2024:** 3 league games are absent from the source itself, since neither block held any 2024 data. One of them is an RR game.
+- **2025:** PBKS v DC appears twice: 40751 stopped after 63 balls, and 43057 is a later full game. RCB v KKR appears once.
+
+Sections 1–11 below describe the state before the two-part upload and are kept as the record.
+
+---
+
+**Status before the two-part upload: not yet validated for analysis. Clutch Index work is paused.**
 
 ## 1. Summary
 

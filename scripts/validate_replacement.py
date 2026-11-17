@@ -8,8 +8,8 @@ Nothing in data/source_parts, data/backup or data/ball_by_ball.csv(.gz) is ever 
 Usage (run from the repo root):
   # replace only some parts (others come from the reference originals)
   python3 -I scripts/validate_replacement.py --replace 2=/path/Part_2.csv --replace 4=/path/Part_4.csv
-  # all five parts (use this if the clean file was re-split at different row boundaries)
-  python3 -I scripts/validate_replacement.py --parts P1.csv P2.csv P3.csv P4.csv P5.csv
+  # a complete set of parts in order, any number (e.g. the file re-split at different boundaries)
+  python3 -I scripts/validate_replacement.py --parts P1.csv P2.csv [P3.csv ...]
   # one complete ball_by_ball.csv
   python3 -I scripts/validate_replacement.py --full /path/ball_by_ball.csv
 Options:
@@ -35,7 +35,9 @@ csv.field_size_limit(sys.maxsize)   # the damaged lines are ~735 KB long
 REF_DIR = ROOT / "data" / "source_parts"
 MANIFEST = ROOT / "data" / "MANIFEST.sha256"
 PROTECTED = [ROOT / "data" / "backup", ROOT / "data" / "source_parts",
-             ROOT / "data" / "ball_by_ball.csv", ROOT / "data" / "ball_by_ball.csv.gz"]
+             ROOT / "data" / "ball_by_ball.csv", ROOT / "data" / "ball_by_ball.csv.gz",
+             ROOT / "data" / "source_parts_v2", ROOT / "data" / "ball_by_ball_v2.csv",
+             ROOT / "data" / "ball_by_ball_v2.csv.gz"]
 
 INT_COLS = ["match_id", "innings", "overid", "over_ball_num", "innings_ball_num", "batting_team_id",
             "bowling_team_id", "striker_id", "non_striker_id", "bowler_id", "batting_order", "runs",
@@ -385,7 +387,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--replace", action="append", metavar="N=FILE")
-    g.add_argument("--parts", nargs=5, metavar="FILE")
+    g.add_argument("--parts", nargs="+", metavar="FILE")
     g.add_argument("--full", metavar="FILE")
     ap.add_argument("--out")
     ap.add_argument("--report")
