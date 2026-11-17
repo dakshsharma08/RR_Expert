@@ -263,7 +263,9 @@ summary = dict(
                   bowl_score=r1(btp.loc["bowl", "score_hit_rate_excl"]), bowl_naive=r1(btp.loc["bowl", "naive_hit_rate_excl"]),
                   bowl_diff_lo=r1(btp.loc["bowl", "hit_diff_lo80"]), bowl_diff_hi=r1(btp.loc["bowl", "hit_diff_hi80"]),
                   bat_rho=r1(btp.loc["bat", "spearman_score_outcome"], 2), bat_rho_naive=r1(btp.loc["bat", "spearman_naive_outcome"], 2),
-                  bowl_rho=r1(btp.loc["bowl", "spearman_score_outcome"], 2), bowl_rho_naive=r1(btp.loc["bowl", "spearman_naive_outcome"], 2)),
+                  bowl_rho=r1(btp.loc["bowl", "spearman_score_outcome"], 2), bowl_rho_naive=r1(btp.loc["bowl", "spearman_naive_outcome"], 2),
+                  bat_base=r1(btp.loc["bat", "base_rate_random_pick"]), bowl_base=r1(btp.loc["bowl", "base_rate_random_pick"]),
+                  bat_claim=str(btp.loc["bat", "claim"]), bowl_claim=str(btp.loc["bowl", "claim"])),
     effective_weights={f"{r.role}_{r.component}": r1(r.effective_weight, 3) for r in comp.itertuples()},
     sens_min_overlap=r1(sens.top10_overlap_pct.min(), 0),
     robustness={f"{r.variant}_{r.role}": r1(r.top20_overlap_pct, 0) for r in rob.itertuples()},
@@ -272,7 +274,8 @@ summary = dict(
     top_gaps=[g["area"] for g in gap_rows if g["gap"] is not None and g["gap"] < 0][:2],
     season_offsets={int(r.season): r1(r.mean_rae_per_ball, 3) for r in offs.itertuples()},
 )
-verdict_word = "persistence not demonstrated"
+verdict_word = ("evidence of persistence" if all("evidence of persistence" in str(btp.loc[r_, "claim"]) for r_ in ("bat", "bowl"))
+                else "persistence not demonstrated")
 summary["claim"] = f"Historical pressure-performance indicator; {verdict_word}. Its ability to predict IPL 2027 is not established (D15)."
 squad["still_lacks"] = (f"Even with Plan A, RR's measured weakness is {summary['top_gaps'][0].split(': ')[1].lower()}-overs batting under pressure; "
                         f"the picks narrow the gap but no option in an assumed Rs 15 cr purse closes it with certainty.") if summary["top_gaps"] else ""
@@ -293,6 +296,7 @@ method = dict(
     wp_eval=wpe.to_dict("records"), calibration=cal.to_dict("records"), boosts=bcorr.to_dict("records"),
     overlap_balls=ovb.to_dict("records"), shares=shares.to_dict("records"), offsets=offs.to_dict("records"),
     data_notes=notes0.fillna("").to_dict("records"),
+    too_close=(pd.read_csv(TABLES / "step4_too_close_to_call.csv").to_dict("records") if (TABLES / "step4_too_close_to_call.csv").exists() else []),
     facts=facts[["id", "topic", "fact", "value", "status", "source1_url", "source1_published", "verified_on"]].to_dict("records"),
     assumptions=assum.to_dict("records"),
     limitations=[
@@ -302,7 +306,7 @@ method = dict(
         "The 2023 model learned from one season (2022) only.",
         "Expected runs from earlier matches trail scoring jumps: mean RAE per ball +0.02 (2023), +0.04 (2024), +0.00 (2025), +0.02 (2026). Season-centred check: top-20 unchanged 100%.",
         "Match impact (WPA) and pressure drop showed no detectable player differences at these sample sizes.",
-        "Backtest: no demonstrated persistence for batters; for bowlers, overall economy predicts next-season pressure performance better than the score.",
+        "Backtest: persistence of the score from one season to the next is not demonstrated (small samples; see Method & Proof for hit rates against naive and random-pick baselines).",
         "Fielding is not in the data; wicketkeeper and captaincy are not identifiable.",
         "Ages, injuries and availability are not verifiable here; the shortlist is conditional on the official auction list."],
     stamp=dict(last_match=str(matches.match_date.max()), build=datetime.date.today().isoformat(), seed=SEED, data_sha256=RAW_SHA256),
@@ -330,7 +334,7 @@ summary["exec_summary"] = [
     f"We rated {summary['scorable_bat']} batters, {summary['scorable_bowl']} bowlers and {summary['scorable_ar']} all-rounders on how they performed when a ball could swing the match (IPL 2023–26).",
     f"RR's measured gaps: {', '.join(g.split(': ')[1].lower() + '-overs batting' for g in summary['top_gaps'])} under pressure; RR's bowling under pressure is above league in every phase.",
     f"Must-Back if available: {', '.join(summary['must_back'])}. Plan A in an assumed Rs 15 cr purse: {', '.join(summary['planA'])}.",
-    f"Honest test: the score did not beat a naive ranking at predicting next season (batters {summary['backtest']['bat_score']}% v {summary['backtest']['bat_naive']}%; bowlers {summary['backtest']['bowl_score']}% v {summary['backtest']['bowl_naive']}%).",
+    f"Honest test (top 10 still above average next season): batters {summary['backtest']['bat_score']}% v naive {summary['backtest']['bat_naive']}% v random pick {summary['backtest']['bat_base']}%; bowlers {summary['backtest']['bowl_score']}% v {summary['backtest']['bowl_naive']}% v {summary['backtest']['bowl_base']}%. Verdict: {verdict_word}.",
     "So read it as proof of past pressure performance, not a promise; prices, ages and availability are unverified assumptions to recheck before 16 Dec.",
 ]
 

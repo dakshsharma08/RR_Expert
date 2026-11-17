@@ -68,6 +68,9 @@ def descriptive(rows, role):
         rec[f"High_{key}_death"] = 100 * d.rae.sum() / d.balls.sum() if d.balls.sum() else np.nan
         rec["High_balls_death"] = d.balls.sum()
         if role == "bowl":
+            hd = hi[hi.phase == "Death"]
+            rec["High_death_econ"] = 6 * hd.runs.sum() / hd.legal.sum() if hd.legal.sum() else np.nan
+            rec["High_death_legal"] = hd.legal.sum()
             dd = g[g.phase == "Death"]
             rec["death_econ_all"] = 6 * dd.runs.sum() / dd.legal.sum() if dd.legal.sum() else np.nan
             rec["death_legal_all"] = dd.legal.sum()
@@ -134,6 +137,13 @@ if __name__ == "__main__":
         df["rank"] = df.score.rank(ascending=False, method="min").astype(int)
     sb.sort_values("score", ascending=False).reset_index().to_csv(TABLES / "step4_scores_batters.csv", index=False)
     sw.sort_values("score", ascending=False).reset_index().to_csv(TABLES / "step4_scores_bowlers.csv", index=False)
+    tc = []
+    for role, df in (("bat", sb), ("bowl", sw)):
+        t10 = df.sort_values("score", ascending=False).head(10)
+        pairs = [(a, b_) for i_, a in enumerate(t10.index) for b_ in t10.index[i_ + 1:]]
+        sep = sum(1 for a, b_ in pairs if t10.score_lo80[a] > t10.score_hi80[b_] or t10.score_lo80[b_] > t10.score_hi80[a])
+        tc.append(dict(role=role, top10_pairs=len(pairs), pairs_separated_by_80pct_ranges=sep, pairs_too_close_to_call=len(pairs) - sep))
+    pd.DataFrame(tc).to_csv(TABLES / "step4_too_close_to_call.csv", index=False)
     ar_ids = sb.index.intersection(sw.index)
     bw = bat_s.groupby("player_id").agg(bat_wpa=("wpa", "sum"), bat_matches=("match_id", "nunique"))
     ow = bowl_s.groupby("player_id").agg(bowl_wpa=("wpa", "sum"), bowl_matches=("match_id", "nunique"))
@@ -170,6 +180,10 @@ if __name__ == "__main__":
                 w = dict(P.WEIGHTS); w[c] *= (1 + d); tot = sum(w.values()); w = {k: v / tot for k, v in w.items()}
                 alt, _ = role_scores(rows, role, 2026, mn, weights=w, boot=False)
                 sens.append(dict(role=role, component=c, change=d, top10_overlap_pct=100 * len(top & topk(alt.score)) / 10))
+        for label, w in (("skill_only", {"S": 1.0, "I": 0.0, "H": 0.0, "C": 0.0}), ("consistency_only", {"S": 0.0, "I": 0.0, "H": 0.0, "C": 1.0}),
+                         ("equal_weights", {"S": 0.25, "I": 0.25, "H": 0.25, "C": 0.25})):
+            alt, _ = role_scores(rows, role, 2026, mn, weights=w, boot=False)
+            sens.append(dict(role=role, component=label, change=0.0, top10_overlap_pct=100 * len(top & topk(alt.score)) / 10))
     pd.DataFrame(sens).to_csv(TABLES / "step4_sensitivity.csv", index=False)
 
     # ------------------------------------------------ robustness across pressure definitions (D25) + close-game comparison (D8)
@@ -191,6 +205,7 @@ if __name__ == "__main__":
             common = base.index.intersection(alt.index)
             rob.append(dict(variant=vname, role=role, scorable_main=len(base), scorable_variant=len(alt),
                             top20_overlap_pct=100 * len(topk(base.score, 20) & topk(alt.score, 20)) / 20,
+                            top10_overlap_pct=100 * len(topk(base.score, 10) & topk(alt.score, 10)) / 10,
                             spearman_common=float(spearmanr(base.score.reindex(common), alt.score.reindex(common)).correlation)))
     rb = pd.DataFrame(rob)
     rb.to_csv(TABLES / "step4_definition_robustness.csv", index=False)
@@ -203,72 +218,92 @@ if __name__ == "__main__":
     pd.concat(cg).to_csv(TABLES / "step4_close_game_comparison.csv", index=False)
 
     # ------------------------------------------------ backtest (D6, D16): history 2023..N-1 -> outcome in N
+    # D31: top-10 membership uses EXPECTED inclusion under random tie-breaking (ties at the cut share the remaining
+    # slots), so results never depend on sort order; the random-pick base rate is reported.
+    def incl_prob(series, k=10, ascending=False):
+        s_ = series.dropna().sort_values(ascending=ascending)
+        if len(s_) <= k:
+            return pd.Series(1.0, index=s_.index)
+        cut = s_.iloc[k - 1]
+        better = (s_ < cut) if ascending else (s_ > cut)
+        tied = np.isclose(s_, cut)
+        p = pd.Series(0.0, index=s_.index)
+        p[better] = 1.0
+        p[tied] = (k - better.sum()) / tied.sum()
+        return p
+
     det = []
     for N in (2024, 2025, 2026):
-        hist = [s for s in SCORED if s < N]
-        for role, rows_all, mn, base_col in (("bat", bat, BT_MIN_BAT, "sr"), ("bowl", bowl, BT_MIN_BOWL, "econ")):
+        hist = [s_ for s_ in SCORED if s_ < N]
+        for role, rows_all, mn in (("bat", bat, BT_MIN_BAT), ("bowl", bowl, BT_MIN_BOWL)):
             h = rows_all[rows_all.season.isin(hist)]
-            res, _ = role_scores(h, role, max(hist), mn, boot=False)
-            # naive baseline: overall SR (bat) / economy (bowl) over ALL balls in the history window, same entry filter
+            res, sc_ = role_scores(h, role, max(hist), mn, boot=False)
             if role == "bat":
-                hb = h  # pressure-scored balls only include eligible matches; use same balls for fairness
-                agg = hb.groupby("player_id").agg(r=("runs", "sum"), n=("balls", "sum"))
-                naive = (100 * agg.r / agg.n).reindex(res.index)
-                naive_top = topk(naive)
+                agg = h.groupby("player_id").agg(r=("runs", "sum"), n=("balls", "sum"))
+                naive = (100 * agg.r / agg.n).reindex(res.index); pn = incl_prob(naive)
             else:
                 agg = h.groupby("player_id").agg(r=("runs", "sum"), n=("legal", "sum"))
-                naive = (6 * agg.r / agg.n).reindex(res.index)
-                naive_top = topk(naive, ascending=True)
-            # outcome in season N
+                naive = (6 * agg.r / agg.n).reindex(res.index); pn = incl_prob(naive, ascending=True)
+            ps = incl_prob(res.score)
             o = rows_all[(rows_all.season == N) & (rows_all.bucket == "High")]
             ostat = o.groupby("player_id").agg(n=("balls" if role == "bat" else "legal", "sum"), r=("rae", "sum"), d=("balls", "sum"))
             league = o.rae.sum() / o.balls.sum()
             ostat["per_ball"] = ostat.r / ostat.d
-            ostat["assessable"] = ostat.n >= BT_OUT_MIN
-            ostat["above_avg"] = ostat.per_ball > league
-            score_top = topk(res.score)
             for pid in res.index:
-                os_ = ostat.reindex([pid]).iloc[0] if pid in ostat.index else None
+                os_ = ostat.loc[pid] if pid in ostat.index else None
+                assess = bool(os_ is not None and os_.n >= BT_OUT_MIN)
                 det.append(dict(fold=N, role=role, player_id=pid, player_name=names.get(pid, pid), score=res.score[pid],
-                                naive=naive.get(pid, np.nan), in_score_top10=pid in score_top, in_naive_top10=pid in naive_top,
-                                assessable=bool(os_ is not None and os_.assessable),
-                                outcome_per_ball=(os_.per_ball if os_ is not None else np.nan),
-                                above_avg=bool(os_ is not None and os_.assessable and os_.above_avg),
-                                league_per_ball=league))
+                                naive=naive.get(pid, np.nan), p_score_top10=float(ps.get(pid, 0.0)), p_naive_top10=float(pn.get(pid, 0.0)),
+                                assessable=assess, outcome_per_ball=(os_.per_ball if os_ is not None else np.nan),
+                                above_avg=bool(assess and os_.per_ball > league), league_per_ball=league,
+                                informative_components="".join(c for c in P.WEIGHTS if sc_.informative[c])))
     det = pd.DataFrame(det)
     det.to_csv(TABLES / "step4_backtest_detail.csv", index=False)
+
+    def rates(d, col):
+        a = d[d.assessable]
+        excl = 100 * (a[col] * a.above_avg).sum() / a[col].sum() if a[col].sum() > 0 else np.nan
+        miss = 100 * (d[col] * d.above_avg).sum() / d[col].sum() if d[col].sum() > 0 else np.nan
+        return excl, miss, float(a[col].sum())
+
     summ = []
     for role in ("bat", "bowl"):
         for fold in [2024, 2025, 2026, "pooled"]:
             d = det[det.role == role] if fold == "pooled" else det[(det.role == role) & (det.fold == fold)]
             rec = dict(role=role, fold=fold, qualified=len(d))
-            for which in ("score", "naive"):
-                t = d[d[f"in_{which}_top10"]]
-                a = t[t.assessable]
-                rec[f"{which}_top10_assessable"] = len(a)
-                rec[f"{which}_hit_rate_excl"] = 100 * a.above_avg.mean() if len(a) else np.nan
-                rec[f"{which}_hit_rate_as_miss"] = 100 * t.above_avg.sum() / len(t) if len(t) else np.nan
+            for which, col in (("score", "p_score_top10"), ("naive", "p_naive_top10")):
+                e_, m_, n_ = rates(d, col)
+                rec[f"{which}_hit_rate_excl"] = e_; rec[f"{which}_hit_rate_as_miss"] = m_; rec[f"{which}_top10_assessable_exp"] = n_
             a = d[d.assessable]
-            rec["spearman_score_outcome"] = float(spearmanr(a.score, a.outcome_per_ball).correlation) if len(a) > 5 else np.nan
-            sgn = -1 if role == "bowl" else 1   # naive economy: lower is better
-            rec["spearman_naive_outcome"] = float(spearmanr(sgn * a.naive, a.outcome_per_ball).correlation) if len(a) > 5 else np.nan
+            rec["base_rate_random_pick"] = 100 * a.above_avg.mean() if len(a) else np.nan
             rec["assessable_qualified"] = len(a)
+            rec["spearman_score_outcome"] = float(spearmanr(a.score, a.outcome_per_ball).correlation) if len(a) > 5 else np.nan
+            sgn = -1 if role == "bowl" else 1
+            rec["spearman_naive_outcome"] = float(spearmanr(sgn * a.naive, a.outcome_per_ball).correlation) if len(a) > 5 else np.nan
+            if fold != "pooled":
+                rec["informative_components_in_fold"] = d.informative_components.iloc[0] if len(d) else ""
             summ.append(rec)
     summ = pd.DataFrame(summ)
-    # bootstrap 80% interval of pooled hit-rate difference (resample players within each fold, recompute top 10s)
-    for role in ("bat", "bowl"):
+    for role in ("bat", "bowl"):     # bootstrap 80% interval of the pooled hit-rate difference (resample players within fold)
         diffs = []
         d0 = det[det.role == role]
         for _ in range(1000):
-            hs, hn = [], []
+            hs = hn = ws = wn = 0.0
             for fold, d in d0.groupby("fold"):
                 smp = d.sample(len(d), replace=True, random_state=int(rng.integers(1e9))).drop_duplicates("player_id")
-                st = smp.nlargest(10, "score"); nt = smp.nsmallest(10, "naive") if role == "bowl" else smp.nlargest(10, "naive")
-                hs += list(st[st.assessable].above_avg); hn += list(nt[nt.assessable].above_avg)
-            if hs and hn:
-                diffs.append(100 * (np.mean(hs) - np.mean(hn)))
+                ps = incl_prob(smp.set_index("player_id").score)
+                pn = incl_prob(smp.set_index("player_id").naive, ascending=(role == "bowl"))
+                a = smp.set_index("player_id"); a = a[a.assessable]
+                hs += (ps.reindex(a.index).fillna(0) * a.above_avg).sum(); ws += ps.reindex(a.index).fillna(0).sum()
+                hn += (pn.reindex(a.index).fillna(0) * a.above_avg).sum(); wn += pn.reindex(a.index).fillna(0).sum()
+            if ws > 0 and wn > 0:
+                diffs.append(100 * (hs / ws - hn / wn))
         m = summ.index[(summ.role == role) & (summ.fold == "pooled")]
         summ.loc[m, "hit_diff_lo80"] = np.percentile(diffs, 10); summ.loc[m, "hit_diff_hi80"] = np.percentile(diffs, 90)
+        lo, hi_ = np.percentile(diffs, 10), np.percentile(diffs, 90)
+        pr = summ.loc[m].iloc[0]
+        summ.loc[m, "claim"] = ("historical indicator; evidence of persistence" if (pr.score_hit_rate_excl > pr.naive_hit_rate_excl and lo > 0)
+                                else "historical indicator; persistence not demonstrated")
     summ.to_csv(TABLES / "step4_backtest_summary.csv", index=False)
     print(summ.round(2).to_string())
     print(rb.round(2).to_string())

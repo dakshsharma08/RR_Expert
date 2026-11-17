@@ -7,10 +7,10 @@
   "wp_eligible": 353,
   "last_match": "2026-05-31",
   "in_scope": 257,
-  "scorable_bat": 45,
+  "scorable_bat": 47,
   "scorable_bowl": 71,
   "scorable_ar": 8,
-  "not_scorable": 149,
+  "not_scorable": 147,
   "brier": {
    "2023": 0.217,
    "2024": 0.166,
@@ -28,53 +28,59 @@
    "2026_2": 0.121
   },
   "high_share": {
-   "2023": 22.7,
+   "2023": 22.8,
    "2024": 14.3,
-   "2025": 22.2,
-   "2026": 19.8
+   "2025": 22.4,
+   "2026": 19.9
   },
   "backtest": {
-   "bat_score": 57.1,
-   "bat_naive": 50.0,
-   "bat_diff_lo": -11.5,
-   "bat_diff_hi": 10.0,
-   "bowl_score": 64.7,
-   "bowl_naive": 84.2,
-   "bowl_diff_lo": -25.0,
-   "bowl_diff_hi": -3.3,
-   "bat_rho": -0.02,
-   "bat_rho_naive": -0.16,
-   "bowl_rho": 0.11,
-   "bowl_rho_naive": 0.36
+   "bat_score": 42.9,
+   "bat_naive": 46.7,
+   "bat_diff_lo": -17.1,
+   "bat_diff_hi": 3.8,
+   "bowl_score": 72.8,
+   "bowl_naive": 75.0,
+   "bowl_diff_lo": -14.6,
+   "bowl_diff_hi": 4.4,
+   "bat_rho": -0.13,
+   "bat_rho_naive": -0.15,
+   "bowl_rho": -0.05,
+   "bowl_rho_naive": 0.29,
+   "bat_base": 50.8,
+   "bowl_base": 59.5,
+   "bat_claim": "historical indicator; persistence not demonstrated",
+   "bowl_claim": "historical indicator; persistence not demonstrated"
   },
   "effective_weights": {
-   "bat_S": 0.667,
-   "bat_I": 0.0,
-   "bat_H": 0.0,
-   "bat_C": 0.333,
-   "bowl_S": 0.667,
+   "bat_S": 0.4,
+   "bat_I": 0.25,
+   "bat_H": 0.15,
+   "bat_C": 0.2,
+   "bowl_S": 0.533,
    "bowl_I": 0.0,
-   "bowl_H": 0.0,
-   "bowl_C": 0.333
+   "bowl_H": 0.2,
+   "bowl_C": 0.267
   },
-  "sens_min_overlap": 100.0,
+  "sens_min_overlap": 40.0,
   "robustness": {
    "leverage_only_bat": 70.0,
-   "leverage_only_bowl": 70.0,
-   "rule_based_bat": 25.0,
-   "rule_based_bowl": 50.0,
+   "leverage_only_bowl": 80.0,
+   "rule_based_bat": 20.0,
+   "rule_based_bowl": 40.0,
    "with_close_game_bat": 85.0,
-   "with_close_game_bowl": 100.0,
-   "d18_strict_buckets_bat": 35.0,
-   "d18_strict_buckets_bowl": 45.0,
+   "with_close_game_bowl": 95.0,
+   "d18_strict_buckets_bat": 40.0,
+   "d18_strict_buckets_bowl": 65.0,
    "season_centred_bat": 100.0,
    "season_centred_bowl": 100.0
   },
   "planA": [
    "Vyshak Kumar",
+   "Xavier Bartlett",
+   "Mohsin Khan",
    "Abdul Samad",
-   "Venkatesh Iyer",
-   "Ashutosh Sharma"
+   "Ashutosh Sharma",
+   "Sameer Rizvi"
   ],
   "must_back": [
    "Ashutosh Sharma",
@@ -94,10 +100,10 @@
   },
   "claim": "Historical pressure-performance indicator; persistence not demonstrated. Its ability to predict IPL 2027 is not established (D15).",
   "exec_summary": [
-   "We rated 45 batters, 71 bowlers and 8 all-rounders on how they performed when a ball could swing the match (IPL 2023–26).",
+   "We rated 47 batters, 71 bowlers and 8 all-rounders on how they performed when a ball could swing the match (IPL 2023–26).",
    "RR's measured gaps: middle-overs batting, death-overs batting under pressure; RR's bowling under pressure is above league in every phase.",
-   "Must-Back if available: Ashutosh Sharma, Matheesha Pathirana, Patrick Cummins. Plan A in an assumed Rs 15 cr purse: Vyshak Kumar, Abdul Samad, Venkatesh Iyer, Ashutosh Sharma.",
-   "Honest test: the score did not beat a naive ranking at predicting next season (batters 57.1% v 50.0%; bowlers 64.7% v 84.2%).",
+   "Must-Back if available: Ashutosh Sharma, Matheesha Pathirana, Patrick Cummins. Plan A in an assumed Rs 15 cr purse: Vyshak Kumar, Xavier Bartlett, Mohsin Khan, Abdul Samad, Ashutosh Sharma, Sameer Rizvi.",
+   "Honest test (top 10 still above average next season): batters 42.9% v naive 46.7% v random pick 50.8%; bowlers 72.8% v 75.0% v 59.5%. Verdict: persistence not demonstrated.",
    "So read it as proof of past pressure performance, not a promise; prices, ages and availability are unverified assumptions to recheck before 16 Dec."
   ]
  },

@@ -122,13 +122,19 @@ wp_bowl = predict_states(b, R0 + bowler_runs, K0 + b.is_bowler_wicket.values.ast
 ns_out = wkt_any & ~striker_out & (b.player_out_id.astype(str) != "").values & (b.player_out_id.astype(str) != "nan").values
 wp_no_wkt = predict_states(b, R0 + b.total_runs.values, K0, B0 - legal)
 b["wpa_ball"] = b.wp_after - b.wp_before
-b["wpa_batter"] = np.where(b.is_wide.values.astype(bool), 0.0, wp_bat - b.wp_before.values)
+# G5 (critic Step 1-2 M3): batter gets the FULL change on balls faced, byes and leg-byes included, except a
+# non-striker's dismissal (charged to that player). On a wide the batter gets only his own dismissal component.
+wp_bat_full = predict_states(b, R0 + b.total_runs.values, K0 + striker_out, B0 - legal)
+wp_wide_nowkt = predict_states(b, R0 + b.total_runs.values, K0, B0 - legal)
+b["wpa_batter"] = np.where(b.is_wide.values.astype(bool), np.where(striker_out, wp_bat_full - wp_wide_nowkt, 0.0),
+                           wp_bat_full - b.wp_before.values)
 b["wpa_bowler"] = -(wp_bowl - b.wp_before.values)
 b["wpa_nonstriker_out"] = np.where(ns_out, b.wp_after.values - wp_no_wkt, 0.0)
 
 # ---------------------------------------------------------------- context boosts
 bb = b.legal_balls_before.values
-crr = np.where(bb > 0, b.team_runs_before.values * 6.0 / np.maximum(bb, 1), 0.0)
+# current run rate shrunk toward the par rate over the first 12 legal balls (critic Step 1-2: CRR = 0 on ball 1 maxed the boost)
+crr = (b.team_runs_before.values + (b.par.values / 120.0) * 12) * 6.0 / (bb + 12)
 need = (b.target_f - b.team_runs_before).clip(lower=0).values
 rrr = np.where(B0 > 0, need * 6.0 / np.maximum(B0, 1), 36.0)
 b["chase_pressure"] = np.where(b.innings == 2, np.clip((rrr - crr) / 6.0, 0, 1), 0.0)

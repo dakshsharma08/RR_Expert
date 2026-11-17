@@ -82,3 +82,39 @@
 - **Framing (D15):** a historical pressure-performance indicator. Its ability to predict 2027 is not established. For bowlers, overall economy is a better forward signal and is shown next to the score.
 - **Surprising:** the backtest samples are tiny (3–8 assessable players per fold top 10), so every hit rate is very noisy.
 - **Critic 2:** launched.
+
+## Checkpoint 4 (REVISED after Critics 1–2; supersedes the earlier Checkpoint 4 numbers)
+
+- **Did:**
+  - Fixed WPA so byes and leg-byes follow G5, and fixed the chase-pressure boost.
+  - Corrected the shrinkage: Kish effective n, and the right pressure-drop variance.
+  - Made the backtest robust to ties, and added a base rate.
+  - Tested and rejected the first-innings model change (D32).
+- **Effective weights:**
+  - batters: S 0.40 / I 0.25 / H 0.15 / C 0.20 (all components informative);
+  - bowlers: S 0.53 / H 0.20 / C 0.27 (WPA per ball has no detectable player signal).
+- **Backtest (pooled 2024–26, top 10 still above average next season):**
+  - batters: score 42.9% v naive 46.7% v random pick 50.8%; difference interval -17.1 to +3.8;
+  - bowlers: 72.8% v 75.0% v 59.5%; interval -14.6 to +4.4.
+  - Pre-registered verdict for both: "historical indicator; persistence not demonstrated".
+- **Too close to call:** 0 of 45 top-10 pairs are separated by their 80% ranges, for batters and for bowlers. The data identifies the top group, not the order within it.
+- **Robustness (top-20 overlap, batters / bowlers):**
+  - leverage-only: 70% / 80%
+  - with close-game boost: 85% / 95%
+  - season-centred: 100% / 100%
+  - strict D18 buckets: 40% / 65%
+  - rule-based: 20% / 40% (below 60%: rules flag situations, not how much a ball can swing the result)
+- **Weight sensitivity (top-10 overlap):** ±10% keeps 90–100%; skill-only 80%; consistency-only 40% / 60%; equal weights 90%.
+- **Changes since the earlier Checkpoint 4:** the top 10 overlaps 8/10 (batters) and 7/10 (bowlers) with the pre-correction version (kept as `*_v1_preD31.csv`).
+
+## Checkpoint 5: Auction lens (2026-11-17)
+
+- **Did:**
+  - Measured RR's gaps: the RR 2026 group against the league under High pressure, by phase.
+  - Built the conditional shortlist, optimiser Plans A/B, a sample XI, contrarian picks, the unsung hero, the avoid list and the not-scorable list.
+- **Gaps:** middle-overs batting and death-overs batting under pressure. RR's bowling is above league in every phase.
+- **Shortlist:** Must-Back Ashutosh Sharma, Matheesha Pathirana, Patrick Cummins. Plan A (assumed Rs 15 cr purse, 6 slots): Vyshak Kumar, Xavier Bartlett, Mohsin Khan, Abdul Samad, Ashutosh Sharma, Sameer Rizvi.
+- **Caveats:**
+  - Every external fact is UNKNOWN or REPORTED. Assumptions A1–A11 are tagged (availability, purse, price bands, nationality inferred from the data, keeper).
+  - The shortlist is conditional on the official auction list (recheck F2).
+- **Critic 3:** pending (to run on the Step 5 tables alongside the dashboard review).

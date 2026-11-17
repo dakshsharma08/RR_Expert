@@ -3,6 +3,7 @@
 Newest first. Each line: time (UTC), step, status, what was done, next action.
 
 | When | Step | Status | Done | Next |
+| 2026-11-17 | 1–5 | done | Steps 1–5 run end to end (`src/run_all.py`); Critics 0, 1, 2 handled (D31, D32); checkpoints 0–5 recorded | Dashboard and docs (agents running); notebook and video script (supervisor); Critic 3; Step 8 |
 |---|---|---|---|---|
 | 2026-11-17 | Mode | — | Autonomous mode (D22). Venue blocker logged (D23). Division of labour (D24) | Finish Step 0 gate |
 | 2026-11-17 | 0B venues | done (blocked) | All 367 venues UNKNOWN; network policy blocks the source sites | Re-run only if the hosts are allowed |

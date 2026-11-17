@@ -1,12 +1,15 @@
 role,component,change,top10_overlap_pct
-bat,S,-0.1,100.0
+bat,S,-0.1,90.0
 bat,S,0.1,100.0
 bat,I,-0.1,100.0
 bat,I,0.1,100.0
 bat,H,-0.1,100.0
 bat,H,0.1,100.0
 bat,C,-0.1,100.0
-bat,C,0.1,100.0
+bat,C,0.1,90.0
+bat,skill_only,0.0,80.0
+bat,consistency_only,0.0,40.0
+bat,equal_weights,0.0,90.0
 bowl,S,-0.1,100.0
 bowl,S,0.1,100.0
 bowl,I,-0.1,100.0
@@ -15,3 +18,6 @@ bowl,H,-0.1,100.0
 bowl,H,0.1,100.0
 bowl,C,-0.1,100.0
 bowl,C,0.1,100.0
+bowl,skill_only,0.0,80.0
+bowl,consistency_only,0.0,60.0
+bowl,equal_weights,0.0,90.0

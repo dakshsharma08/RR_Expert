@@ -21,3 +21,19 @@ The critic is a fresh sub-agent that did not build the work it reviews (Part 2).
 | Step 0 | 1 | Hard-coded literals; DEFINITIONS B hand-edited | #14 | Minor | yes | Kept; values are asserted in scripts and documented | Accepted |
 | Step 0 | 1 | Gate checks partly not independent | #15 | Minor | yes | Noted. The strongest evidence is the 10/10 season-leader match and the critic's own recomputation | Accepted |
 | Step 0 | 1 | DATA_AUDIT text: KKR/RCB played 13 in 2025 | #16 | Minor | yes | Text corrected | Fixed |
+| Step 1–2 | 1 | No leakage: truncation test bit-identical; cumulative-minus-own correct | `outputs/reviews/critic_step1_2.csv` | — | yes | None needed | Pass |
+| Step 1–2 | 1 | M1: first-innings model makes early wickets cost ~8 points | critic M1 | Major | yes | Tested against data: an over-1 wicket shifts the real win rate by −8.6 points. The model is consistent with the data; D32 rejects the change | Rejected with evidence |
+| Step 1–2 | 1 | M2: overconfident win probability at the end of chases (≤6 balls left) | critic M2 | Major | yes | Not fixable inside the approved simple model without a more complex model class (D13/D19). Disclosed as a limitation and named risk | Open → named risk |
+| Step 1–2 | 1 | M3: byes and leg-byes WPA broke G5 | critic M3 | Major | yes | Batter WPA = full change on balls faced (D31h) | Fixed |
+| Step 1–2 | 1 | M4: the D26 feature change was chosen after seeing test seasons | critic M4 | Major | yes | Disclosed in D26, the checkpoints and the limitations: model selection used test seasons (pooled Brier unchanged) | Disclosed |
+| Step 1–2 | 1 | M5: innings × phase offset in expected runs (first-innings death +0.06) | critic M5 | Major | yes | Disclosed as limitation R14. The season-centred check leaves the top-20 unchanged. Effect on chasing/setting split noted | Disclosed |
+| Step 1–2 | 1 | Chase-pressure boost maxed on ball 1 (current run rate 0) | critic minor | Minor | yes | Current run rate shrunk toward par over 12 balls (D31i) | Fixed |
+| Step 1–2 | 1 | Other minors: base-rate Brier is an oracle (renamed); no calibration chart file (drawn in dashboard/deck); boosts barely matter (reported); GBM a strawman (comparison only); K_REF chosen after shares (disclosed in D27) | critic minors | Minor | yes | Renamed / disclosed | Done |
+| Step 3–4 | 1 | BLOCKER: backtest fold scores collapse to consistency only, with ties decided by sort order | `critic_step3_4.csv` #1 | Blocker | yes | Expected inclusion under random tie-breaks (D31c); effective n (D31a) restores the skill component where identifiable; per-fold informative components reported | Fixed (re-run) |
+| Step 3–4 | 1 | D30 called "faithful", but it zeroes components | #2 | Major | yes | Reworded: D30 is an implementation guard. Pre-fix tables kept; both are reported | Fixed (wording) |
+| Step 3–4 | 1 | EB noise uses recency-weighted n | #3 | Major | yes | Kish effective n (D31a) | Fixed |
+| Step 3–4 | 1 | Pressure-drop variance doubled | #4 | Major | yes | σh²/nh + σl²/nl (D31b) | Fixed |
+| Step 3–4 | 1 | Bowler ranking barely informative; no too-close-to-call output | #5 | Major | yes | `step4_too_close_to_call.csv` added; profiles and the dashboard flag overlap; limitation stated | Fixed |
+| Step 3–4 | 1 | Backtest claims outrun the evidence; no base rate | #6 | Major | yes | Base rate added; pre-registered wording only (D31d, D31e) | Fixed |
+| Step 3–4 | 1 | Batter outs undercounted | #7 | Major | yes | Wides and non-striker outs counted (D31f) | Fixed |
+| Step 3–4 | 1 | Minors: vacuous sensitivity, missing top-10 overlaps, death economy, AR interval, splits without minimums | #8–20 | Minor | yes | Skill-only, consistency-only and equal-weight sensitivities added; top-10 overlaps added; High death economy added; splits show n in the profile; AR interval documented as an average of bounds | Mostly fixed |

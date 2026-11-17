@@ -93,7 +93,7 @@ for s in [2023, 2024, 2025, 2026]:
         br, lo, hi, ll, nm, nb = brier_ci(part)
         evals.append(dict(season=s, innings=inn, train_matches=train.match_id.nunique(), train_seasons=f"2022-{s-1}",
                           test_matches=nm, test_balls=nb, brier=br, brier_lo80=lo, brier_hi80=hi, log_loss=ll,
-                          coin_flip_brier=0.25, base_rate_brier=float(((part.y - part.y.mean()) ** 2).mean())))
+                          coin_flip_brier=0.25, base_rate_brier_oracle=float(((part.y - part.y.mean()) ** 2).mean())))
     # calibration (10 equal-width bins) with match-bootstrap intervals
     live = live.assign(bin=np.clip((live.p * 10).astype(int), 0, 9))
     mids = live.match_id.unique()
