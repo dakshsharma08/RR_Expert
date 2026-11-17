@@ -1,12 +1,10 @@
-<!-- Verbatim copy of the RR Clutch Index Master Prompt as provided by the user (second, fuller version of Part 1). Do not edit. -->
-RR CLUTCH INDEX — MASTER PROMPT
+# RR CLUTCH INDEX — MASTER PROMPT
 
 Layout: Part 1 Mission · Part 2 How you work · Part 3 Golden rules · Part 4 Before you start · Part 5 Shared definitions · Part 6 Steps 0–8 · Part 7 Dashboard spec · Part 8 Output style
 
-
 ---
 
-PART 1 — THE MISSION
+## PART 1 — THE MISSION
 
 I'm competing in "SupeRR Selector Season 2", run by Rajasthan Royals (RR). The raw material is a ball-by-ball IPL dataset that I will provide.
 
