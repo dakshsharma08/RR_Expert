@@ -355,8 +355,7 @@ _sc_txt = " and ".join(f"{r.top20_overlap_pct:.0f}% for {'batters' if r.role == 
 LIMITS_SLIDE = [
     "Venues are unknown for every match (source sites were blocked), so there is no home-ground adjustment.",
     "No outside fact could be checked (squads, prices, ages, purse, who is in the auction): all are reported, unknown or [ASSUMPTION]s.",
-    f"The win-chance forecast has little skill in first innings (error {f3(brier_1.min())}\u2013{f3(brier_1.max())} against {coin:.2f} for a coin flip) and is clearly better in chases.",
-    "The 2023 forecast learned from one season only.",
+    f"The win-chance forecast has little skill in first innings (error {f3(brier_1.min())}\u2013{f3(brier_1.max())} against {coin:.2f} for a coin flip) and is clearly better in chases. The 2023 forecast learned from one season only.",
     f"Scoring rose faster than the 'expected runs' benchmark built from earlier matches; a season-adjusted check kept {_sc_txt} of the top 20.",
     "Fielding, wicketkeeping and captaincy are not in the data.",
 ] + ([f"Some parts of the score could not tell players apart ({NO_INFO_PLAIN}) and carry no weight."] if NO_INFO else []) + [
@@ -466,7 +465,25 @@ def table(headers, rows, cls="tbl", aligns=None, raw=False):
     return f"<table class='{cls}'><thead><tr>{h}</tr></thead><tbody>{body}</tbody></table>"
 
 PLACEHOLDER = "Dashboard URL and QR code: pending, to be added when the public link exists"
+# the dashboard URL is read from outputs/tables/dashboard_url.txt (one line) only if that file exists; nothing is ever invented
+URL_FILE = TABLES / "dashboard_url.txt"
+DASH_URL = (URL_FILE.read_text().strip().splitlines() or [""])[0].strip() if URL_FILE.exists() else ""
+DASH_URL = DASH_URL or None
+
+def qr_uri(url):
+    """QR code (error correction M) as a PNG data URI; 29 modules x 5 px is rendered at 100 px (about 2.6 cm on print)"""
+    import qrcode
+    from qrcode.constants import ERROR_CORRECT_M
+    q = qrcode.QRCode(error_correction=ERROR_CORRECT_M, box_size=10, border=4)
+    q.add_data(url); q.make(fit=True)
+    buf = io.BytesIO(); q.make_image(fill_color="black", back_color="white").save(buf, format="PNG")
+    return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode(), q
+
 def placeholder_box(compact=False):
+    if DASH_URL:
+        uri, _ = qr_uri(DASH_URL)
+        return (f"<div class='ph-real'><img src='{uri}' width='100' height='100' alt='QR code for the dashboard'>"
+                f"<div><b>Scan to open the interactive dashboard</b><br><span class='url'>{esc(DASH_URL)}</span></div></div>")
     return (f"<div class='ph{' ph-c' if compact else ''}'><div class='ph-sq'>QR<br>pending</div>"
             f"<div><b>{esc(PLACEHOLDER)}</b><br><span>No link has been invented and no QR code was generated.</span></div></div>")
 
@@ -485,6 +502,9 @@ th.r,td.r{{text-align:right;font-variant-numeric:tabular-nums}} th.c,td.c{{text-
 .ph{{display:flex;gap:12px;align-items:center;border:2px dashed var(--muted);border-radius:8px;padding:10px 14px;background:#FFFBEA}}
 .ph-sq{{flex:none;width:62px;height:62px;border:2px dashed var(--muted);display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;font-weight:700;color:var(--muted);background:#fff}}
 .ph span{{color:var(--muted);font-size:.9em}}
+.ph-real{{display:flex;gap:12px;align-items:center;border:2px solid var(--blue);border-radius:8px;padding:6px 12px;background:#fff}}
+.ph-real img{{flex:none;width:100px;height:100px;image-rendering:pixelated}}
+.ph-real .url{{font-size:.9em;color:var(--blue);word-break:break-all}}
 """
 
 # ------------------------------------------------------------------------------------------ B: the deck
@@ -540,7 +560,7 @@ def deck_html():
     body = (f"<div class='cols'><div class='col' style='flex:1.25'><h2>Five lines for selectors</h2><ol class='ex'>"
             + "".join(f"<li>{inline(l)}</li>" for l in EXEC) + "</ol></div>"
             f"<div class='col' style='flex:1'><h2>Back {'this one' if n_must == 1 else 'these ' + NUMW[n_must]} first</h2>{cards}"
-            f"<div class='small'>{'The ranges overlap, so the order is too close to call. ' if (mb_sep == 0 and n_must > 1) else ''}80% range = we are 80% sure the true value sits inside it. A wide range means we are less sure.</div></div></div>")
+            f"<div class='small'>{'The ranges overlap, so the order is too close to call. ' if (mb_sep == 0 and n_must > 1) else ''}80% range = we are 80% sure the true value sits inside it. A wide range means we are less sure.</div><div style='margin-top:10px'>{placeholder_box(True)}</div></div></div>")
     sl.append(slide(1, "Executive summary",
                     f"RR Clutch Index: back {names(list(must.player_name))} first, and treat the Clutch Score as a record, not a forecast.", body,
                     f"Pursue {'these' if n_must > 1 else 'this'} only if {'they reach' if n_must > 1 else 'he reaches'} the auction pool; every price and availability here is an assumption to recheck before the auction ({AUCTION_DATE}, reported, not confirmed)."))
@@ -664,8 +684,8 @@ def deck_html():
     howto = "".join(f"<li>{inline(x)}</li>" for x in HOW_TO_USE)
     body = (f"<div class='cols'><div class='col' style='flex:0.95'><h2>Backtest: did the top 10 stay above average next season?</h2><img class='chart' src='{b64(CH['backtest'])}'>"
             f"<p class='small'>Pooled 2024–26. {esc(hit_line(bat_p, 'Batters'))} ({esc(CLAIM_BAT)}). {esc(hit_line(bowl_p, 'Bowlers'))} ({esc(CLAIM_BOWL)}). 80% interval = range we are 80% sure holds the true difference. Only {cnt(bat_p.score_top10_assessable)} batter and {cnt(bowl_p.score_top10_assessable)} bowler player-seasons in the top 10 could be assessed (expected counts), so every rate is noisy.</p></div>"
-            f"<div class='col' style='flex:1.05'><div class='howto'><b>How to use this score</b><ul>{howto}</ul></div><h2 style='margin-top:8px'>Limits, in plain words</h2><ul class='lim' style='font-size:11.2px;line-height:1.22'>{lim}</ul>"
-            f"<p class='small' style='margin:3px 0'>External facts: {ver} verified of {len(METHOD['facts'])}. Full detail: Methodology and Limitations note.</p>{placeholder_box(True)}</div></div>")
+            f"<div class='col' style='flex:1.05'><div class='howto'><b>How to use this score</b><ul>{howto}</ul></div><h2 style='margin-top:6px'>Limits, in plain words ({ver} of {len(METHOD['facts'])} external facts verified; detail in the Methodology and Limitations note)</h2><ul class='lim' style='font-size:11px;line-height:1.2'>{lim}</ul>"
+            f"<div style='margin-top:4px'>{placeholder_box(True)}</div></div></div>")
     sl.append(slide(7, "Risks and limits",
                     "The Clutch Score describes the past: " + ("it did not clearly beat a simple ranking at predicting next season." if not BEAT else "it beat a simple ranking in the backtest, but the samples are tiny."), body,
                     "Use the score to build the shortlist and set walk-away prices, never as a forecast" + ("; for bowlers, check overall economy next to the score before bidding." if bowl_p.spearman_naive_outcome > bowl_p.spearman_score_outcome else ".")))
@@ -688,6 +708,10 @@ img.chart{display:block;width:100%;height:auto;margin-top:2px}
 .small{font-size:9px;color:var(--muted);line-height:1.28}
 .howto{background:#EAF0FF;border-left:5px solid var(--blue);border-radius:0 5px 5px 0;padding:4px 8px;font-size:9.4px;line-height:1.28;margin-bottom:4px}
 .howto ul{padding-left:13px}
+.qrrow{display:flex;gap:10px;align-items:flex-start}.qrleft{flex:1;min-width:0}
+.qrside{flex:none;width:118px;border:1.5px solid var(--blue);border-radius:6px;padding:4px;text-align:center;font-size:7.8px;line-height:1.2}
+.qrside img{display:block;margin:0 auto 3px auto;width:100px;height:100px;image-rendering:pixelated}
+.qrside b{display:block}.qrside .url{display:block;color:var(--blue);word-break:break-all;font-size:7px;margin-top:2px}
 """
 
 def cheat_html():
@@ -716,11 +740,18 @@ def cheat_html():
     pick_note = " ".join(f"{ph}-overs batting: Plan A picks {pcell(ph)} v RR {neg(SQ['before'][ph]['bat'])} v league {neg(SQ['league'][ph]['bat'])} per 100 High-pressure balls." for ph in [g.split(': ')[1] for g in top_gaps if g.startswith('Batting')])
     rules = "Switch: " + "; ".join(f"{esc(r.if_player)} past Rs {r.goes_past_cr:g} cr, take {esc(r.switch_to)} (-{r.rr_loses_pct:.0f}%)" for r in planb.itertuples()) + "."
     howto = "".join(f"<li>{inline(x)}</li>" for x in HOW_TO_USE)
+    if DASH_URL:
+        CS_OPEN = "<div class='qrrow'><div class='qrleft'>"
+        CS_CLOSE = (f"</div><div class='qrside'><img src='{qr_uri(DASH_URL)[0]}' width='100' height='100' alt='QR code for the dashboard'>"
+                    f"<b>Scan to open the interactive dashboard</b><span class='url'>{esc(DASH_URL)}</span></div></div>")
+    else:
+        CS_OPEN = CS_CLOSE = ""
+    CS_DASH = '' if DASH_URL else '<div class="small" style="margin-top:4px"><b>Dashboard URL and QR code: pending, to be added when the public link exists.</b> No link has been invented.</div>'
     return na(f"""<!doctype html><html><head><meta charset='utf-8'><title>RR Clutch Index cheat sheet</title><style>{CS_CSS}</style></head><body><div class="page">
 <div class="top"><div class="k">RR Clutch Index &middot; IPL 2027 auction cheat sheet &middot; data to {esc(META['last_match'])}</div>
 <h1>Back {esc(names(list(must.player_name)))} first; chase the other {NUMW[len(short) - n_must]} only at or below walk-away price.</h1></div>
-<div class="honest"><b>Honesty line.</b> {esc(HONESTY_SHORT)}</div>
-<div class="howto"><b>How to use this score</b><ul>{howto}</ul></div>
+{CS_OPEN}<div class="honest"><b>Honesty line.</b> {esc(HONESTY_SHORT)}</div>
+<div class="howto"><b>How to use this score</b><ul>{howto}</ul></div>{CS_CLOSE}
 <h2>Top picks by tier (Clutch Score 0&ndash;100 within role, with 80% range = we are 80% sure the true value sits inside; overlapping ranges are too close to call)</h2>
 {table(['Tier', 'Player', 'Clutch Score, 80% range', 'Price band [ASSUMPTION]', 'Risk', 'Gap it fills'], rows, 'tbl', ['l', 'l', 'r', 'l', 'l', 'l'], raw=True)}
 <p class='small' style='margin-top:3px'>All {NUMW[len(short)]}: age and injury UNKNOWN [ASSUMPTION]; whether they reach the auction pool is UNKNOWN [ASSUMPTION]. Pursue only if they are on the official list. {esc(bowl_note)} {notmb_txt}</p>
@@ -732,7 +763,7 @@ def cheat_html():
 <span class='small'>{rules} {esc(A5_SHORT)}</span></p></div>
 <div><h2>Do not chase</h2><p class='small' style='color:var(--ink)'><b>Lowest scores in the assumed pool:</b> {av_txt}.<br><b>Popular (top quarter by 2025\u201326 runs or wickets) but low score:</b> {ct_txt}.</p>
 <h2>Do the Plan A picks fix RR's gaps?</h2><p class='small' style='color:var(--ink)'>{esc(pick_note)} Past record of players chosen on that record, not a projection. RR's batting gaps are {gap_noise_note}.</p></div></div>
-<div class="small" style="margin-top:4px"><b>Dashboard URL and QR code: pending, to be added when the public link exists.</b> No link has been invented.</div>
+{CS_DASH}
 <div class="foot"><b>How to read it.</b> Clutch Score (short for Clutch Reliability Score) = how well a player did on balls that could swing the match (Pressure Index {PARAM['high_cut']}+), IPL {esc(seasons_scored)}, against an average player in the same spot, pulled toward average for small samples. Price bands are rule-based assumptions, not market data; walk-away = top of band. {esc(ROB_RULE)} Nationality (shown for overseas players only) is inferred from the data. None of the external facts could be verified (network blocked): recheck before the auction. <b>Key to [ASSUMPTION] tags:</b> {esc(ASSUME_KEY)}.</div>
 </div></body></html>""")
 
@@ -999,6 +1030,30 @@ def main():
     for k, stem in (("B", "B_deck"), ("C", "C_cheat_sheet"), ("D", "D_methodology")):
         previews(outs[k], stem, 80 if k == "B" else 100)
         print(f"{outs[k].name}: {pages(outs[k])} page(s)")
+    # one combined submission PDF: the 7 deck slides, then the cheat sheet as the last page (mixed page sizes)
+    from pypdf import PdfWriter
+    sub = DELIV / "RR_Clutch_Index_Submission.pdf"
+    w = PdfWriter()
+    for k in ("B", "C"):
+        w.append(str(outs[k]))
+    w.add_metadata({"/Title": "RR Clutch Index: deck and cheat sheet"})
+    with open(sub, "wb") as fh:
+        w.write(fh)
+    n = pages(sub)
+    assert n == pages(outs["B"]) + pages(outs["C"]), "combined page count is wrong"
+    for old in PREV.glob("Submission_p*.png"):
+        old.unlink()
+    subprocess.run(["pdftoppm", "-png", "-r", "100", "-f", str(n), "-l", str(n), str(sub), str(PREV / "Submission_last")], check=True)
+    for f in PREV.glob("Submission_last*.png"):
+        f.rename(PREV / f"Submission_p{n}.png")
+    print(f"{sub.name}: {n} page(s)")
+    if DASH_URL:   # QR round-trip: the PNG pixels must reproduce the library's module matrix for this URL
+        from PIL import Image
+        uri, q = qr_uri(DASH_URL)
+        im = Image.open(io.BytesIO(base64.b64decode(uri.split(",", 1)[1]))).convert("L")
+        m = q.get_matrix(); bs = im.width // len(m)
+        ok = all((im.getpixel((x * bs + bs // 2, y * bs + bs // 2)) < 128) == bool(m[y][x]) for y in range(len(m)) for x in range(len(m)))
+        print(f"QR check: {len(m)}x{len(m)} modules, error correction M, pixels match matrix: {ok}; URL {DASH_URL}")
     shutil.rmtree(TMP, ignore_errors=True)
 
 if __name__ == "__main__":
