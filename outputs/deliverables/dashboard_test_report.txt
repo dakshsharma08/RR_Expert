@@ -1,5 +1,5 @@
 Dashboard file: /home/user/RR_Expert/outputs/deliverables/RR_Clutch_Index_Dashboard.html
-File size: 1,181,124 bytes (1.18 MB)
+File size: 1,181,328 bytes (1.18 MB)
 PASS  file under 5 MB
 PASS  [380] tab summary opens via URL hash  -> summary
 PASS  [380] no horizontal scroll on summary  -> scrollWidth 380 vs clientWidth 380
@@ -69,41 +69,42 @@ PASS  [380] active filter chips and reset are shown  -> Active filters: Season: 
 PASS  [380] no horizontal scroll with filters applied  -> 380/380
 PASS  [380] no horizontal scroll with profile card open  -> 380/380
 PASS  [380] profile card panel does not scroll sideways  -> 378/378
-PASS  random card Vaibhav Arora: name matches  -> Vaibhav Arora
-PASS  random card Vaibhav Arora: score 23 matches payload  -> 23
-PASS  random card Vaibhav Arora: 80% range 3–61 matches payload  -> 3–61
-PASS  random card Vaibhav Arora: rank 56 of 71 shown
-PASS  random card Vaibhav Arora: High-pressure legal balls 151 shown
-PASS  random card Vaibhav Arora: price band text shown
-PASS  random card Vaibhav Arora: age tagged UNKNOWN
-PASS  random card Kartik Tyagi: name matches  -> Kartik Tyagi
-PASS  random card Kartik Tyagi: score 5 matches payload  -> 5
-PASS  random card Kartik Tyagi: 80% range 1–22 matches payload  -> 1–22
-PASS  random card Kartik Tyagi: rank 69 of 71 shown
-PASS  random card Kartik Tyagi: High-pressure legal balls 105 shown
-PASS  random card Kartik Tyagi: price band text shown
-PASS  random card Kartik Tyagi: age tagged UNKNOWN
-PASS  random card Mohammed Shami: name matches  -> Mohammed Shami
-PASS  random card Mohammed Shami: score 49 matches payload  -> 49
-PASS  random card Mohammed Shami: 80% range 17–86 matches payload  -> 17–86
-PASS  random card Mohammed Shami: rank 29 of 71 shown
-PASS  random card Mohammed Shami: High-pressure legal balls 155 shown
-PASS  random card Mohammed Shami: price band text shown
-PASS  random card Mohammed Shami: age tagged UNKNOWN
-PASS  random card Vyshak Kumar: name matches  -> Vyshak Kumar
-PASS  random card Vyshak Kumar: score 91 matches payload  -> 91
-PASS  random card Vyshak Kumar: 80% range 36–99 matches payload  -> 36–99
-PASS  random card Vyshak Kumar: rank 8 of 71 shown
-PASS  random card Vyshak Kumar: High-pressure legal balls 88 shown
-PASS  random card Vyshak Kumar: price band text shown
-PASS  random card Vyshak Kumar: age tagged UNKNOWN
-PASS  random card Arshdeep Singh: name matches  -> Arshdeep Singh
-PASS  random card Arshdeep Singh: score 40 matches payload  -> 40
-PASS  random card Arshdeep Singh: 80% range 10–90 matches payload  -> 10–90
-PASS  random card Arshdeep Singh: rank 40 of 71 shown
-PASS  random card Arshdeep Singh: High-pressure legal balls 317 shown
-PASS  random card Arshdeep Singh: price band text shown
-PASS  random card Arshdeep Singh: age tagged UNKNOWN
+PASS  random card Nicholas Pooran: name matches  -> Nicholas Pooran
+PASS  random card Nicholas Pooran: score 35 matches payload  -> 35
+PASS  random card Nicholas Pooran: 80% range 3–86 matches payload  -> 3–86
+PASS  random card Nicholas Pooran: rank 31 of 47 shown
+PASS  random card Nicholas Pooran: High-pressure balls 133 shown
+PASS  random card Nicholas Pooran: price band text shown
+PASS  random card Nicholas Pooran: age tagged UNKNOWN
+PASS  random card Sandeep Sharma: name matches  -> Sandeep Sharma
+PASS  random card Sandeep Sharma: score 69 matches payload  -> 69
+PASS  random card Sandeep Sharma: 80% range 19–96 matches payload  -> 19–96
+PASS  random card Sandeep Sharma: rank 22 of 71 shown
+PASS  random card Sandeep Sharma: High-pressure legal balls 266 shown
+PASS  random card Sandeep Sharma: price band text shown
+PASS  random card Sandeep Sharma: age tagged UNKNOWN
+PASS  random card Axar Patel: name matches  -> Axar Patel
+PASS  random card Axar Patel: score 70 matches payload  -> 70
+PASS  random card Axar Patel: 80% range 35–94 matches payload  -> 35–94
+PASS  random card Axar Patel: rank 2 of 8 shown
+PASS  random card Axar Patel: High-pressure balls 147 shown
+PASS  random card Axar Patel: High-pressure legal balls 150 shown
+PASS  random card Axar Patel: price band text shown
+PASS  random card Axar Patel: age tagged UNKNOWN
+PASS  random card Tristan Stubbs: name matches  -> Tristan Stubbs
+PASS  random card Tristan Stubbs: score 17 matches payload  -> 17
+PASS  random card Tristan Stubbs: 80% range 4–48 matches payload  -> 4–48
+PASS  random card Tristan Stubbs: rank 39 of 47 shown
+PASS  random card Tristan Stubbs: High-pressure balls 179 shown
+PASS  random card Tristan Stubbs: price band text shown
+PASS  random card Tristan Stubbs: age tagged UNKNOWN
+PASS  random card Yuzvendra Chahal: name matches  -> Yuzvendra Chahal
+PASS  random card Yuzvendra Chahal: score 61 matches payload  -> 61
+PASS  random card Yuzvendra Chahal: 80% range 25–97 matches payload  -> 25–97
+PASS  random card Yuzvendra Chahal: rank 25 of 71 shown
+PASS  random card Yuzvendra Chahal: High-pressure legal balls 258 shown
+PASS  random card Yuzvendra Chahal: price band text shown
+PASS  random card Yuzvendra Chahal: age tagged UNKNOWN
 PASS  match explorer: choosing a ball shows its situation and WPA
 PASS  match explorer: switching match redraws
 PASS  pressure map: innings toggle works

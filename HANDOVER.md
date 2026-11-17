@@ -4,7 +4,7 @@
 > **What it is not:** a forecast. Its ability to predict 2027 is not established (D15).
 
 ## Open these first
-1. `outputs/deliverables/RR_Clutch_Index_Dashboard.html` (1.16 MB). Works offline in any modern browser. Start on the Summary tab.
+1. `outputs/deliverables/RR_Clutch_Index_Dashboard.html` (1.18 MB). Works offline in any modern browser. Start on the Summary tab.
 2. `outputs/deliverables/C_RR_Clutch_Index_Cheat_Sheet.pdf`: one page with the picks and their uncertainty.
 3. `outputs/deliverables/B_RR_Clutch_Index_Deck.pdf`: 7 slides.
 4. `outputs/deliverables/D_Methodology_and_Limitations.pdf` and `D_Data_Dictionary.md`: the method, proof and limits.
@@ -23,7 +23,7 @@
 
 ## Reproduce
 - `pip install -r requirements.txt`, then `python3 -I src/run_all.py`. The whole pipeline runs from `data/raw` in about 3 minutes, with seed 2027.
-- Then `python3 -I src/step7_build_dashboard.py`, `python3 -I src/step7_docs.py`, `python3 -I src/step7_video_script.py`, `python3 -I src/step7_notebook.py`, `python3 -I src/step8_audit.py` and `python3 -I src/step8_handover.py`.
+- Deliverables and audit, in order: `python3 -I src/build_final.py` (notebook → dashboard + tests → docs → video script → audit → handover).
 - Dashboard tests: `node src/tests/test_dashboard.js`.
 
 ## Where things are
@@ -55,7 +55,7 @@
 | Misleading chart axes | Pass | Diverging gap bars (negative/positive) are centred on 0 by design |
 | Colour-blind readability | Pass | Pink and blue are close in luminance under deuteranopia, so patterns and labels carry the distinction |
 | Every external fact tagged VERIFIED or [ASSUMPTION] | Pass | Nothing could be VERIFIED (network policy, D23): every fact is REPORTED, UNKNOWN or [ASSUMPTION] |
-| The same number everywhere (dashboard, PDF, cheat sheet, notebook = outputs/tables) | Partial | Free-text sentences in deliverables are templates; they were rebuilt after the last data change |
+| The same number everywhere (dashboard, PDF, cheat sheet, notebook = outputs/tables) | Pass | Free-text sentences in deliverables are templates; they were rebuilt after the last data change |
 | Every shortlisted player is actually available at the auction | Open (named risk) | Retention lists and the auction pool could not be read (network policy). Must recheck (F2) before 16 Dec 2026 |
-| Every selector-facing page passes the cold-reader test | Pending | nan |
+| Every selector-facing page passes the cold-reader test | Partial | Remaining confusions listed in outputs/reviews/cold_reader.csv |
 | The dashboard works offline at 380px with no console errors | Pass | Tested in Chromium only |
