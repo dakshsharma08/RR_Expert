@@ -1,0 +1,1 @@
+Deadline: Pass the AWS Certified Cloud Practitioner exam, due 28 Dec 2026. [PENDING REAL GEMINI RUN: re-run npm run submission with GEMINI_API_KEY to fill how Gemini split it into milestones.] Code checks every date and my 46.5 h capacity; the plan becomes a live countdown and this lock screen. Lesson: [DEVELOPER: write your own lesson]

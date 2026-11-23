@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-11-23T05:29:24.143Z",
+  "mode": "manual-no-key",
+  "model": null,
+  "goal": "Pass the AWS Certified Cloud Practitioner exam",
+  "deadline_utc": "2026-12-28T10:00:00.000Z",
+  "timezone": "UTC",
+  "milestones": 4,
+  "tasks": 0,
+  "repaired": false,
+  "feasibility_code": "Achievable",
+  "feasibility_gemini": null,
+  "checks_passed": "0/0",
+  "exports": {
+    "ios": "lockstep-pass-the-aws-certified-cloud-practitione-iphone-pro-2026-11-23.png",
+    "android": "lockstep-pass-the-aws-certified-cloud-practitione-android-1080-2026-11-23.png"
+  },
+  "dimensions": [
+    {
+      "file": "lockscreen.png",
+      "expected": "1206×2622",
+      "actual": "1206×2622",
+      "ok": true
+    },
+    {
+      "file": "lockscreen-android.png",
+      "expected": "1080×2400",
+      "actual": "1080×2400",
+      "ok": true
+    },
+    {
+      "file": "cover.png",
+      "expected": "2400×1600",
+      "actual": "2400×1600",
+      "ok": true
+    }
+  ],
+  "description_chars": 338,
+  "live_url": null
+}
