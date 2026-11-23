@@ -22,7 +22,9 @@ import {
 export interface GeminiLike {
   models: {
     generateContent(params: GenerateContentParameters): Promise<GenerateContentResponse>;
-    generateContentStream(params: GenerateContentParameters): Promise<AsyncGenerator<GenerateContentResponse>>;
+    generateContentStream(
+      params: GenerateContentParameters,
+    ): Promise<AsyncGenerator<GenerateContentResponse>>;
     list(params?: ListModelsParameters): Promise<AsyncIterable<Model>>;
   };
 }
@@ -133,7 +135,9 @@ export class ModelResolver {
   private async fetchNames(): Promise<string[]> {
     const names: string[] = [];
     // A timeout so /api/health can never hang on a slow listing.
-    const pager = await this.gemini.models.list({ config: { pageSize: 100, abortSignal: AbortSignal.timeout(10_000) } });
+    const pager = await this.gemini.models.list({
+      config: { pageSize: 100, abortSignal: AbortSignal.timeout(10_000) },
+    });
     for await (const model of pager) {
       const actions = model.supportedActions;
       if (model.name && (!actions || actions.includes('generateContent'))) names.push(model.name);

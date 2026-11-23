@@ -36,7 +36,9 @@ export function LandingPhones() {
   // Draw the phone only after the page is idle: the headline paints first (better LCP/TBT).
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    const ric = (
+      window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }
+    ).requestIdleCallback;
     if (ric) ric(() => setReady(true), { timeout: 1500 });
     else setTimeout(() => setReady(true), 600);
   }, []);
@@ -51,15 +53,33 @@ export function LandingPhones() {
   return (
     <div className="relative mx-auto flex flex-col items-center">
       {!ready ? (
-        <div className="rounded-[40px] border border-line-strong bg-[#050505]" style={{ width: w + 16, height: Math.round(w * 2.174) + 16 }} aria-hidden />
+        <div
+          className="rounded-[40px] border border-line-strong bg-[#050505]"
+          style={{ width: w + 16, height: Math.round(w * 2.174) + 16 }}
+          aria-hidden
+        />
       ) : (
-      <AnimatePresence mode="wait">
-        <motion.div key={t} initial={{ opacity: 0, y: 10, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.98 }} transition={{ duration: 0.35 }}>
-          <PhonePreview design={defaultDesign(t, undefined, 'iphone-pro')} data={EXAMPLE} width={w} showUi label={`Example lock screen, ${t} template`} />
-        </motion.div>
-      </AnimatePresence>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={t}
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ duration: 0.35 }}
+          >
+            <PhonePreview
+              design={defaultDesign(t, undefined, 'iphone-pro')}
+              data={EXAMPLE}
+              width={w}
+              showUi
+              label={`Example lock screen, ${t} template`}
+            />
+          </motion.div>
+        </AnimatePresence>
       )}
-      <p className="mt-4 text-xs text-muted" aria-live="off">Example wallpaper · {getTemplate(t).label} template · 8 templates in the Studio</p>
+      <p className="mt-4 text-xs text-muted" aria-live="off">
+        Example wallpaper · {getTemplate(t).label} template · 8 templates in the Studio
+      </p>
     </div>
   );
 }

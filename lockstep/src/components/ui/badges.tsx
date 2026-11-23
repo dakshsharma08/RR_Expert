@@ -9,7 +9,12 @@ import type { Feasibility } from '@shared/plan';
 
 export function AiBadge({ className }: { className?: string }) {
   return (
-    <span className={cn('inline-flex h-6 items-center gap-1 rounded-full border border-accent px-2 text-[11px] font-medium text-accent-text', className)}>
+    <span
+      className={cn(
+        'inline-flex h-6 items-center gap-1 rounded-full border border-accent px-2 text-[11px] font-medium text-accent-text',
+        className,
+      )}
+    >
       <span aria-hidden>✦</span> AI suggestion
     </span>
   );
@@ -17,7 +22,12 @@ export function AiBadge({ className }: { className?: string }) {
 
 export function ApprovedBadge({ className }: { className?: string }) {
   return (
-    <span className={cn('inline-flex h-6 items-center rounded-full bg-ivory px-2 text-[11px] font-semibold text-obsidian', className)}>
+    <span
+      className={cn(
+        'inline-flex h-6 items-center rounded-full bg-ivory px-2 text-[11px] font-semibold text-obsidian',
+        className,
+      )}
+    >
       Approved
     </span>
   );
@@ -25,7 +35,12 @@ export function ApprovedBadge({ className }: { className?: string }) {
 
 export function EditedBadge({ className }: { className?: string }) {
   return (
-    <span className={cn('inline-flex h-6 items-center gap-1 rounded-full border border-hairline px-2 text-[11px] text-muted', className)}>
+    <span
+      className={cn(
+        'inline-flex h-6 items-center gap-1 rounded-full border border-hairline px-2 text-[11px] text-muted',
+        className,
+      )}
+    >
       <Pencil className="size-3" strokeWidth={1.5} aria-hidden /> Edited by you
     </span>
   );
@@ -33,15 +48,33 @@ export function EditedBadge({ className }: { className?: string }) {
 
 export function CompletedBadge({ className }: { className?: string }) {
   return (
-    <span className={cn('inline-flex h-6 items-center gap-1 rounded-full bg-success/15 px-2 text-[11px] font-medium text-success', className)}>
+    <span
+      className={cn(
+        'inline-flex h-6 items-center gap-1 rounded-full bg-success/15 px-2 text-[11px] font-medium text-success',
+        className,
+      )}
+    >
       <Check className="size-3" strokeWidth={2} aria-hidden /> Completed
     </span>
   );
 }
 
-export function GeneratedStamp({ model, at, className }: { model: string | null; at: string | null; className?: string }) {
+export function GeneratedStamp({
+  model,
+  at,
+  className,
+}: {
+  model: string | null;
+  at: string | null;
+  className?: string;
+}) {
   if (!at) return null;
-  const time = new Date(at).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const time = new Date(at).toLocaleString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
   return (
     <p className={cn('inline-flex items-center gap-1.5 text-xs text-muted', className)}>
       <Sparkles className="size-3.5 text-accent-text" strokeWidth={1.5} aria-hidden />
@@ -56,9 +89,23 @@ const feasClass: Record<Feasibility, string> = {
   Unrealistic: 'bg-danger/15 text-danger border-danger/35',
 };
 
-export function FeasibilityBadge({ value, className, prefix }: { value: Feasibility; className?: string; prefix?: string }) {
+export function FeasibilityBadge({
+  value,
+  className,
+  prefix,
+}: {
+  value: Feasibility;
+  className?: string;
+  prefix?: string;
+}) {
   return (
-    <span className={cn('inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold', feasClass[value], className)}>
+    <span
+      className={cn(
+        'inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold',
+        feasClass[value],
+        className,
+      )}
+    >
       <span className="size-1.5 rounded-full bg-current" aria-hidden />
       {prefix ? `${prefix} ` : ''}
       {value}

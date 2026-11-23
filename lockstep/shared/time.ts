@@ -350,16 +350,22 @@ export function formatInZone(
 }
 
 /** "12 Dec" style label for a day key (no zone needed — it is already a calendar date). */
-export function formatDayKey(key: string, opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }): string {
-  return new Intl.DateTimeFormat('en-GB', { ...opts, timeZone: 'UTC' }).format(new Date(keyToUtcMidnight(key)));
+export function formatDayKey(
+  key: string,
+  opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' },
+): string {
+  return new Intl.DateTimeFormat('en-GB', { ...opts, timeZone: 'UTC' }).format(
+    new Date(keyToUtcMidnight(key)),
+  );
 }
 
 /** Short zone label such as "GMT+5:30" for display next to times. */
 export function zoneLabel(tz: string, at: Date | number = Date.now()): string {
   try {
-    const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'shortOffset' }).formatToParts(
-      typeof at === 'number' ? new Date(at) : at,
-    );
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz,
+      timeZoneName: 'shortOffset',
+    }).formatToParts(typeof at === 'number' ? new Date(at) : at);
     return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
   } catch {
     return tz;

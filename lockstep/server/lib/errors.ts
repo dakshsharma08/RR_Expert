@@ -39,9 +39,13 @@ export const DEFAULTS: Record<ApiErrorCode, { message: string; retryable: boolea
     message: "You've made a lot of AI requests in a short time. Please wait a little and try again.",
     retryable: true,
   },
-  INVALID_INPUT: { message: "Some of the details aren't valid. Please check them and try again.", retryable: false },
+  INVALID_INPUT: {
+    message: "Some of the details aren't valid. Please check them and try again.",
+    retryable: false,
+  },
   PLAN_INVALID: {
-    message: "Gemini's plan didn't pass our date and hour checks, even after one repair attempt. Please try again — a fresh attempt usually works.",
+    message:
+      "Gemini's plan didn't pass our date and hour checks, even after one repair attempt. Please try again — a fresh attempt usually works.",
     retryable: true,
   },
   TIMEOUT: { message: 'Gemini took too long to answer. Please try again.', retryable: true },
@@ -126,9 +130,13 @@ export function toAppError(err: unknown, signal?: AbortSignal): AppError {
     // The SDK message may contain request details, so only look for a few keywords.
     const raw = err instanceof Error ? err.message : '';
     if (status === 401 || status === 403 || /API[_ ]KEY/i.test(raw)) {
-      return new AppError('AI_NOT_CONFIGURED', "The server's Gemini API key was rejected. Check GEMINI_API_KEY on the server.", {
-        details: [`Gemini status ${status}`],
-      });
+      return new AppError(
+        'AI_NOT_CONFIGURED',
+        "The server's Gemini API key was rejected. Check GEMINI_API_KEY on the server.",
+        {
+          details: [`Gemini status ${status}`],
+        },
+      );
     }
     if (status === 429 || status === 500 || status === 502 || status === 503 || status === 504) {
       return new AppError('AI_BUSY', undefined, { details: [`Gemini status ${status}`] });
@@ -140,17 +148,24 @@ export function toAppError(err: unknown, signal?: AbortSignal): AppError {
       });
     }
     if (status === 400) {
-      return new AppError('INTERNAL', "Gemini couldn't process this request. If you attached a file, try a different one.", {
-        retryable: false,
-        details: ['Gemini status 400'],
-      });
+      return new AppError(
+        'INTERNAL',
+        "Gemini couldn't process this request. If you attached a file, try a different one.",
+        {
+          retryable: false,
+          details: ['Gemini status 400'],
+        },
+      );
     }
     return new AppError('INTERNAL', undefined, { details: [`Gemini status ${status}`] });
   }
 
   // `fetch failed` and friends: we couldn't reach Gemini at all.
   if (err instanceof TypeError && /fetch/i.test(err.message)) {
-    return new AppError('AI_BUSY', "We couldn't reach Gemini right now — your saved plan still works. Try again in a minute.");
+    return new AppError(
+      'AI_BUSY',
+      "We couldn't reach Gemini right now — your saved plan still works. Try again in a minute.",
+    );
   }
   return new AppError('INTERNAL');
 }

@@ -50,7 +50,8 @@ function decide(rules: RateLimitRule[], counts: { count: number; ttlSec: number 
     if (!c || c.count <= rule.max) return;
     const retry = Math.max(1, Math.ceil(c.ttlSec));
     // If several windows are exceeded, the client must wait for the LONGEST one.
-    if (blocked.ok || retry > blocked.retryAfterSec) blocked = { ok: false, retryAfterSec: retry, rule: rule.name };
+    if (blocked.ok || retry > blocked.retryAfterSec)
+      blocked = { ok: false, retryAfterSec: retry, rule: rule.name };
   });
   return blocked;
 }
@@ -167,10 +168,11 @@ export function rateLimitMiddleware(limiter: RateLimiter, what = 'AI requests'):
     const decision = await limiter.hit(clientIp(req));
     if (decision.ok) return next();
     const minutes = Math.ceil(decision.retryAfterSec / 60);
-    const message =
-      decision.rule?.endsWith('day')
-        ? `You've reached today's limit for ${what}. Try again in about ${Math.ceil(minutes / 60)} hour(s).`
-        : `You've made a lot of ${what} in a short time. Try again in about ${minutes} minute(s).`;
-    next(new AppError('RATE_LIMITED', message, { headers: { 'Retry-After': String(decision.retryAfterSec) } }));
+    const message = decision.rule?.endsWith('day')
+      ? `You've reached today's limit for ${what}. Try again in about ${Math.ceil(minutes / 60)} hour(s).`
+      : `You've made a lot of ${what} in a short time. Try again in about ${minutes} minute(s).`;
+    next(
+      new AppError('RATE_LIMITED', message, { headers: { 'Retry-After': String(decision.retryAfterSec) } }),
+    );
   };
 }

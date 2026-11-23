@@ -3,7 +3,18 @@
  * Desktop: collapsible left sidebar + Ctrl/⌘K command palette.
  */
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
-import { BarChart3, ChevronsLeft, ChevronsRight, Home, LayoutGrid, Plus, Search, Settings, Smartphone, Timer } from 'lucide-react';
+import {
+  BarChart3,
+  ChevronsLeft,
+  ChevronsRight,
+  Home,
+  LayoutGrid,
+  Plus,
+  Search,
+  Settings,
+  Smartphone,
+  Timer,
+} from 'lucide-react';
 import { useEffect } from 'react';
 import { cn } from '@/lib/cn';
 import { useUi } from '@/stores/ui';
@@ -46,7 +57,10 @@ export function AppShell() {
 
   return (
     <div className="min-h-dvh bg-bg text-text">
-      <a href="#main" className="sr-only-focusable fixed left-3 top-3 z-[90] rounded-lg bg-gold px-3 py-2 text-sm font-semibold text-obsidian">
+      <a
+        href="#main"
+        className="sr-only-focusable fixed left-3 top-3 z-[90] rounded-lg bg-gold px-3 py-2 text-sm font-semibold text-obsidian"
+      >
         Skip to content
       </a>
 
@@ -59,7 +73,12 @@ export function AppShell() {
         )}
         aria-label="Primary"
       >
-        <div className={cn('flex h-16 items-center px-4', sidebarCollapsed ? 'justify-center' : 'justify-between')}>
+        <div
+          className={cn(
+            'flex h-16 items-center px-4',
+            sidebarCollapsed ? 'justify-center' : 'justify-between',
+          )}
+        >
           <NavLink to="/" aria-label="LOCKSTEP home" className="rounded-md">
             <Wordmark compact={sidebarCollapsed} />
           </NavLink>
@@ -97,17 +116,31 @@ export function AppShell() {
           {NAV.map((n) => (
             <SideLink key={n.to} to={n.to} label={n.label} icon={n.icon} collapsed={sidebarCollapsed} />
           ))}
-          {activeGoalId && <SideLink to={`/focus/${activeGoalId}`} label="Focus mode" icon={Timer} collapsed={sidebarCollapsed} />}
+          {activeGoalId && (
+            <SideLink
+              to={`/focus/${activeGoalId}`}
+              label="Focus mode"
+              icon={Timer}
+              collapsed={sidebarCollapsed}
+            />
+          )}
         </nav>
         <div className="space-y-1 border-t border-hairline p-3">
           <SideLink to="/settings" label="Settings" icon={Settings} collapsed={sidebarCollapsed} />
           <button
             onClick={toggleSidebar}
-            className={cn('flex h-11 w-full items-center gap-3 rounded-[12px] px-3 text-sm text-muted hover:bg-surface-2 hover:text-text', sidebarCollapsed && 'justify-center px-0')}
+            className={cn(
+              'flex h-11 w-full items-center gap-3 rounded-[12px] px-3 text-sm text-muted hover:bg-surface-2 hover:text-text',
+              sidebarCollapsed && 'justify-center px-0',
+            )}
             aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             aria-expanded={!sidebarCollapsed}
           >
-            {sidebarCollapsed ? <ChevronsRight className="size-5" strokeWidth={1.5} /> : <ChevronsLeft className="size-5" strokeWidth={1.5} />}
+            {sidebarCollapsed ? (
+              <ChevronsRight className="size-5" strokeWidth={1.5} />
+            ) : (
+              <ChevronsLeft className="size-5" strokeWidth={1.5} />
+            )}
             {!sidebarCollapsed && 'Collapse'}
           </button>
         </div>
@@ -128,7 +161,10 @@ export function AppShell() {
               aria-label="Settings"
               className="flex size-11 items-center justify-center rounded-full"
             >
-              <span className="flex size-8 items-center justify-center rounded-full border border-accent bg-surface-2 text-xs font-semibold text-accent-text" aria-hidden>
+              <span
+                className="flex size-8 items-center justify-center rounded-full border border-accent bg-surface-2 text-xs font-semibold text-accent-text"
+                aria-hidden
+              >
                 G
               </span>
             </NavLink>
@@ -151,7 +187,10 @@ export function AppShell() {
       </main>
 
       {/* Mobile bottom bar */}
-      <nav aria-label="Primary" className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-bg/95 backdrop-blur md:hidden">
+      <nav
+        aria-label="Primary"
+        className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-bg/95 backdrop-blur md:hidden"
+      >
         <ul className="mx-auto grid h-16 max-w-md grid-cols-5 items-center px-2">
           <BottomLink {...NAV[0]} />
           <BottomLink {...NAV[1]} />
@@ -174,7 +213,17 @@ export function AppShell() {
   );
 }
 
-function SideLink({ to, label, icon: Icon, collapsed }: { to: string; label: string; icon: typeof Home; collapsed: boolean }) {
+function SideLink({
+  to,
+  label,
+  icon: Icon,
+  collapsed,
+}: {
+  to: string;
+  label: string;
+  icon: typeof Home;
+  collapsed: boolean;
+}) {
   return (
     <NavLink
       to={to}
@@ -203,7 +252,10 @@ function BottomLink({ to, label, icon: Icon }: { to: string; label: string; icon
       <NavLink
         to={to}
         className={({ isActive }) =>
-          cn('flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px]', isActive ? 'text-accent-text' : 'text-muted')
+          cn(
+            'flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px]',
+            isActive ? 'text-accent-text' : 'text-muted',
+          )
         }
       >
         <Icon className="size-5" strokeWidth={1.5} aria-hidden />

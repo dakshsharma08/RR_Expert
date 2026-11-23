@@ -65,5 +65,6 @@ describe.each([
 });
 
 describe('approved badge', () => {
-  it('obsidian on ivory passes AA', () => expect(contrastRatio('#090909', '#E8DFC9')).toBeGreaterThanOrEqual(4.5));
+  it('obsidian on ivory passes AA', () =>
+    expect(contrastRatio('#090909', '#E8DFC9')).toBeGreaterThanOrEqual(4.5));
 });

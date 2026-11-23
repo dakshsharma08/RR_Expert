@@ -18,7 +18,10 @@ import type {
 import type { IntakeInput } from '@shared/plan';
 
 export class ApiCallError extends Error {
-  constructor(public readonly error: ApiError, public readonly status: number) {
+  constructor(
+    public readonly error: ApiError,
+    public readonly status: number,
+  ) {
     super(error.message);
   }
 }
@@ -32,8 +35,17 @@ const OFFLINE: ApiError = {
 function toApiError(status: number, body: unknown): ApiError {
   const b = body as Partial<ApiError> | null;
   if (b && typeof b.code === 'string' && typeof b.message === 'string') return b as ApiError;
-  if (status === 404) return { code: 'NOT_FOUND', message: 'The LOCKSTEP API is not reachable on this deployment.', retryable: false };
-  return { code: 'INTERNAL', message: 'Something went wrong on our side. Please try again.', retryable: true };
+  if (status === 404)
+    return {
+      code: 'NOT_FOUND',
+      message: 'The LOCKSTEP API is not reachable on this deployment.',
+      retryable: false,
+    };
+  return {
+    code: 'INTERNAL',
+    message: 'Something went wrong on our side. Please try again.',
+    retryable: true,
+  };
 }
 
 async function postJson<T>(path: string, body: unknown, signal?: AbortSignal): Promise<T> {
@@ -71,7 +83,8 @@ export const getMotivation = (req: MotivationRequest, signal?: AbortSignal) =>
 export const generateBackground = (req: BackgroundRequestBody, signal?: AbortSignal) =>
   postJson<BackgroundResponse>('/api/background', req, signal);
 
-export const askCoach = (req: CoachRequest, signal?: AbortSignal) => postJson<CoachResponse>('/api/coach', req, signal);
+export const askCoach = (req: CoachRequest, signal?: AbortSignal) =>
+  postJson<CoachResponse>('/api/coach', req, signal);
 
 export const getWeeklyInsight = (req: WeeklyInsightRequest, signal?: AbortSignal) =>
   postJson<WeeklyInsightResponse>('/api/insights/weekly', req, signal);

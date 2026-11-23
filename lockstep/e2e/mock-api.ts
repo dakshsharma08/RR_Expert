@@ -13,16 +13,23 @@ process.env.GEMINI_API_KEY = 'e2e-fake-key-not-real';
 process.env.GEMINI_MODEL = 'gemini-e2e-mock';
 process.env.ALLOWED_ORIGINS = 'http://localhost:4173,http://localhost:5173';
 
-const STREAM = /^https:\/\/generativelanguage\.googleapis\.com\/v1[a-z0-9]*\/models\/[^/:]+:streamGenerateContent/;
-const GENERATE = /^https:\/\/generativelanguage\.googleapis\.com\/v1[a-z0-9]*\/models\/[^/:]+:generateContent/;
+const STREAM =
+  /^https:\/\/generativelanguage\.googleapis\.com\/v1[a-z0-9]*\/models\/[^/:]+:streamGenerateContent/;
+const GENERATE =
+  /^https:\/\/generativelanguage\.googleapis\.com\/v1[a-z0-9]*\/models\/[^/:]+:generateContent/;
 
 type Body = {
   systemInstruction?: { parts: { text: string }[] };
-  generationConfig?: { responseJsonSchema?: { properties?: Record<string, { items?: { properties?: Record<string, { enum?: string[] }> } }> } };
+  generationConfig?: {
+    responseJsonSchema?: {
+      properties?: Record<string, { items?: { properties?: Record<string, { enum?: string[] }> } }>;
+    };
+  };
 };
 
 function allowedDates(body: Body): string[] {
-  const en = body.generationConfig?.responseJsonSchema?.properties?.milestones?.items?.properties?.targetDate?.enum;
+  const en =
+    body.generationConfig?.responseJsonSchema?.properties?.milestones?.items?.properties?.targetDate?.enum;
   if (en?.length) return en;
   const sys = body.systemInstruction?.parts.map((p) => p.text).join('\n') ?? '';
   return [...new Set(sys.match(/\d{4}-\d{2}-\d{2}/g) ?? [])].sort();
@@ -36,10 +43,16 @@ function capacity(body: Body): number {
 
 function fixturePlan(body: Body) {
   const dates = allowedDates(body).filter((d) => d > new Date().toISOString().slice(0, 10));
-  const pick = (f: number) => dates[Math.min(dates.length - 1, Math.max(0, Math.round(f * (dates.length - 1))))]!;
+  const pick = (f: number) =>
+    dates[Math.min(dates.length - 1, Math.max(0, Math.round(f * (dates.length - 1))))]!;
   const cap = capacity(body);
   const per = Math.max(1, Math.floor((cap * 0.7) / 4));
-  const titles = ['Map the exam domains', 'Core services deep-dive', 'Practice question sprint', 'Full mock exam + review'];
+  const titles = [
+    'Map the exam domains',
+    'Core services deep-dive',
+    'Practice question sprint',
+    'Full mock exam + review',
+  ];
   return {
     goal: 'E2E fixture goal',
     deadline: 'fixture',
@@ -71,7 +84,13 @@ function sse(text: string) {
   const chunks = parts.map((t, i) =>
     enc.encode(
       `data: ${JSON.stringify({
-        candidates: [{ content: { role: 'model', parts: [{ text: t }] }, index: 0, ...(i === parts.length - 1 ? { finishReason: 'STOP' } : {}) }],
+        candidates: [
+          {
+            content: { role: 'model', parts: [{ text: t }] },
+            index: 0,
+            ...(i === parts.length - 1 ? { finishReason: 'STOP' } : {}),
+          },
+        ],
         ...(i === parts.length - 1 ? { usageMetadata: { totalTokenCount: 1234 } } : {}),
         modelVersion: 'gemini-e2e-mock',
       })}\r\n\r\n`,
@@ -93,7 +112,9 @@ function sse(text: string) {
 
 function json(obj: unknown) {
   return HttpResponse.json({
-    candidates: [{ content: { role: 'model', parts: [{ text: JSON.stringify(obj) }] }, finishReason: 'STOP', index: 0 }],
+    candidates: [
+      { content: { role: 'model', parts: [{ text: JSON.stringify(obj) }] }, finishReason: 'STOP', index: 0 },
+    ],
     usageMetadata: { totalTokenCount: 120 },
     modelVersion: 'gemini-e2e-mock',
   });
@@ -108,7 +129,13 @@ const mock = setupServer(
     if (keys.includes('summary')) return json({ summary: 'Fixture summary: steady week.' });
     if (keys.includes('milestones')) return json(fixturePlan(body));
     return HttpResponse.json({
-      candidates: [{ content: { role: 'model', parts: [{ text: 'Fixture coach reply: you are on track.' }] }, finishReason: 'STOP', index: 0 }],
+      candidates: [
+        {
+          content: { role: 'model', parts: [{ text: 'Fixture coach reply: you are on track.' }] },
+          finishReason: 'STOP',
+          index: 0,
+        },
+      ],
       usageMetadata: { totalTokenCount: 80 },
     });
   }),
@@ -117,4 +144,6 @@ mock.listen(); // MSW v3: unmatched requests pass through to the network by defa
 
 const { createApp } = await import('../server/app');
 const port = Number(process.env.PORT) || 8787;
-createApp({ tuning: { rateLimit: { windowMax: 1000, dayMax: 10000 } } }).listen(port, () => console.log(`E2E mock API (fixtures, NOT real Gemini) on :${port}`));
+createApp({ tuning: { rateLimit: { windowMax: 1000, dayMax: 10000 } } }).listen(port, () =>
+  console.log(`E2E mock API (fixtures, NOT real Gemini) on :${port}`),
+);

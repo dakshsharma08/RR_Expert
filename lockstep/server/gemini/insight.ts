@@ -10,7 +10,10 @@ import { buildWeeklyPrompt } from './prompts';
 import { SUMMARY_SCHEMA } from './schema';
 import { tryParseJson } from './streamParser';
 
-const minutes = z.number().min(0).max(7 * 24 * 60);
+const minutes = z
+  .number()
+  .min(0)
+  .max(7 * 24 * 60);
 
 export const WeeklyInsightRequestSchema = z.object({
   goal: z.string().trim().min(1).max(300),
@@ -45,7 +48,11 @@ export async function generateWeeklyInsight(
     model,
     request: {
       contents: [{ role: 'user', parts: [{ text: user }] }],
-      config: { systemInstruction: system, responseMimeType: 'application/json', responseJsonSchema: SUMMARY_SCHEMA },
+      config: {
+        systemInstruction: system,
+        responseMimeType: 'application/json',
+        responseJsonSchema: SUMMARY_SCHEMA,
+      },
     },
   });
   const parsed = tryParseJson(responseText(response)) as { summary?: unknown } | undefined;

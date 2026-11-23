@@ -12,7 +12,14 @@ import { renderWallpaper, type RenderArgs } from '@shared/wallpaper/render';
 import { fontsToLoad, FONT_FAMILIES } from '@shared/wallpaper/fonts';
 import { resolveSize } from '@shared/wallpaper/devices';
 import { normalizeDesign } from '@shared/wallpaper/templates';
-import type { CanvasFactory, Ctx2D, ImageLike, RenderReport, WallpaperData, WallpaperDesign } from '@shared/wallpaper/types';
+import type {
+  CanvasFactory,
+  Ctx2D,
+  ImageLike,
+  RenderReport,
+  WallpaperData,
+  WallpaperDesign,
+} from '@shared/wallpaper/types';
 
 export const browserCanvas: CanvasFactory = (width, height) => {
   const c = document.createElement('canvas');
@@ -32,7 +39,14 @@ export async function ensureFonts(design: WallpaperDesign): Promise<void> {
     ...ids.flatMap((id) => [300, 400, 500, 600, 700].map((w) => `${w} 32px "${FONT_FAMILIES[id].family}"`)),
   ].filter((s) => !loadedFonts.has(s));
   if (specs.length && 'fonts' in document) {
-    await Promise.all(specs.map((s) => document.fonts.load(s).then(() => loadedFonts.add(s)).catch(() => undefined)));
+    await Promise.all(
+      specs.map((s) =>
+        document.fonts
+          .load(s)
+          .then(() => loadedFonts.add(s))
+          .catch(() => undefined),
+      ),
+    );
   }
   if ('fonts' in document) await document.fonts.ready;
 }
@@ -89,7 +103,11 @@ export function loadDesignImage(src: string | undefined): Promise<ImageLike | nu
 export function renderTo(canvas: HTMLCanvasElement, args: Omit<RenderArgs, 'createCanvas'>): RenderReport {
   const ctx = canvas.getContext('2d') as unknown as Ctx2D | null;
   if (!ctx) throw new Error('Canvas is not available in this browser.');
-  return renderWallpaper(ctx, { ...args, createCanvas: browserCanvas, size: { width: canvas.width, height: canvas.height } });
+  return renderWallpaper(ctx, {
+    ...args,
+    createCanvas: browserCanvas,
+    size: { width: canvas.width, height: canvas.height },
+  });
 }
 
 export interface ExportResult {
@@ -116,7 +134,8 @@ export async function exportPng(design: WallpaperDesign, data: WallpaperData): P
   const head = new DataView(await blob.slice(0, 24).arrayBuffer());
   const w = head.getUint32(16);
   const h = head.getUint32(20);
-  if (w !== width || h !== height) throw new Error(`Export size mismatch: got ${w}×${h}, expected ${width}×${height}.`);
+  if (w !== width || h !== height)
+    throw new Error(`Export size mismatch: got ${w}×${h}, expected ${width}×${height}.`);
   return { blob, width: w, height: h, report };
 }
 

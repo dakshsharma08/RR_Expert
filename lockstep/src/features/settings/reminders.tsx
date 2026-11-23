@@ -15,7 +15,8 @@ export function notificationsSupported() {
 
 export async function requestNotificationPermission(): Promise<NotificationPermission | 'unsupported'> {
   if (!notificationsSupported()) return 'unsupported';
-  if (Notification.permission === 'granted' || Notification.permission === 'denied') return Notification.permission;
+  if (Notification.permission === 'granted' || Notification.permission === 'denied')
+    return Notification.permission;
   return Notification.requestPermission();
 }
 
@@ -34,7 +35,10 @@ export function ReminderScheduler() {
       await setKv('lastReminder', today);
       const active = await db.goals.where('status').equals('active').toArray();
       if (!active.length) return;
-      const body = active.length === 1 ? `Today's focus for "${active[0]!.title}" is waiting.` : `${active.length} countdowns are running. Check today's focus.`;
+      const body =
+        active.length === 1
+          ? `Today's focus for "${active[0]!.title}" is waiting.`
+          : `${active.length} countdowns are running. Check today's focus.`;
       toast('LOCKSTEP reminder', { description: body });
       if (notificationsSupported() && Notification.permission === 'granted') {
         try {

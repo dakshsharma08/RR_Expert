@@ -93,7 +93,11 @@ export async function generateMotivation(
     model,
     request: {
       contents: [{ role: 'user', parts: [{ text: user }] }],
-      config: { systemInstruction: system, responseMimeType: 'application/json', responseJsonSchema: LINE_SCHEMA },
+      config: {
+        systemInstruction: system,
+        responseMimeType: 'application/json',
+        responseJsonSchema: LINE_SCHEMA,
+      },
     },
   });
   const parsed = tryParseJson(responseText(response)) as { line?: unknown } | undefined;

@@ -17,7 +17,10 @@ interface SpeechRecognitionLike {
 
 function getCtor(): (new () => SpeechRecognitionLike) | null {
   if (typeof window === 'undefined') return null;
-  const w = window as unknown as { SpeechRecognition?: new () => SpeechRecognitionLike; webkitSpeechRecognition?: new () => SpeechRecognitionLike };
+  const w = window as unknown as {
+    SpeechRecognition?: new () => SpeechRecognitionLike;
+    webkitSpeechRecognition?: new () => SpeechRecognitionLike;
+  };
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
@@ -38,7 +41,10 @@ export function VoiceButton({ onText }: { onText: (t: string) => void }) {
     rec.interimResults = false;
     rec.continuous = false;
     rec.onresult = (e) => {
-      const text = Array.from(e.results).map((r) => r[0]?.transcript ?? '').join(' ').trim();
+      const text = Array.from(e.results)
+        .map((r) => r[0]?.transcript ?? '')
+        .join(' ')
+        .trim();
       if (text) onText(text);
     };
     rec.onend = () => setListening(false);
@@ -49,8 +55,17 @@ export function VoiceButton({ onText }: { onText: (t: string) => void }) {
   };
 
   return (
-    <IconButton label={listening ? 'Stop dictation' : 'Dictate your goal'} onClick={toggle} className={cn(listening && 'text-danger')} aria-pressed={listening}>
-      {listening ? <MicOff className="size-5" strokeWidth={1.5} /> : <Mic className="size-5" strokeWidth={1.5} />}
+    <IconButton
+      label={listening ? 'Stop dictation' : 'Dictate your goal'}
+      onClick={toggle}
+      className={cn(listening && 'text-danger')}
+      aria-pressed={listening}
+    >
+      {listening ? (
+        <MicOff className="size-5" strokeWidth={1.5} />
+      ) : (
+        <Mic className="size-5" strokeWidth={1.5} />
+      )}
     </IconButton>
   );
 }

@@ -6,7 +6,14 @@ import { useActiveGoalId, useGoalData, useGoals } from '@/db/hooks';
 import { db, type GoalRow } from '@/db/db';
 import { Button } from '@/components/ui/button';
 import { EmptyState, ProgressRing, Skeleton } from '@/components/ui/misc';
-import { GoalHero, MotivationCard, TodayFocus, UpcomingMilestones, useLiveMetrics, useMotivation } from '@/features/goals/components';
+import {
+  GoalHero,
+  MotivationCard,
+  TodayFocus,
+  UpcomingMilestones,
+  useLiveMetrics,
+  useMotivation,
+} from '@/features/goals/components';
 import { CoachCard } from '@/features/coach/CoachCard';
 import { goalMetrics, stateLabel } from '@/lib/metrics';
 import { useMinute } from '@/lib/ticker';
@@ -20,7 +27,13 @@ export default function DashboardPage() {
   const motivation = useMotivation(data?.goal, m);
   const navigate = useNavigate();
 
-  if (goals === undefined || activeId === undefined) return <div className="mx-auto max-w-5xl space-y-4 px-4 py-10"><Skeleton className="h-64" /><Skeleton className="h-40" /></div>;
+  if (goals === undefined || activeId === undefined)
+    return (
+      <div className="mx-auto max-w-5xl space-y-4 px-4 py-10">
+        <Skeleton className="h-64" />
+        <Skeleton className="h-40" />
+      </div>
+    );
 
   if (goals.length === 0 || !activeId) {
     return (
@@ -32,8 +45,16 @@ export default function DashboardPage() {
           title="Tell LOCKSTEP your goal and deadline. Gemini drafts the milestones; you approve every one."
           action={
             <div className="flex flex-wrap justify-center gap-2">
-              <Button onClick={() => navigate('/new')} icon={<Plus className="size-4" strokeWidth={1.75} />}>New goal</Button>
-              <Button variant="ghost" onClick={() => navigate('/new')} icon={<Wand2 className="size-4" strokeWidth={1.5} />}>Try a sample</Button>
+              <Button onClick={() => navigate('/new')} icon={<Plus className="size-4" strokeWidth={1.75} />}>
+                New goal
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/new')}
+                icon={<Wand2 className="size-4" strokeWidth={1.5} />}
+              >
+                Try a sample
+              </Button>
             </div>
           }
         />
@@ -50,17 +71,46 @@ export default function DashboardPage() {
           <div className="card p-6">
             <p className="eyebrow mb-1">Waiting for your approval</p>
             <h1 className="text-2xl">{data.goal.title}</h1>
-            <p className="mt-2 text-sm text-muted">Review the milestones and approve the plan to start the live countdown.</p>
-            <Button className="mt-4" onClick={() => navigate(data.goal.status === 'planning' ? `/goals/${data.goal.id}/plan` : `/goals/${data.goal.id}/review`)}>Review plan</Button>
+            <p className="mt-2 text-sm text-muted">
+              Review the milestones and approve the plan to start the live countdown.
+            </p>
+            <Button
+              className="mt-4"
+              onClick={() =>
+                navigate(
+                  data.goal.status === 'planning'
+                    ? `/goals/${data.goal.id}/plan`
+                    : `/goals/${data.goal.id}/review`,
+                )
+              }
+            >
+              Review plan
+            </Button>
           </div>
         ) : (
           <>
-            <Link to={`/goals/${data.goal.id}`} className="block rounded-[20px] focus-visible:outline-2" aria-label={`Open ${data.goal.title}`}>
+            <Link
+              to={`/goals/${data.goal.id}`}
+              className="block rounded-[20px] focus-visible:outline-2"
+              aria-label={`Open ${data.goal.title}`}
+            >
               <GoalHero data={data} m={m} />
             </Link>
             <div className="flex flex-wrap gap-2">
-              <Button variant="secondary" onClick={() => navigate(`/studio/${data.goal.id}`)} icon={<Smartphone className="size-4" strokeWidth={1.5} />}>Make lock screen</Button>
-              <Button variant="ghost" onClick={() => navigate(`/focus/${data.goal.id}`)} icon={<Timer className="size-4" strokeWidth={1.5} />}>Focus mode</Button>
+              <Button
+                variant="secondary"
+                onClick={() => navigate(`/studio/${data.goal.id}`)}
+                icon={<Smartphone className="size-4" strokeWidth={1.5} />}
+              >
+                Make lock screen
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => navigate(`/focus/${data.goal.id}`)}
+                icon={<Timer className="size-4" strokeWidth={1.5} />}
+              >
+                Focus mode
+              </Button>
             </div>
             <MotivationCard line={motivation.line} source={motivation.source} />
             <div className="grid gap-5 lg:grid-cols-2">
@@ -78,7 +128,9 @@ export default function DashboardPage() {
 
       {others.length > 0 && (
         <section aria-labelledby="others-title" className="pt-4">
-          <h2 id="others-title" className="mb-3 text-xl">Other countdowns</h2>
+          <h2 id="others-title" className="mb-3 text-xl">
+            Other countdowns
+          </h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {others.map((g) => (
               <OtherCountdown key={g.id} goal={g} />
@@ -101,7 +153,12 @@ function OtherCountdown({ goal }: { goal: GoalRow }) {
     ]);
     return { ms, ts, ls };
   }, [goal.id]);
-  if (!rows) return <li><Skeleton className="h-20" /></li>;
+  if (!rows)
+    return (
+      <li>
+        <Skeleton className="h-20" />
+      </li>
+    );
   const m = goalMetrics(goal, rows.ms, rows.ts, rows.ls, now);
   const pending = goal.status === 'review' || goal.status === 'planning';
   return (

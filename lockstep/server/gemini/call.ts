@@ -60,7 +60,14 @@ function tokensOf(r: GenerateContentResponse | undefined): number | null {
   return typeof t === 'number' ? t : null;
 }
 
-const SAFETY_FINISH = new Set(['SAFETY', 'PROHIBITED_CONTENT', 'BLOCKLIST', 'SPII', 'RECITATION', 'IMAGE_SAFETY']);
+const SAFETY_FINISH = new Set([
+  'SAFETY',
+  'PROHIBITED_CONTENT',
+  'BLOCKLIST',
+  'SPII',
+  'RECITATION',
+  'IMAGE_SAFETY',
+]);
 
 /** Why Gemini refused to answer (prompt blocked or answer stopped for safety), if it did. */
 export function blockReason(r: GenerateContentResponse): string | null {
@@ -72,9 +79,13 @@ export function blockReason(r: GenerateContentResponse): string | null {
 
 /** A refusal is not a server fault and retrying won't help, so it gets its own clear message. */
 function blockedError(reason: string): AppError {
-  return new AppError('INVALID_INPUT', 'Gemini declined this request for safety reasons. Try rephrasing it.', {
-    details: [`blocked: ${reason}`],
-  });
+  return new AppError(
+    'INVALID_INPUT',
+    'Gemini declined this request for safety reasons. Try rephrasing it.',
+    {
+      details: [`blocked: ${reason}`],
+    },
+  );
 }
 
 function record(ctx: CallContext, meta: AiRunMeta) {
@@ -168,7 +179,10 @@ export async function streamGemini(ctx: CallContext, args: StreamArgs): Promise<
         const attemptCtrl = new AbortController();
         attemptSignal = AbortSignal.any([total, attemptCtrl.signal]);
         const firstTimer = setTimeout(
-          () => attemptCtrl.abort(timeoutError(`No first chunk within ${Math.round(t.firstChunkTimeoutMs / 1000)} s`)),
+          () =>
+            attemptCtrl.abort(
+              timeoutError(`No first chunk within ${Math.round(t.firstChunkTimeoutMs / 1000)} s`),
+            ),
           t.firstChunkTimeoutMs,
         );
         try {
@@ -206,7 +220,10 @@ export async function streamGemini(ctx: CallContext, args: StreamArgs): Promise<
     try {
       while (stream) {
         const idle = setTimeout(
-          () => attemptCtrl.abort(timeoutError(`Stream paused for more than ${Math.round(t.chunkIdleTimeoutMs / 1000)} s`)),
+          () =>
+            attemptCtrl.abort(
+              timeoutError(`Stream paused for more than ${Math.round(t.chunkIdleTimeoutMs / 1000)} s`),
+            ),
           t.chunkIdleTimeoutMs,
         );
         let next: IteratorResult<GenerateContentResponse>;

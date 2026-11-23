@@ -3,7 +3,15 @@
  * and "Today's focus". Pure function of database rows + the current time.
  */
 import type { GoalRow, MilestoneRow, ProgressLogRow, TaskRow } from '@/db/db';
-import { addDays, computeCountdown, computePace, dayKey, formatDayKey, type Countdown, type Pace } from '@shared/time';
+import {
+  addDays,
+  computeCountdown,
+  computePace,
+  dayKey,
+  formatDayKey,
+  type Countdown,
+  type Pace,
+} from '@shared/time';
 
 export interface GoalMetrics {
   countdown: Countdown;
@@ -58,7 +66,8 @@ export function goalMetrics(
     progress = credited / minutesTotal;
   } else if (ordered.length) {
     const totalH = ordered.reduce((s, m) => s + m.estimated_hours, 0) || 1;
-    progress = ordered.filter((m) => m.status === 'completed').reduce((s, m) => s + m.estimated_hours, 0) / totalH;
+    progress =
+      ordered.filter((m) => m.status === 'completed').reduce((s, m) => s + m.estimated_hours, 0) / totalH;
   }
   if (goal.status === 'completed') progress = 1;
   progress = Math.min(1, Math.max(0, progress));

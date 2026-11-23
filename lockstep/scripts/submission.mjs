@@ -48,7 +48,8 @@ const GOAL = {
   daysOut: 35,
   time: '10:00',
   hours: 1.5,
-  constraints: 'Full-time job, so I study in the evenings. I learn best with practice questions. I want a full mock exam in the final week.',
+  constraints:
+    'Full-time job, so I study in the evenings. I learn best with practice questions. I want a full mock exam in the final week.',
 };
 
 async function main() {
@@ -57,7 +58,12 @@ async function main() {
     execSync('npm run build', { cwd: root, stdio: 'inherit' });
   }
   console.log(`› starting app on ${base}`);
-  const server = spawn('npx', ['tsx', 'server/prod.ts'], { cwd: root, env: { ...process.env, PORT: String(port), NODE_ENV: 'production', ALLOWED_ORIGINS: base }, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
+  const server = spawn('npx', ['tsx', 'server/prod.ts'], {
+    cwd: root,
+    env: { ...process.env, PORT: String(port), NODE_ENV: 'production', ALLOWED_ORIGINS: base },
+    stdio: ['ignore', 'pipe', 'pipe'],
+    detached: true,
+  });
   server.stderr.on('data', (d) => process.stderr.write(`[server] ${d}`));
   try {
     for (let i = 0; i < 60; i++) {
@@ -71,10 +77,16 @@ async function main() {
     }
     const health = await (await fetch(`${base}/api/health`)).json();
     const aiMode = health.ai?.configured === true;
-    console.log(`› Gemini ${aiMode ? 'CONFIGURED — real plan' : 'NOT configured — manual plan, Gemini text marked PENDING'}`);
+    console.log(
+      `› Gemini ${aiMode ? 'CONFIGURED — real plan' : 'NOT configured — manual plan, Gemini text marked PENDING'}`,
+    );
 
     const browser = await chromium.launch();
-    const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1, acceptDownloads: true });
+    const ctx = await browser.newContext({
+      viewport: { width: 1440, height: 1000 },
+      deviceScaleFactor: 1,
+      acceptDownloads: true,
+    });
     const page = await ctx.newPage();
     page.on('pageerror', (e) => console.error('[page error]', e.message));
 
@@ -127,8 +139,11 @@ async function main() {
           req.onsuccess = () => {
             const db = req.result;
             const tx = db.transaction(['goals', 'milestones', 'tasks'], 'readonly');
-            const all = (n) => new Promise((r) => (tx.objectStore(n).getAll().onsuccess = (e) => r(e.target.result)));
-            Promise.all([all('goals'), all('milestones'), all('tasks')]).then(([g, m, t]) => resolve({ goal: g[0], milestones: m, tasks: t }));
+            const all = (n) =>
+              new Promise((r) => (tx.objectStore(n).getAll().onsuccess = (e) => r(e.target.result)));
+            Promise.all([all('goals'), all('milestones'), all('tasks')]).then(([g, m, t]) =>
+              resolve({ goal: g[0], milestones: m, tasks: t }),
+            );
           };
         }),
     );
@@ -148,7 +163,10 @@ async function main() {
       await page.waitForTimeout(800);
       await page.getByRole('button', { name: 'Export', exact: true }).click();
       await page.getByText(/checked from the PNG header/).waitFor({ timeout: 60_000 });
-      const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download PNG' }).click()]);
+      const [dl] = await Promise.all([
+        page.waitForEvent('download'),
+        page.getByRole('button', { name: 'Download PNG' }).click(),
+      ]);
       await dl.saveAs(join(out, file));
       await page.keyboard.press('Escape');
       return dl.suggestedFilename();
@@ -157,7 +175,11 @@ async function main() {
     const androidName = await exportFor('android-1080', 'lockscreen-android.png');
 
     // ── Cover 2400×1600 @ DPR 1 ──
-    const coverCtx = await browser.newContext({ viewport: { width: 2400, height: 1600 }, deviceScaleFactor: 1, storageState: await ctx.storageState() });
+    const coverCtx = await browser.newContext({
+      viewport: { width: 2400, height: 1600 },
+      deviceScaleFactor: 1,
+      storageState: await ctx.storageState(),
+    });
     const cover = await coverCtx.newPage();
     // IndexedDB isn't in storageState for all versions — copy the active goal via the same origin.
     await cover.goto(`${base}/cover${liveUrl ? `?url=${encodeURIComponent(liveUrl)}` : ''}`);
@@ -169,11 +191,17 @@ async function main() {
       await page.locator('#cover-phones[data-ready="true"]').waitFor({ timeout: 30_000 });
       await page.evaluate(() => document.fonts.ready);
       await page.waitForTimeout(1500);
-      await page.screenshot({ path: join(out, 'cover.png'), clip: { x: 0, y: 0, width: 2400, height: 1600 } });
+      await page.screenshot({
+        path: join(out, 'cover.png'),
+        clip: { x: 0, y: 0, width: 2400, height: 1600 },
+      });
     } else {
       await cover.evaluate(() => document.fonts.ready);
       await cover.waitForTimeout(1500);
-      await cover.screenshot({ path: join(out, 'cover.png'), clip: { x: 0, y: 0, width: 2400, height: 1600 } });
+      await cover.screenshot({
+        path: join(out, 'cover.png'),
+        clip: { x: 0, y: 0, width: 2400, height: 1600 },
+      });
       await coverCtx.close();
     }
     await browser.close();
@@ -185,7 +213,12 @@ async function main() {
       ['cover.png', 2400, 1600],
     ].map(([f, w, h]) => {
       const s = pngSize(join(out, f));
-      return { file: f, expected: `${w}×${h}`, actual: `${s.width}×${s.height}`, ok: s.width === w && s.height === h };
+      return {
+        file: f,
+        expected: `${w}×${h}`,
+        actual: `${s.width}×${s.height}`,
+        ok: s.width === w && s.height === h,
+      };
     });
 
     // ── Text assets ──
@@ -193,7 +226,12 @@ async function main() {
     writeFileSync(join(out, 'title.txt'), title + '\n');
     const n = facts.milestones.length;
     const t = facts.tasks.length;
-    const due = new Date(facts.goal.deadline_utc).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: facts.goal.timezone });
+    const due = new Date(facts.goal.deadline_utc).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      timeZone: facts.goal.timezone,
+    });
     const cap = meta?.capacity?.capacityHours;
     const urlPart = liveUrl ? ` ${liveUrl}` : '';
     let description;
@@ -250,14 +288,18 @@ ${checks.map((c) => `- ${c.ok ? '✅' : '❌'} ${c.file}: ${c.actual} (expected 
 ## Privacy
 Only the goal title appears. No name, email, phone, school ID, address or face.
 
-${pending ? `## ⚠️ Before you submit
+${
+  pending
+    ? `## ⚠️ Before you submit
 This environment had **no GEMINI_API_KEY**, so this run used the app's manual-plan path. Nothing here claims to be Gemini output. To make the assets from a real Gemini plan:
 
 \`\`\`bash
 cd lockstep && echo "GEMINI_API_KEY=…" >> .env
 npm run submission -- --url https://<your-live-url>
 \`\`\`
-` : ''}
+`
+    : ''
+}
 ## Before you paste the description
 1. Replace \`[DEVELOPER: write your own lesson]\` with one true sentence about what *you* learned.
 2. Re-count: \`node -e "console.log([...require('fs').readFileSync('submission/description.txt','utf8').trim()].length)"\`. It must stay ≤ 500.
@@ -265,7 +307,8 @@ npm run submission -- --url https://<your-live-url>
     );
 
     console.log('\n› dimensions:');
-    for (const c of checks) console.log(`  ${c.ok ? '✓' : '✗'} ${c.file} ${c.actual} (expected ${c.expected})`);
+    for (const c of checks)
+      console.log(`  ${c.ok ? '✓' : '✗'} ${c.file} ${c.actual} (expected ${c.expected})`);
     console.log(`› description: ${chars} characters (limit 500, target ≤480)`);
     console.log(`› mode: ${run.mode}`);
     if (checks.some((c) => !c.ok) || chars > 480) process.exitCode = 1;

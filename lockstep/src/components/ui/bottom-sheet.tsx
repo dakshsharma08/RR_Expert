@@ -50,7 +50,8 @@ export function BottomSheet({
     const current = drag ?? restOffset;
     start.current = null;
     setDrag(null);
-    if (moved < 6) onExpandedChange(!expanded); // a tap toggles
+    if (moved < 6)
+      onExpandedChange(!expanded); // a tap toggles
     else onExpandedChange(current < (fullH - vh * peek) / 2);
   };
 

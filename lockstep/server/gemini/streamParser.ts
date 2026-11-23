@@ -128,7 +128,11 @@ export class PlanStreamParser {
     if (!this.feasibilitySent && this.feasibility !== null && this.reason !== null) {
       this.feasibilitySent = true;
       if ((FEASIBILITY as readonly string[]).includes(this.feasibility)) {
-        out.push({ type: 'feasibility', feasibility: this.feasibility as Feasibility, feasibilityReason: this.reason });
+        out.push({
+          type: 'feasibility',
+          feasibility: this.feasibility as Feasibility,
+          feasibilityReason: this.reason,
+        });
       }
     }
   }

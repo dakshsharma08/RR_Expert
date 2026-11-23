@@ -3,7 +3,15 @@ import type { ReactNode } from 'react';
 
 export const TooltipProvider = T.Provider;
 
-export function Tooltip({ content, children, side = 'top' }: { content: ReactNode; children: ReactNode; side?: 'top' | 'bottom' | 'left' | 'right' }) {
+export function Tooltip({
+  content,
+  children,
+  side = 'top',
+}: {
+  content: ReactNode;
+  children: ReactNode;
+  side?: 'top' | 'bottom' | 'left' | 'right';
+}) {
   return (
     <T.Root delayDuration={350}>
       <T.Trigger asChild>{children}</T.Trigger>

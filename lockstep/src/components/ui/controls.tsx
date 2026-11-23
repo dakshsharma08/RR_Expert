@@ -54,7 +54,13 @@ export function ChoiceChips<T extends string>({
   label: string;
 }) {
   return (
-    <ToggleGroup.Root type="single" value={value} onValueChange={(v) => v && onChange(v as T)} aria-label={label} className="flex flex-wrap gap-2">
+    <ToggleGroup.Root
+      type="single"
+      value={value}
+      onValueChange={(v) => v && onChange(v as T)}
+      aria-label={label}
+      className="flex flex-wrap gap-2"
+    >
       {options.map((o) => (
         <ToggleGroup.Item
           key={o.value}
@@ -69,7 +75,15 @@ export function ChoiceChips<T extends string>({
 }
 
 /** Mon–Sun toggles (multi-select). Week starts Monday. */
-export function WeekdayToggles({ value, onChange, label = 'Working days' }: { value: number[]; onChange: (v: number[]) => void; label?: string }) {
+export function WeekdayToggles({
+  value,
+  onChange,
+  label = 'Working days',
+}: {
+  value: number[];
+  onChange: (v: number[]) => void;
+  label?: string;
+}) {
   const order = [1, 2, 3, 4, 5, 6, 0];
   return (
     <ToggleGroup.Root
@@ -134,7 +148,17 @@ export function Slider({
   );
 }
 
-export function Switch({ checked, onChange, label, id }: { checked: boolean; onChange: (v: boolean) => void; label: string; id?: string }) {
+export function Switch({
+  checked,
+  onChange,
+  label,
+  id,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  id?: string;
+}) {
   return (
     <RSwitch.Root
       id={id}
@@ -149,7 +173,17 @@ export function Switch({ checked, onChange, label, id }: { checked: boolean; onC
 }
 
 /** Wraps a Switch with a visible label; the whole row is a ≥44px target. */
-export function SwitchRow({ checked, onChange, label, description }: { checked: boolean; onChange: (v: boolean) => void; label: string; description?: string }) {
+export function SwitchRow({
+  checked,
+  onChange,
+  label,
+  description,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  description?: string;
+}) {
   return (
     <label className="flex min-h-11 cursor-pointer items-center justify-between gap-4 py-1">
       <span>

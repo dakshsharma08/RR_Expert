@@ -138,9 +138,8 @@ export interface Capacity {
  */
 export function computeCapacity(input: CapacityInput): Capacity {
   const toKey = effectiveDeadlineKey(input.deadlineUtc, input.timezone);
-  const workingDates = diffDays(input.todayKey, toKey) >= 0
-    ? workingDaysBetween(input.todayKey, toKey, input.workingDays)
-    : [];
+  const workingDates =
+    diffDays(input.todayKey, toKey) >= 0 ? workingDaysBetween(input.todayKey, toKey, input.workingDays) : [];
   const capacityHours = round1(workingDates.length * input.hoursPerDay);
   return {
     fromKey: input.todayKey,
@@ -156,7 +155,8 @@ export function computeCapacity(input: CapacityInput): Capacity {
 export function allowedMilestoneDates(cap: Capacity): string[] {
   const valid = cap.workingDates.filter((d) => d > cap.fromKey);
   // Same-day deadline: today is the only possible date.
-  if (valid.length === 0 && cap.toKey === cap.fromKey && cap.workingDates.includes(cap.fromKey)) return [cap.fromKey];
+  if (valid.length === 0 && cap.toKey === cap.fromKey && cap.workingDates.includes(cap.fromKey))
+    return [cap.fromKey];
   return valid;
 }
 
@@ -189,8 +189,10 @@ export function codeFeasibility(totalHours: number, cap: Capacity, subject = 'Pl
   const ratio = totalHours / cap.capacityHours;
   const pct = Math.round(ratio * 100);
   const base = `${subject} needs ${fmtH(totalHours)} h; you have ${fmtH(cap.capacityHours)} h (${cap.workingDayCount} working day${cap.workingDayCount === 1 ? '' : 's'} × ${fmtH(cap.hoursPerDay)} h/day) — ${pct}% of your capacity.`;
-  if (ratio <= 0.85) return { feasibility: 'Achievable', ratio, reason: `${base} That leaves room for bad days.` };
-  if (ratio <= 1) return { feasibility: 'Tight', ratio, reason: `${base} Little slack — one missed day hurts.` };
+  if (ratio <= 0.85)
+    return { feasibility: 'Achievable', ratio, reason: `${base} That leaves room for bad days.` };
+  if (ratio <= 1)
+    return { feasibility: 'Tight', ratio, reason: `${base} Little slack — one missed day hurts.` };
   return { feasibility: 'Unrealistic', ratio, reason: `${base} It does not fit before the deadline.` };
 }
 
@@ -201,13 +203,7 @@ function fmtH(n: number): string {
 // ───────────────────────────── Validation ─────────────────────────────
 
 export type CheckId =
-  | 'shape'
-  | 'dates-future'
-  | 'dates-deadline'
-  | 'chronological'
-  | 'working-days'
-  | 'hours-sum'
-  | 'capacity';
+  'shape' | 'dates-future' | 'dates-deadline' | 'chronological' | 'working-days' | 'hours-sum' | 'capacity';
 
 export interface PlanCheck {
   id: CheckId;
@@ -255,7 +251,9 @@ export function validatePlan(raw: unknown, ctx: ValidationContext): ValidationRe
     return {
       ok: false,
       plan: null,
-      checks: [{ id: 'shape', label: 'Response matches the plan schema', ok: false, detail: errors.join('; ') }],
+      checks: [
+        { id: 'shape', label: 'Response matches the plan schema', ok: false, detail: errors.join('; ') },
+      ],
       errors,
       capacity,
       code,
@@ -282,7 +280,8 @@ export function validatePlan(raw: unknown, ctx: ValidationContext): ValidationRe
       return;
     }
     const afterToday = sameDayDeadline ? m.targetDate >= ctx.todayKey : m.targetDate > ctx.todayKey;
-    if (!afterToday) pastDates.push(`${label} targetDate ${m.targetDate} must be after today (${ctx.todayKey}).`);
+    if (!afterToday)
+      pastDates.push(`${label} targetDate ${m.targetDate} must be after today (${ctx.todayKey}).`);
     if (m.targetDate > deadlineKey)
       lateDates.push(`${label} targetDate ${m.targetDate} is after the deadline day (${deadlineKey}).`);
     if (!working.has(weekdayOf(m.targetDate)))
@@ -316,7 +315,12 @@ export function validatePlan(raw: unknown, ctx: ValidationContext): ValidationRe
   const fits = sum <= capacity.capacityHours;
 
   const checks: PlanCheck[] = [
-    { id: 'shape', label: 'Response matches the plan schema', ok: true, detail: `${plan.milestones.length} milestones, ${plan.milestones.reduce((s, m) => s + m.tasks.length, 0)} tasks.` },
+    {
+      id: 'shape',
+      label: 'Response matches the plan schema',
+      ok: true,
+      detail: `${plan.milestones.length} milestones, ${plan.milestones.reduce((s, m) => s + m.tasks.length, 0)} tasks.`,
+    },
     {
       id: 'dates-future',
       label: 'Every milestone date is after today',
@@ -376,9 +380,17 @@ export function validatePlan(raw: unknown, ctx: ValidationContext): ValidationRe
  * Code feasibility for a plan total, taking into account a FULL-goal estimate when
  * Gemini had to cut scope. Shared by server validation and client re-checks after edits.
  */
-export function feasibilityFor(planHours: number, fullScopeHours: number | null | undefined, cap: Capacity, subject = 'Plan'): FeasibilityResult {
-  const scope = fullScopeHours != null && fullScopeHours > planHours + 0.5 ? round1(fullScopeHours) : planHours;
-  return scope > planHours && scope > cap.capacityHours ? scopeFeasibility(scope, planHours, cap) : codeFeasibility(planHours, cap, subject);
+export function feasibilityFor(
+  planHours: number,
+  fullScopeHours: number | null | undefined,
+  cap: Capacity,
+  subject = 'Plan',
+): FeasibilityResult {
+  const scope =
+    fullScopeHours != null && fullScopeHours > planHours + 0.5 ? round1(fullScopeHours) : planHours;
+  return scope > planHours && scope > cap.capacityHours
+    ? scopeFeasibility(scope, planHours, cap)
+    : codeFeasibility(planHours, cap, subject);
 }
 
 /** Feasibility when the plan was trimmed to fit: the full goal doesn't fit, by definition. */

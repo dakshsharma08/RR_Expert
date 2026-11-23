@@ -7,7 +7,11 @@ export function useGoals() {
 }
 
 export function useGoal(goalId: string | undefined) {
-  return useLiveQuery(async () => (goalId ? ((await db.goals.get(goalId)) ?? null) : null), [goalId], undefined);
+  return useLiveQuery(
+    async () => (goalId ? ((await db.goals.get(goalId)) ?? null) : null),
+    [goalId],
+    undefined,
+  );
 }
 
 export function useGoalData(goalId: string | undefined) {

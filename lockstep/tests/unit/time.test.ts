@@ -84,7 +84,11 @@ describe('countdown', () => {
   const base = { startUtc: '2026-11-01T00:00:00.000Z', timezone: 'UTC' };
 
   it('is active with days left and Day X of Y', () => {
-    const c = computeCountdown({ ...base, deadlineUtc: '2026-12-31T17:00:00.000Z', nowMs: Date.parse('2026-11-23T10:00:00Z') });
+    const c = computeCountdown({
+      ...base,
+      deadlineUtc: '2026-12-31T17:00:00.000Z',
+      nowMs: Date.parse('2026-11-23T10:00:00Z'),
+    });
     expect(c.state).toBe('active');
     expect(c.daysLeft).toBe(38);
     expect(c.dayNumber).toBe(23);
@@ -94,20 +98,32 @@ describe('countdown', () => {
   });
 
   it('is due-today on a same-day deadline', () => {
-    const c = computeCountdown({ ...base, deadlineUtc: '2026-11-23T18:00:00.000Z', nowMs: Date.parse('2026-11-23T10:00:00Z') });
+    const c = computeCountdown({
+      ...base,
+      deadlineUtc: '2026-11-23T18:00:00.000Z',
+      nowMs: Date.parse('2026-11-23T10:00:00Z'),
+    });
     expect(c.state).toBe('due-today');
     expect(c.daysLeft).toBe(0);
     expect(c.parts).toEqual({ days: 0, hours: 8, minutes: 0, seconds: 0 });
   });
 
   it('is due-today the day before a midnight deadline', () => {
-    const c = computeCountdown({ ...base, deadlineUtc: '2026-11-24T00:00:00.000Z', nowMs: Date.parse('2026-11-23T10:00:00Z') });
+    const c = computeCountdown({
+      ...base,
+      deadlineUtc: '2026-11-24T00:00:00.000Z',
+      nowMs: Date.parse('2026-11-23T10:00:00Z'),
+    });
     expect(c.state).toBe('due-today');
     expect(c.daysLeft).toBe(0);
   });
 
   it('is expired after the deadline and never shows negative time', () => {
-    const c = computeCountdown({ ...base, deadlineUtc: '2026-11-20T18:00:00.000Z', nowMs: Date.parse('2026-11-23T10:00:00Z') });
+    const c = computeCountdown({
+      ...base,
+      deadlineUtc: '2026-11-20T18:00:00.000Z',
+      nowMs: Date.parse('2026-11-23T10:00:00Z'),
+    });
     expect(c.state).toBe('expired');
     expect(c.remainingMs).toBe(0);
     expect(c.parts.seconds).toBe(0);
@@ -115,10 +131,20 @@ describe('countdown', () => {
   });
 
   it('is upcoming before the start and completed when flagged', () => {
-    const up = computeCountdown({ ...base, startUtc: '2026-12-01T00:00:00Z', deadlineUtc: '2026-12-31T00:00:00Z', nowMs: Date.parse('2026-11-23T10:00:00Z') });
+    const up = computeCountdown({
+      ...base,
+      startUtc: '2026-12-01T00:00:00Z',
+      deadlineUtc: '2026-12-31T00:00:00Z',
+      nowMs: Date.parse('2026-11-23T10:00:00Z'),
+    });
     expect(up.state).toBe('upcoming');
     expect(up.dayNumber).toBe(0);
-    const done = computeCountdown({ ...base, deadlineUtc: '2026-12-31T00:00:00Z', nowMs: Date.parse('2026-11-23T10:00:00Z'), completed: true });
+    const done = computeCountdown({
+      ...base,
+      deadlineUtc: '2026-12-31T00:00:00Z',
+      nowMs: Date.parse('2026-11-23T10:00:00Z'),
+      completed: true,
+    });
     expect(done.state).toBe('completed');
   });
 
@@ -126,7 +152,12 @@ describe('countdown', () => {
     // Deadline 9:00 New York on 2026-03-10; now is 2026-03-07 noon New York (before spring forward).
     const deadline = localToUtcIso('2026-03-10', '09:00', 'America/New_York').iso;
     const now = Date.parse(localToUtcIso('2026-03-07', '12:00', 'America/New_York').iso);
-    const c = computeCountdown({ startUtc: '2026-03-01T00:00:00Z', deadlineUtc: deadline, timezone: 'America/New_York', nowMs: now });
+    const c = computeCountdown({
+      startUtc: '2026-03-01T00:00:00Z',
+      deadlineUtc: deadline,
+      timezone: 'America/New_York',
+      nowMs: now,
+    });
     expect(c.daysLeft).toBe(3);
     // 2 days 21 hours wall-clock, minus the hour lost to DST → 2d 20h.
     expect(c.parts.days).toBe(2);
@@ -134,7 +165,12 @@ describe('countdown', () => {
   });
 
   it('handles a leap-day deadline', () => {
-    const c = computeCountdown({ startUtc: '2028-02-01T00:00:00Z', deadlineUtc: '2028-02-29T12:00:00Z', timezone: 'UTC', nowMs: Date.parse('2028-02-28T12:00:00Z') });
+    const c = computeCountdown({
+      startUtc: '2028-02-01T00:00:00Z',
+      deadlineUtc: '2028-02-29T12:00:00Z',
+      timezone: 'UTC',
+      nowMs: Date.parse('2028-02-28T12:00:00Z'),
+    });
     expect(c.daysLeft).toBe(1);
     expect(c.totalDays).toBe(29);
   });

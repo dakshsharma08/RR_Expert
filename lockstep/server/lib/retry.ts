@@ -25,7 +25,12 @@ export interface RetryOptions {
  * Delay before retry number `attempt` (0-based): base × 2^attempt, capped,
  * then "equal jitter": a random value between half and all of that.
  */
-export function backoffDelay(attempt: number, baseMs: number, maxMs: number, random: () => number = Math.random): number {
+export function backoffDelay(
+  attempt: number,
+  baseMs: number,
+  maxMs: number,
+  random: () => number = Math.random,
+): number {
   const exp = Math.min(maxMs, baseMs * 2 ** attempt);
   return Math.round(exp / 2 + random() * (exp / 2));
 }

@@ -15,6 +15,8 @@ const { createApp } = await import('./app');
 
 const port = Number(process.env.PORT) || 8787;
 createApp().listen(port, () => {
-  const ai = process.env.GEMINI_API_KEY ? 'configured' : 'NOT configured (AI routes answer 503 AI_NOT_CONFIGURED)';
+  const ai = process.env.GEMINI_API_KEY
+    ? 'configured'
+    : 'NOT configured (AI routes answer 503 AI_NOT_CONFIGURED)';
   console.log(`LOCKSTEP API on http://localhost:${port}/api — Gemini ${ai}`);
 });

@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { IntakeSchema, PlanSchema, codeFeasibility, computeCapacity, suggestFixes, validatePlan, type Plan } from '../../shared/plan';
+import {
+  IntakeSchema,
+  PlanSchema,
+  codeFeasibility,
+  computeCapacity,
+  suggestFixes,
+  validatePlan,
+  type Plan,
+} from '../../shared/plan';
 
 // Monday 2026-11-23, deadline Fri 2026-12-04 18:00 UTC, Mon–Fri, 2 h/day.
 const ctx = {
@@ -19,9 +27,33 @@ function plan(overrides: Partial<Plan> = {}): Plan {
     feasibilityReason: 'Fits comfortably.',
     totalEstimatedHours: 12,
     milestones: [
-      { id: 'm1', title: 'Wireframes', description: 'Sketch pages', targetDate: '2026-11-25', estimatedHours: 4, difficulty: 'Easy', tasks: [{ id: 't1', title: 'Home page sketch', estimatedMinutes: 120 }] },
-      { id: 'm2', title: 'Build', description: 'Code it', targetDate: '2026-12-01', estimatedHours: 6, difficulty: 'Medium', tasks: [{ id: 't2', title: 'Layout', estimatedMinutes: 180 }] },
-      { id: 'm3', title: 'Launch', description: 'Deploy', targetDate: '2026-12-04', estimatedHours: 2, difficulty: 'Easy', tasks: [{ id: 't3', title: 'Deploy', estimatedMinutes: 60 }] },
+      {
+        id: 'm1',
+        title: 'Wireframes',
+        description: 'Sketch pages',
+        targetDate: '2026-11-25',
+        estimatedHours: 4,
+        difficulty: 'Easy',
+        tasks: [{ id: 't1', title: 'Home page sketch', estimatedMinutes: 120 }],
+      },
+      {
+        id: 'm2',
+        title: 'Build',
+        description: 'Code it',
+        targetDate: '2026-12-01',
+        estimatedHours: 6,
+        difficulty: 'Medium',
+        tasks: [{ id: 't2', title: 'Layout', estimatedMinutes: 180 }],
+      },
+      {
+        id: 'm3',
+        title: 'Launch',
+        description: 'Deploy',
+        targetDate: '2026-12-04',
+        estimatedHours: 2,
+        difficulty: 'Easy',
+        tasks: [{ id: 't3', title: 'Deploy', estimatedMinutes: 60 }],
+      },
     ],
     risks: ['Scope creep'],
     recoveryStrategy: 'Cut the blog.',
@@ -109,7 +141,9 @@ describe('validatePlan', () => {
 
   it('allows today only for a same-day deadline', () => {
     const sameDay = { ...ctx, deadlineUtc: '2026-11-23T20:00:00Z' };
-    const p = plan({ milestones: [{ ...plan().milestones[0]!, targetDate: '2026-11-23', estimatedHours: 1 }] });
+    const p = plan({
+      milestones: [{ ...plan().milestones[0]!, targetDate: '2026-11-23', estimatedHours: 1 }],
+    });
     expect(validatePlan(p, sameDay).ok).toBe(true);
   });
 });
@@ -144,11 +178,27 @@ describe('fix suggestions', () => {
 describe('schemas', () => {
   it('validates intake', () => {
     const ok = IntakeSchema.safeParse({
-      goal: 'Pass the AWS exam', deadlineDate: '2026-12-20', deadlineTime: '09:00', timezone: 'Asia/Kolkata',
-      level: 'Beginner', hoursPerDay: 2, workingDays: [1, 2, 3], constraints: '', pace: 'Balanced',
+      goal: 'Pass the AWS exam',
+      deadlineDate: '2026-12-20',
+      deadlineTime: '09:00',
+      timezone: 'Asia/Kolkata',
+      level: 'Beginner',
+      hoursPerDay: 2,
+      workingDays: [1, 2, 3],
+      constraints: '',
+      pace: 'Balanced',
     });
     expect(ok.success).toBe(true);
-    const bad = IntakeSchema.safeParse({ goal: 'x', deadlineDate: '2026-02-30', deadlineTime: '25:00', timezone: 'Nope', level: 'Pro', hoursPerDay: 40, workingDays: [], pace: 'Fast' });
+    const bad = IntakeSchema.safeParse({
+      goal: 'x',
+      deadlineDate: '2026-02-30',
+      deadlineTime: '25:00',
+      timezone: 'Nope',
+      level: 'Pro',
+      hoursPerDay: 40,
+      workingDays: [],
+      pace: 'Fast',
+    });
     expect(bad.success).toBe(false);
     expect(bad.error!.issues.length).toBeGreaterThanOrEqual(7);
   });

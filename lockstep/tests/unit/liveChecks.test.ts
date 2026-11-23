@@ -3,9 +3,21 @@ import { liveChecks } from '../../src/lib/liveChecks';
 import type { GoalRow, MilestoneRow } from '../../src/db/db';
 
 const NOW = Date.parse('2026-11-23T12:00:00Z'); // Monday
-const goal = { status: 'review', timezone: 'UTC', deadline_utc: '2026-12-04T18:00:00Z', working_days: [1, 2, 3, 4, 5] } as unknown as GoalRow;
+const goal = {
+  status: 'review',
+  timezone: 'UTC',
+  deadline_utc: '2026-12-04T18:00:00Z',
+  working_days: [1, 2, 3, 4, 5],
+} as unknown as GoalRow;
 const ms = (dates: string[], extra: Partial<MilestoneRow> = {}) =>
-  dates.map((d, i) => ({ id: `m${i}`, order: i, target_date: d, estimated_hours: 2, status: 'pending', ...extra })) as MilestoneRow[];
+  dates.map((d, i) => ({
+    id: `m${i}`,
+    order: i,
+    target_date: d,
+    estimated_hours: 2,
+    status: 'pending',
+    ...extra,
+  })) as MilestoneRow[];
 
 describe('live plan checks (review screen)', () => {
   it('accepts a clean plan', () => {

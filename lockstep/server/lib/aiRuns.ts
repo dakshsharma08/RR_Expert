@@ -62,6 +62,19 @@ export function createRunRecorder(opts: RunRecorderOptions): RunRecorder {
 }
 
 /** Build an AiRunMeta. `tokens` is usageMetadata.totalTokenCount when Gemini reports it. */
-export function runMeta(kind: AiKind, model: string, startedAt: number, ok: boolean, tokens: number | null): AiRunMeta {
-  return { kind, model, latencyMs: Math.max(0, Date.now() - startedAt), ok, tokens, at: new Date().toISOString() };
+export function runMeta(
+  kind: AiKind,
+  model: string,
+  startedAt: number,
+  ok: boolean,
+  tokens: number | null,
+): AiRunMeta {
+  return {
+    kind,
+    model,
+    latencyMs: Math.max(0, Date.now() - startedAt),
+    ok,
+    tokens,
+    at: new Date().toISOString(),
+  };
 }

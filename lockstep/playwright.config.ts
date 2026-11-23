@@ -27,6 +27,11 @@ export default defineConfig({
   ],
   webServer: [
     { command: 'PORT=8787 npx tsx e2e/mock-api.ts', port: 8787, reuseExistingServer: false, timeout: 60_000 },
-    { command: 'npx vite preview --port 4173 --strictPort', port: 4173, reuseExistingServer: false, timeout: 60_000 },
+    {
+      command: 'npx vite preview --port 4173 --strictPort',
+      port: 4173,
+      reuseExistingServer: false,
+      timeout: 60_000,
+    },
   ],
 });

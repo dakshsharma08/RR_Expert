@@ -16,8 +16,27 @@ import { getHealth } from '@/lib/api';
 import { createGoalDraft, startManualPlan, setActiveGoal } from '@/db/repo';
 import { usePlanner } from '@/stores/planner';
 import type { StoredIntake } from '@/db/db';
-import { LEVELS, LIMITS, PACES, MAX_HORIZON_DAYS, allowedMilestoneDates, computeCapacity, IntakeSchema, type IntakeInput } from '@shared/plan';
-import { addDays, dayKey, deviceTimeZone, formatInZone, isValidTimeZone, listTimeZones, localToUtcIso, zoneLabel, computeCountdown } from '@shared/time';
+import {
+  LEVELS,
+  LIMITS,
+  PACES,
+  MAX_HORIZON_DAYS,
+  allowedMilestoneDates,
+  computeCapacity,
+  IntakeSchema,
+  type IntakeInput,
+} from '@shared/plan';
+import {
+  addDays,
+  dayKey,
+  deviceTimeZone,
+  formatInZone,
+  isValidTimeZone,
+  listTimeZones,
+  localToUtcIso,
+  zoneLabel,
+  computeCountdown,
+} from '@shared/time';
 import { SAMPLE_GOALS } from './samples';
 import { useUi } from '@/stores/ui';
 import { AttachmentPicker } from './AttachmentPicker';
@@ -88,11 +107,17 @@ export default function WizardPage() {
   const preview = useMemo(() => {
     if (!isValidTimeZone(draft.timezone)) return null;
     // Don't walk millions of days for a typo like year 9999: validation reports it instead.
-    if (draft.deadlineDate > addDays(dayKey(Date.now(), draft.timezone), MAX_HORIZON_DAYS + 1)) return TOO_FAR;
+    if (draft.deadlineDate > addDays(dayKey(Date.now(), draft.timezone), MAX_HORIZON_DAYS + 1))
+      return TOO_FAR;
     try {
       const conv = localToUtcIso(draft.deadlineDate, draft.deadlineTime, draft.timezone);
       const now = Date.now();
-      const c = computeCountdown({ nowMs: now, startUtc: new Date(now).toISOString(), deadlineUtc: conv.iso, timezone: draft.timezone });
+      const c = computeCountdown({
+        nowMs: now,
+        startUtc: new Date(now).toISOString(),
+        deadlineUtc: conv.iso,
+        timezone: draft.timezone,
+      });
       const cap = computeCapacity({
         todayKey: dayKey(now, draft.timezone),
         deadlineUtc: conv.iso,
@@ -105,7 +130,7 @@ export default function WizardPage() {
         c,
         cap,
         past: conv.utc.getTime() <= now,
-        tooFar: draft.deadlineDate > addDays(dayKey(now, draft.timezone), MAX_HORIZON_DAYS) as boolean,
+        tooFar: (draft.deadlineDate > addDays(dayKey(now, draft.timezone), MAX_HORIZON_DAYS)) as boolean,
         plannableDays: allowedMilestoneDates(cap).length,
       };
     } catch {
@@ -124,12 +149,14 @@ export default function WizardPage() {
       if (!isValidTimeZone(draft.timezone)) e.timezone = 'Pick a time zone from the list.';
       else if (!preview) e.deadlineDate = 'Enter a real date and time.';
       else if (preview.past) e.deadlineDate = 'The deadline has to be in the future.';
-      else if (preview.tooFar || !('cap' in preview)) e.deadlineDate = 'Pick a deadline within the next 3 years.';
+      else if (preview.tooFar || !('cap' in preview))
+        e.deadlineDate = 'Pick a deadline within the next 3 years.';
     }
     if (s === 2) {
       if (draft.workingDays.length === 0) e.workingDays = 'Pick at least one working day.';
       else if (preview && !preview.past && preview.plannableDays === 0)
-        e.workingDays = 'None of these working days fall between today and the deadline. Add a day or move the deadline.';
+        e.workingDays =
+          'None of these working days fall between today and the deadline. Add a day or move the deadline.';
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -162,7 +189,9 @@ export default function WizardPage() {
     });
     setErrors({});
     toast.success('Sample goal filled in', {
-      description: aiReady ? 'Gemini will still plan it for real. Edit anything you like.' : 'Edit anything you like.',
+      description: aiReady
+        ? 'Gemini will still plan it for real. Edit anything you like.'
+        : 'Edit anything you like.',
     });
   }
 
@@ -210,7 +239,12 @@ export default function WizardPage() {
           <p className="eyebrow">
             Step {step + 1} of {STEPS.length} · {STEPS[step]}
           </p>
-          <Button variant="ghost" size="sm" onClick={trySample} icon={<Wand2 className="size-4" strokeWidth={1.5} />}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={trySample}
+            icon={<Wand2 className="size-4" strokeWidth={1.5} />}
+          >
             Try a sample goal
           </Button>
         </div>
@@ -241,7 +275,11 @@ export default function WizardPage() {
                 <h1 id="wizard-q" className="text-[28px] leading-tight sm:text-[40px]">
                   What are you working towards?
                 </h1>
-                <Field label="Your goal" error={errors.goal} hint="Be specific: what will be true when you're done?">
+                <Field
+                  label="Your goal"
+                  error={errors.goal}
+                  hint="Be specific: what will be true when you're done?"
+                >
                   {({ id, describedBy, invalid }) => (
                     <div className="relative">
                       <Textarea
@@ -256,7 +294,9 @@ export default function WizardPage() {
                         autoFocus
                       />
                       <div className="absolute bottom-2 right-2">
-                        <VoiceButton onText={(t) => update('goal', (draft.goal ? draft.goal + ' ' : '') + t)} />
+                        <VoiceButton
+                          onText={(t) => update('goal', (draft.goal ? draft.goal + ' ' : '') + t)}
+                        />
                       </div>
                     </div>
                   )}
@@ -273,18 +313,51 @@ export default function WizardPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field label="Deadline date" error={errors.deadlineDate}>
                     {({ id, describedBy, invalid }) => (
-                      <Input id={id} type="date" aria-describedby={describedBy} aria-invalid={invalid} value={draft.deadlineDate} min={dayKey(Date.now(), isValidTimeZone(draft.timezone) ? draft.timezone : 'UTC')} onChange={(e) => update('deadlineDate', e.target.value)} />
+                      <Input
+                        id={id}
+                        type="date"
+                        aria-describedby={describedBy}
+                        aria-invalid={invalid}
+                        value={draft.deadlineDate}
+                        min={dayKey(Date.now(), isValidTimeZone(draft.timezone) ? draft.timezone : 'UTC')}
+                        onChange={(e) => update('deadlineDate', e.target.value)}
+                      />
                     )}
                   </Field>
                   <Field label="Time">
-                    {({ id }) => <Input id={id} type="time" value={draft.deadlineTime} onChange={(e) => update('deadlineTime', e.target.value || '00:00')} />}
+                    {({ id }) => (
+                      <Input
+                        id={id}
+                        type="time"
+                        value={draft.deadlineTime}
+                        onChange={(e) => update('deadlineTime', e.target.value || '00:00')}
+                      />
+                    )}
                   </Field>
                 </div>
-                <Field label="Time zone" error={errors.timezone} hint="We count days in this zone, so travelling never shifts your deadline.">
+                <Field
+                  label="Time zone"
+                  error={errors.timezone}
+                  hint="We count days in this zone, so travelling never shifts your deadline."
+                >
                   {({ id, describedBy, invalid }) => (
                     <div className="relative">
-                      <Globe2 className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted" strokeWidth={1.5} aria-hidden />
-                      <Input id={id} list="tz-list" aria-describedby={describedBy} aria-invalid={invalid} className="pl-11" value={draft.timezone} onChange={(e) => update('timezone', e.target.value.trim())} autoComplete="off" spellCheck={false} />
+                      <Globe2
+                        className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted"
+                        strokeWidth={1.5}
+                        aria-hidden
+                      />
+                      <Input
+                        id={id}
+                        list="tz-list"
+                        aria-describedby={describedBy}
+                        aria-invalid={invalid}
+                        className="pl-11"
+                        value={draft.timezone}
+                        onChange={(e) => update('timezone', e.target.value.trim())}
+                        autoComplete="off"
+                        spellCheck={false}
+                      />
                       <datalist id="tz-list">
                         {zones.map((z) => (
                           <option key={z} value={z} />
@@ -295,11 +368,17 @@ export default function WizardPage() {
                 </Field>
                 {preview && 'cap' in preview && !preview.past && (
                   <div className="card flex items-start gap-3 p-4" aria-live="polite">
-                    <CalendarClock className="mt-0.5 size-5 shrink-0 text-accent-text" strokeWidth={1.5} aria-hidden />
+                    <CalendarClock
+                      className="mt-0.5 size-5 shrink-0 text-accent-text"
+                      strokeWidth={1.5}
+                      aria-hidden
+                    />
                     <div className="text-sm">
                       <p className="text-text">
-                        <span className="font-mono tabular text-accent-text">{preview.c.daysLeft}</span> day{preview.c.daysLeft === 1 ? '' : 's'} from today ·{' '}
-                        {formatInZone(preview.conv.utc, draft.timezone)} ({zoneLabel(draft.timezone, preview.conv.utc)})
+                        <span className="font-mono tabular text-accent-text">{preview.c.daysLeft}</span> day
+                        {preview.c.daysLeft === 1 ? '' : 's'} from today ·{' '}
+                        {formatInZone(preview.conv.utc, draft.timezone)} (
+                        {zoneLabel(draft.timezone, preview.conv.utc)})
                       </p>
                       {preview.conv.note && <p className="mt-1 text-warning">{preview.conv.note}</p>}
                     </div>
@@ -314,20 +393,41 @@ export default function WizardPage() {
                   How much time can you give it?
                 </h1>
                 <div className="space-y-2">
-                  <p className="text-sm font-medium" id="level-label">Your level</p>
-                  <ChoiceChips label="Your level" value={draft.level} onChange={(v) => update('level', v)} options={LEVELS.map((l) => ({ value: l, label: l }))} />
+                  <p className="text-sm font-medium" id="level-label">
+                    Your level
+                  </p>
+                  <ChoiceChips
+                    label="Your level"
+                    value={draft.level}
+                    onChange={(v) => update('level', v)}
+                    options={LEVELS.map((l) => ({ value: l, label: l }))}
+                  />
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-baseline justify-between">
                     <p className="text-sm font-medium">Hours per working day</p>
-                    <p className="font-mono tabular text-lg text-accent-text">{draft.hoursPerDay.toFixed(1)} h</p>
+                    <p className="font-mono tabular text-lg text-accent-text">
+                      {draft.hoursPerDay.toFixed(1)} h
+                    </p>
                   </div>
-                  <Slider label="Hours per working day" value={draft.hoursPerDay} min={0.5} max={12} step={0.5} onChange={(v) => update('hoursPerDay', v)} valueText={`${draft.hoursPerDay} hours`} />
+                  <Slider
+                    label="Hours per working day"
+                    value={draft.hoursPerDay}
+                    min={0.5}
+                    max={12}
+                    step={0.5}
+                    onChange={(v) => update('hoursPerDay', v)}
+                    valueText={`${draft.hoursPerDay} hours`}
+                  />
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Working days</p>
                   <WeekdayToggles value={draft.workingDays} onChange={(v) => update('workingDays', v)} />
-                  {errors.workingDays && <p role="alert" className="text-xs text-danger">{errors.workingDays}</p>}
+                  {errors.workingDays && (
+                    <p role="alert" className="text-xs text-danger">
+                      {errors.workingDays}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Pace</p>
@@ -335,14 +435,22 @@ export default function WizardPage() {
                     label="Pace"
                     value={draft.pace}
                     onChange={(v) => update('pace', v)}
-                    options={PACES.map((p) => ({ value: p, label: p, hint: p === 'Steady' ? 'even + buffer' : p === 'Balanced' ? 'default' : 'front-loaded' }))}
+                    options={PACES.map((p) => ({
+                      value: p,
+                      label: p,
+                      hint: p === 'Steady' ? 'even + buffer' : p === 'Balanced' ? 'default' : 'front-loaded',
+                    }))}
                   />
                 </div>
                 {preview && 'cap' in preview && !preview.past && (
                   <p className="text-sm text-muted" aria-live="polite">
-                    That's <span className="font-mono tabular text-text">{preview.cap.workingDayCount}</span> working days ×{' '}
-                    <span className="font-mono tabular text-text">{draft.hoursPerDay}</span> h ≈{' '}
-                    <span className="font-mono tabular text-accent-text">{preview.cap.capacityHours} hours</span> before your deadline.
+                    That's <span className="font-mono tabular text-text">{preview.cap.workingDayCount}</span>{' '}
+                    working days × <span className="font-mono tabular text-text">{draft.hoursPerDay}</span> h
+                    ≈{' '}
+                    <span className="font-mono tabular text-accent-text">
+                      {preview.cap.capacityHours} hours
+                    </span>{' '}
+                    before your deadline.
                   </p>
                 )}
               </div>
@@ -353,9 +461,20 @@ export default function WizardPage() {
                 <h1 id="wizard-q" className="text-[28px] leading-tight sm:text-[40px]">
                   Anything Gemini should know?
                 </h1>
-                <Field label="Constraints" optional hint="Exams, travel, a busy week, resources you already have…">
+                <Field
+                  label="Constraints"
+                  optional
+                  hint="Exams, travel, a busy week, resources you already have…"
+                >
                   {({ id, describedBy }) => (
-                    <Textarea id={id} aria-describedby={describedBy} value={draft.constraints} maxLength={LIMITS.constraintsChars} onChange={(e) => update('constraints', e.target.value)} placeholder="e.g. Full-time job, so evenings only. Away 12–14 Dec." />
+                    <Textarea
+                      id={id}
+                      aria-describedby={describedBy}
+                      value={draft.constraints}
+                      maxLength={LIMITS.constraintsChars}
+                      onChange={(e) => update('constraints', e.target.value)}
+                      placeholder="e.g. Full-time job, so evenings only. Away 12–14 Dec."
+                    />
                   )}
                 </Field>
                 <div className="card space-y-2 p-4 text-sm">
@@ -363,21 +482,33 @@ export default function WizardPage() {
                   <p className="text-text">{draft.goal || '—'}</p>
                   {preview && 'cap' in preview && (
                     <p className="text-muted">
-                      Due {formatInZone(preview.conv.utc, draft.timezone)} · {draft.level} · {draft.hoursPerDay} h/day · {draft.pace} · {preview.cap.capacityHours} h available
+                      Due {formatInZone(preview.conv.utc, draft.timezone)} · {draft.level} ·{' '}
+                      {draft.hoursPerDay} h/day · {draft.pace} · {preview.cap.capacityHours} h available
                     </p>
                   )}
                   {attachment && <p className="text-muted">Attached: {attachment.name}</p>}
                 </div>
                 {health.data && !aiReady && (
-                  <div role="status" className="rounded-[14px] border border-warning/40 bg-warning/10 p-4 text-sm text-text">
+                  <div
+                    role="status"
+                    className="rounded-[14px] border border-warning/40 bg-warning/10 p-4 text-sm text-text"
+                  >
                     <p className="font-medium">Gemini isn't connected on this server yet.</p>
-                    <p className="mt-1 text-muted">You can still build the plan yourself. Every rule check, the countdown and the Studio work the same.</p>
+                    <p className="mt-1 text-muted">
+                      You can still build the plan yourself. Every rule check, the countdown and the Studio
+                      work the same.
+                    </p>
                   </div>
                 )}
                 {health.isFetched && !health.data && (
-                  <div role="status" className="rounded-[14px] border border-warning/40 bg-warning/10 p-4 text-sm">
+                  <div
+                    role="status"
+                    className="rounded-[14px] border border-warning/40 bg-warning/10 p-4 text-sm"
+                  >
                     <p className="font-medium text-text">Can't reach the LOCKSTEP server right now.</p>
-                    <p className="mt-1 text-muted">You may be offline. You can still build the plan yourself.</p>
+                    <p className="mt-1 text-muted">
+                      You may be offline. You can still build the plan yourself.
+                    </p>
                   </div>
                 )}
               </div>
@@ -386,29 +517,55 @@ export default function WizardPage() {
         </AnimatePresence>
 
         <div className="sticky bottom-20 z-10 mt-8 flex items-center justify-between gap-3 border-t border-hairline bg-bg/90 py-4 backdrop-blur md:bottom-0">
-          <Button variant="ghost" onClick={back} disabled={step === 0} icon={<ArrowLeft className="size-4" strokeWidth={1.5} />}>
+          <Button
+            variant="ghost"
+            onClick={back}
+            disabled={step === 0}
+            icon={<ArrowLeft className="size-4" strokeWidth={1.5} />}
+          >
             Back
           </Button>
           {step < STEPS.length - 1 ? (
-            <Button type="submit" icon={<ArrowRight className="size-4" strokeWidth={1.75} />} className="flex-row-reverse">
+            <Button
+              type="submit"
+              icon={<ArrowRight className="size-4" strokeWidth={1.75} />}
+              className="flex-row-reverse"
+            >
               Continue
             </Button>
           ) : (
             <div className="flex flex-wrap justify-end gap-2">
               {aiReady ? (
                 <>
-                  <Button variant="ghost" onClick={() => void submit('manual')} disabled={busy} icon={<PenLine className="size-4" strokeWidth={1.5} />}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => void submit('manual')}
+                    disabled={busy}
+                    icon={<PenLine className="size-4" strokeWidth={1.5} />}
+                  >
                     Plan it myself
                   </Button>
-                  <Button type="submit" loading={busy} icon={<Sparkles className="size-4" strokeWidth={1.75} />}>
+                  <Button
+                    type="submit"
+                    loading={busy}
+                    icon={<Sparkles className="size-4" strokeWidth={1.75} />}
+                  >
                     Plan with Gemini
                   </Button>
                 </>
               ) : (
                 <>
-                  {health.isLoading && <Button disabled loading>Checking Gemini…</Button>}
+                  {health.isLoading && (
+                    <Button disabled loading>
+                      Checking Gemini…
+                    </Button>
+                  )}
                   {!health.isLoading && (
-                    <Button type="submit" loading={busy} icon={<PenLine className="size-4" strokeWidth={1.75} />}>
+                    <Button
+                      type="submit"
+                      loading={busy}
+                      icon={<PenLine className="size-4" strokeWidth={1.75} />}
+                    >
                       Build my plan
                     </Button>
                   )}

@@ -13,7 +13,16 @@
  */
 import { useEffect, useState } from 'react';
 import type { Session, SupabaseClient } from '@supabase/supabase-js';
-import { db, nowIso, type AiRunRow, type GoalRow, type MilestoneRow, type ProgressLogRow, type TaskRow, type WallpaperRow } from '@/db/db';
+import {
+  db,
+  nowIso,
+  type AiRunRow,
+  type GoalRow,
+  type MilestoneRow,
+  type ProgressLogRow,
+  type TaskRow,
+  type WallpaperRow,
+} from '@/db/db';
 import { getKv, setKv } from '@/db/repo';
 import { cloudConfigured, getSupabase } from './client';
 import { mergeRows, planDeletions, sameContent, toMillis, type Versioned } from './merge';
@@ -35,13 +44,17 @@ export async function signInWithEmail(email: string): Promise<AuthResult> {
   const sb = getSupabase();
   if (!sb) return { ok: false, message: NOT_CONFIGURED };
   const address = email.trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) return { ok: false, message: 'Enter a full email address, like you@example.com.' };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address))
+    return { ok: false, message: 'Enter a full email address, like you@example.com.' };
   if (isOffline()) return { ok: false, message: OFFLINE };
   try {
     const { error } = await sb.auth.signInWithOtp({
       email: address,
       // Come back to the page the request was made from (usually Settings).
-      options: { emailRedirectTo: `${window.location.origin}${window.location.pathname}`, shouldCreateUser: true },
+      options: {
+        emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+        shouldCreateUser: true,
+      },
     });
     return error ? { ok: false, message: authMessage(error) } : { ok: true };
   } catch (e) {
@@ -67,7 +80,10 @@ export async function signOut(): Promise<AuthResult> {
  * `ready` is false until that first answer arrives.
  */
 export function useSession(): { session: Session | null; ready: boolean } {
-  const [state, setState] = useState<{ session: Session | null; ready: boolean }>({ session: null, ready: !cloudConfigured });
+  const [state, setState] = useState<{ session: Session | null; ready: boolean }>({
+    session: null,
+    ready: !cloudConfigured,
+  });
   useEffect(() => {
     const sb = getSupabase();
     if (!sb) return;
@@ -81,11 +97,13 @@ export function useSession(): { session: Session | null; ready: boolean } {
 function authMessage(e: unknown): string {
   const err = (e ?? {}) as { code?: string; status?: number; message?: string; name?: string };
   const code = err.code ?? '';
-  if (err.name === 'AuthRetryableFetchError' || /fetch|network/i.test(err.message ?? '')) return "Couldn't reach the sign-in server. Check your connection and try again.";
+  if (err.name === 'AuthRetryableFetchError' || /fetch|network/i.test(err.message ?? ''))
+    return "Couldn't reach the sign-in server. Check your connection and try again.";
   if (code === 'over_email_send_rate_limit' || code === 'over_request_rate_limit' || err.status === 429)
     return 'Too many sign-in emails were requested. Wait a minute, then try again.';
   if (code === 'email_address_invalid') return 'That email address was not accepted. Check it for typos.';
-  if (code === 'signup_disabled' || code === 'email_address_not_authorized') return "This address can't sign up here. The app's owner has turned off new sign-ups.";
+  if (code === 'signup_disabled' || code === 'email_address_not_authorized')
+    return "This address can't sign up here. The app's owner has turned off new sign-ups.";
   if (code === 'otp_disabled' || code === 'email_provider_disabled')
     return 'Email sign-in is turned off for this project. The developer can enable it in Supabase under Authentication → Providers.';
   return "Couldn't complete that. Please try again in a moment.";
@@ -107,8 +125,15 @@ export type CloudGoal = Omit<GoalRow, 'user_id' | 'deleted_at'> & { user_id: str
 export type CloudMilestone = Omit<MilestoneRow, 'order'> & { sort_order: number };
 export type CloudTask = Omit<TaskRow, 'order'> & { sort_order: number };
 export type CloudProgressLog = ProgressLogRow;
-export type CloudWallpaper = Omit<WallpaperRow, 'share_token' | 'share_secret' | 'share_url' | 'revoked_at' | 'thumb'>;
-export type CloudAiRun = Omit<AiRunRow, 'user_id' | 'created_at'> & { user_id: string; at: string; updated_at: string };
+export type CloudWallpaper = Omit<
+  WallpaperRow,
+  'share_token' | 'share_secret' | 'share_url' | 'revoked_at' | 'thumb'
+>;
+export type CloudAiRun = Omit<AiRunRow, 'user_id' | 'created_at'> & {
+  user_id: string;
+  at: string;
+  updated_at: string;
+};
 
 /** Postgres answers "2026-11-23T10:00:00+00:00"; Dexie stores "2026-11-23T10:00:00.000Z". Same moment, one format. */
 const iso = (v: string): string => {
@@ -478,7 +503,11 @@ async function runSync(): Promise<SyncResult> {
     ai_runs: await syncTable(SPECS.ai_runs, ctx),
   };
   const total = Object.values(tables).reduce<SyncCounts>(
-    (sum, c) => ({ pulled: sum.pulled + c.pulled, pushed: sum.pushed + c.pushed, deleted: sum.deleted + c.deleted }),
+    (sum, c) => ({
+      pulled: sum.pulled + c.pulled,
+      pushed: sum.pushed + c.pushed,
+      deleted: sum.deleted + c.deleted,
+    }),
     { pulled: 0, pushed: 0, deleted: 0 },
   );
   const at = nowIso();
@@ -486,7 +515,10 @@ async function runSync(): Promise<SyncResult> {
   return { ok: true, at, total, tables };
 }
 
-async function syncTable<L extends { id: string }, C extends Versioned>(spec: TableSpec<L, C>, ctx: Ctx): Promise<SyncCounts> {
+async function syncTable<L extends { id: string }, C extends Versioned>(
+  spec: TableSpec<L, C>,
+  ctx: Ctx,
+): Promise<SyncCounts> {
   const counts: SyncCounts = { pulled: 0, pushed: 0, deleted: 0 };
   const { sb, userId } = ctx;
   const stamp = (row: L) => spec.toCloud(row, userId).updated_at;
@@ -499,12 +531,16 @@ async function syncTable<L extends { id: string }, C extends Versioned>(spec: Ta
   const known = new Set(ctx.known[spec.name] ?? []);
   const lastPush = ctx.pushedAt[spec.name];
   const changedIds = new Set(changed.map((r) => r.id));
-  const dirtyIds = new Set(localRows.filter((r) => !lastPush || toMillis(stamp(r)) > toMillis(lastPush)).map((r) => r.id));
+  const dirtyIds = new Set(
+    localRows.filter((r) => !lastPush || toMillis(stamp(r)) > toMillis(lastPush)).map((r) => r.id),
+  );
   const stampAtRead = new Map(localRows.map((r) => [r.id, stamp(r)]));
 
   // 2. Decide. A local row takes part if it changed here, changed in the cloud,
   //    or the cloud has never had it (e.g. restored with Undo or imported).
-  const candidates = localRows.filter((r) => dirtyIds.has(r.id) || changedIds.has(r.id) || (!cloudIds.has(r.id) && !known.has(r.id)));
+  const candidates = localRows.filter(
+    (r) => dirtyIds.has(r.id) || changedIds.has(r.id) || (!cloudIds.has(r.id) && !known.has(r.id)),
+  );
   const { toLocal, toRemote } = mergeRows(
     candidates.map((r) => spec.toCloud(r, userId)),
     changed,
@@ -519,29 +555,33 @@ async function syncTable<L extends { id: string }, C extends Versioned>(spec: Ta
 
   // 3. Apply on this device, in one transaction.
   const deletedHere = new Set<string>();
-  await db.transaction('rw', [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers, db.ai_runs, db.kv], async () => {
-    // Re-read inside the transaction so nothing can change between the check and the write.
-    const currents = await spec.table.bulkGet(toLocal.map((r) => r.id));
-    const writes: L[] = [];
-    toLocal.forEach((remote, i) => {
-      const current = currents[i];
-      // Edited on this device while we were busy talking to the server? That edit is newer; keep it.
-      if (current && toMillis(stamp(current)) > toMillis(remote.updated_at)) return;
-      const next = spec.fromCloud(remote, current);
-      if (current && sameContent(next, current)) return; // just an echo of our own upload
-      writes.push(next);
-    });
-    await spec.table.bulkPut(writes);
-    counts.pulled = writes.length;
+  await db.transaction(
+    'rw',
+    [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers, db.ai_runs, db.kv],
+    async () => {
+      // Re-read inside the transaction so nothing can change between the check and the write.
+      const currents = await spec.table.bulkGet(toLocal.map((r) => r.id));
+      const writes: L[] = [];
+      toLocal.forEach((remote, i) => {
+        const current = currents[i];
+        // Edited on this device while we were busy talking to the server? That edit is newer; keep it.
+        if (current && toMillis(stamp(current)) > toMillis(remote.updated_at)) return;
+        const next = spec.fromCloud(remote, current);
+        if (current && sameContent(next, current)) return; // just an echo of our own upload
+        writes.push(next);
+      });
+      await spec.table.bulkPut(writes);
+      counts.pulled = writes.length;
 
-    const doomed = await spec.table.bulkGet(deleteLocal);
-    deleteLocal.forEach((id, i) => {
-      const current = doomed[i];
-      // Only delete if it hasn't been edited here since we looked.
-      if (current && toMillis(stamp(current)) <= toMillis(stampAtRead.get(id))) deletedHere.add(id);
-    });
-    await deleteOnDevice(spec, [...deletedHere]);
-  });
+      const doomed = await spec.table.bulkGet(deleteLocal);
+      deleteLocal.forEach((id, i) => {
+        const current = doomed[i];
+        // Only delete if it hasn't been edited here since we looked.
+        if (current && toMillis(stamp(current)) <= toMillis(stampAtRead.get(id))) deletedHere.add(id);
+      });
+      await deleteOnDevice(spec, [...deletedHere]);
+    },
+  );
   counts.deleted += deletedHere.size;
 
   // 4. Apply in the cloud: deletions first, then uploads.
@@ -553,13 +593,19 @@ async function syncTable<L extends { id: string }, C extends Versioned>(spec: Ta
 
   // Skip rows whose parent is not in the cloud (it would fail the foreign key and the
   // RLS check). This only happens with inconsistent local data; nothing is deleted.
-  const uploads = toRemote.filter((row) => (spec.parents?.(row) ?? []).every(([table, id]) => ctx.cloudIds[table]?.has(id)));
+  const uploads = toRemote.filter((row) =>
+    (spec.parents?.(row) ?? []).every(([table, id]) => ctx.cloudIds[table]?.has(id)),
+  );
   for (const rows of chunk(uploads, UPSERT_CHUNK)) {
     const { error } = await sb.from(spec.name).upsert(rows, { onConflict: 'id' });
     if (error) throw error;
   }
   counts.pushed = uploads.length;
-  if (spec.adopt && uploads.length) await spec.adopt(uploads.map((r) => r.id), userId);
+  if (spec.adopt && uploads.length)
+    await spec.adopt(
+      uploads.map((r) => r.id),
+      userId,
+    );
 
   // 5. Remember where we got to (only after this table fully succeeded).
   const inCloud = new Set([...cloudIds, ...changedIds, ...uploads.map((r) => r.id)]);
@@ -569,7 +615,10 @@ async function syncTable<L extends { id: string }, C extends Versioned>(spec: Ta
   ctx.cloudIds[spec.name] = inCloud;
   ctx.known[spec.name] = [...onDevice].filter((id) => inCloud.has(id));
   ctx.pushedAt[spec.name] = ctx.startedAt;
-  ctx.pulledSeq[spec.name] = changed.reduce((max, r) => Math.max(max, Number(r.sync_seq) || 0), ctx.pulledSeq[spec.name] ?? 0);
+  ctx.pulledSeq[spec.name] = changed.reduce(
+    (max, r) => Math.max(max, Number(r.sync_seq) || 0),
+    ctx.pulledSeq[spec.name] ?? 0,
+  );
   await setKv(SYNC_KEYS.known, ctx.known);
   await setKv(SYNC_KEYS.lastPushedAt, ctx.pushedAt);
   await setKv(SYNC_KEYS.lastPulledSeq, ctx.pulledSeq);
@@ -577,7 +626,10 @@ async function syncTable<L extends { id: string }, C extends Versioned>(spec: Ta
 }
 
 /** Remove rows on this device. A goal takes its plan with it, like `deleteGoal` in repo.ts. */
-async function deleteOnDevice<L extends { id: string }, C extends Versioned>(spec: TableSpec<L, C>, ids: string[]): Promise<void> {
+async function deleteOnDevice<L extends { id: string }, C extends Versioned>(
+  spec: TableSpec<L, C>,
+  ids: string[],
+): Promise<void> {
   if (!ids.length) return;
   if (spec.name === 'goals') {
     await db.tasks.where('goal_id').anyOf(ids).delete();
@@ -609,11 +661,20 @@ async function listCloudIds(sb: SupabaseClient, table: SyncTable): Promise<Set<s
 }
 
 /** Rows changed in the cloud after change number `since`, oldest first. Paged by sync_seq. */
-async function pullChanged<C>(sb: SupabaseClient, table: SyncTable, since: number): Promise<Array<C & { sync_seq: number }>> {
+async function pullChanged<C>(
+  sb: SupabaseClient,
+  table: SyncTable,
+  since: number,
+): Promise<Array<C & { sync_seq: number }>> {
   const out: Array<C & { sync_seq: number }> = [];
   let cursor = since;
   for (;;) {
-    const { data, error } = await sb.from(table).select('*').gt('sync_seq', cursor).order('sync_seq', { ascending: true }).limit(PAGE);
+    const { data, error } = await sb
+      .from(table)
+      .select('*')
+      .gt('sync_seq', cursor)
+      .order('sync_seq', { ascending: true })
+      .limit(PAGE);
     if (error) throw error;
     const rows = (data ?? []) as Array<C & { sync_seq: number }>;
     out.push(...rows);
@@ -634,13 +695,19 @@ export function syncMessage(e: unknown): string {
   const err = (e ?? {}) as { code?: string; message?: string; name?: string; status?: number };
   const code = String(err.code ?? '');
   const text = err.message ?? '';
-  if (/failed to fetch|network|load failed|fetch failed/i.test(text) || err.name === 'AuthRetryableFetchError')
+  if (
+    /failed to fetch|network|load failed|fetch failed/i.test(text) ||
+    err.name === 'AuthRetryableFetchError'
+  )
     return "Couldn't reach the sync server. Check your connection and try again.";
   if (['42P01', '42703', 'PGRST204', 'PGRST205'].includes(code))
     return "The cloud database isn't set up yet (or is out of date). The developer needs to run supabase/migrations/0001_lockstep.sql in Supabase.";
-  if (code.startsWith('PGRST3') || err.status === 401 || /jwt/i.test(text)) return 'Your sign-in has expired. Sign out, sign in again, then sync.';
-  if (code === '42501') return 'The cloud refused a change for permission reasons. Sign out and back in, then try again.';
-  if (code === '23503') return "Some items point at a goal that isn't in the cloud yet. Tap Sync now once more.";
+  if (code.startsWith('PGRST3') || err.status === 401 || /jwt/i.test(text))
+    return 'Your sign-in has expired. Sign out, sign in again, then sync.';
+  if (code === '42501')
+    return 'The cloud refused a change for permission reasons. Sign out and back in, then try again.';
+  if (code === '23503')
+    return "Some items point at a goal that isn't in the cloud yet. Tap Sync now once more.";
   if (code.startsWith('22') || code.startsWith('23'))
     return "Some data on this device didn't fit the cloud format, so sync stopped. Your data on this device is safe.";
   return "Sync didn't finish. Nothing on this device was lost. Try again in a moment.";

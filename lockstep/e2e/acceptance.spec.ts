@@ -20,9 +20,15 @@ function pngSize(path: string) {
   return { width: b.readUInt32BE(16), height: b.readUInt32BE(20) };
 }
 
-const DEVICE_SIZES: Record<string, [number, number]> = { 'iphone-pro': [1206, 2622], 'android-1080': [1080, 2400] };
+const DEVICE_SIZES: Record<string, [number, number]> = {
+  'iphone-pro': [1206, 2622],
+  'android-1080': [1080, 2400],
+};
 
-test('guest journey: goal → Gemini plan → edit/approve → countdown → studio → export → progress → offline', async ({ page, context }) => {
+test('guest journey: goal → Gemini plan → edit/approve → countdown → studio → export → progress → offline', async ({
+  page,
+  context,
+}) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
 
@@ -73,7 +79,9 @@ test('guest journey: goal → Gemini plan → edit/approve → countdown → stu
   // 6 ─ Live countdown
   await page.waitForURL(/\/goals\/[^/]+$/);
   await expect(page.getByText(/days left · Day 1 of/i)).toBeVisible();
-  const sr = page.locator('p[aria-live="polite"]', { hasText: /days, \d+ hours and \d+ minutes left/ }).first();
+  const sr = page
+    .locator('p[aria-live="polite"]', { hasText: /days, \d+ hours and \d+ minutes left/ })
+    .first();
   await expect(sr).toBeAttached();
   await snap(page, '06-countdown');
   const goalUrl = page.url();
@@ -84,18 +92,31 @@ test('guest journey: goal → Gemini plan → edit/approve → countdown → stu
   await expect(preview).toBeVisible();
   await page.getByRole('radio', { name: /Orbit/ }).first().click();
   // 8 ─ Preview shows real days left, next milestone, progress
-  await expect(preview).toHaveAttribute('aria-label', /\d+ days left, 0% done, next milestone Map the exam domains \(my version\)/);
+  await expect(preview).toHaveAttribute(
+    'aria-label',
+    /\d+ days left, 0% done, next milestone Map the exam domains \(my version\)/,
+  );
   await snap(page, '07-studio');
 
   // 9 ─ Export PNG at native resolution, dimensions verified
   await page.getByRole('button', { name: 'Export', exact: true }).click();
-  await expect(page.getByText(/1206 × 2622 px, checked from the PNG header/)).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText(/1206 × 2622 px, checked from the PNG header/)).toBeVisible({
+    timeout: 30_000,
+  });
   await snap(page, '08-export');
-  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download PNG' }).click()]);
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Download PNG' }).click(),
+  ]);
   const file = test.info().outputPath(download.suggestedFilename());
   await download.saveAs(file);
-  expect(download.suggestedFilename()).toMatch(/^lockstep-pass-the-aws-cloud-practitioner-exam-iphone-pro-\d{4}-\d{2}-\d{2}\.png$/);
-  expect(pngSize(file)).toEqual({ width: DEVICE_SIZES['iphone-pro']![0], height: DEVICE_SIZES['iphone-pro']![1] });
+  expect(download.suggestedFilename()).toMatch(
+    /^lockstep-pass-the-aws-cloud-practitioner-exam-iphone-pro-\d{4}-\d{2}-\d{2}\.png$/,
+  );
+  expect(pngSize(file)).toEqual({
+    width: DEVICE_SIZES['iphone-pro']![0],
+    height: DEVICE_SIZES['iphone-pro']![1],
+  });
 
   // 10 ─ Wallpaper guide
   await page.getByRole('button', { name: 'How to set it as your lock screen' }).click();
@@ -122,13 +143,18 @@ test('guest journey: goal → Gemini plan → edit/approve → countdown → stu
   await page.goto(goalUrl.replace('/goals/', '/studio/'));
   await page.getByRole('tab', { name: 'Export' }).click();
   await page.getByRole('button', { name: "Refresh with today's progress" }).first().click();
-  await expect(page.getByRole('img', { name: /Wallpaper preview:/ }).first()).toHaveAttribute('aria-label', /[1-9]\d?% done, next milestone Core services deep-dive/);
+  await expect(page.getByRole('img', { name: /Wallpaper preview:/ }).first()).toHaveAttribute(
+    'aria-label',
+    /[1-9]\d?% done, next milestone Core services deep-dive/,
+  );
   await snap(page, '10-refreshed');
 
   // 13 ─ Reload offline → data persists
   await context.setOffline(true);
   await page.goto(goalUrl);
-  await expect(page.getByRole('heading', { name: 'Pass the AWS Cloud Practitioner exam' }).first()).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Pass the AWS Cloud Practitioner exam' }).first(),
+  ).toBeVisible();
   await snap(page, '11-offline');
   await context.setOffline(false);
 
@@ -147,14 +173,22 @@ test('Android 1080×2400 export has native dimensions', async ({ page }) => {
   await page.getByRole('tab', { name: 'Layout' }).click();
   await page.getByLabel('Device').selectOption('android-1080');
   await page.getByRole('button', { name: 'Export', exact: true }).click();
-  await expect(page.getByText(/1080 × 2400 px, checked from the PNG header/)).toBeVisible({ timeout: 30_000 });
-  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download PNG' }).click()]);
+  await expect(page.getByText(/1080 × 2400 px, checked from the PNG header/)).toBeVisible({
+    timeout: 30_000,
+  });
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Download PNG' }).click(),
+  ]);
   const file = test.info().outputPath(download.suggestedFilename());
   await download.saveAs(file);
   expect(pngSize(file)).toEqual({ width: 1080, height: 2400 });
 });
 
-test('Living Wallpaper link: create in Studio → URL returns today\'s PNG → revoke in Settings', async ({ page, request }) => {
+test("Living Wallpaper link: create in Studio → URL returns today's PNG → revoke in Settings", async ({
+  page,
+  request,
+}) => {
   await page.goto('/new');
   await page.getByRole('button', { name: 'Try a sample goal' }).click();
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue' }).click();

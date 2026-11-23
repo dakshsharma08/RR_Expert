@@ -33,7 +33,9 @@ export default function FocusPage() {
     let cancelled = false;
     const acquire = async () => {
       try {
-        const s = (await (navigator as unknown as { wakeLock: { request: (t: 'screen') => Promise<WakeLockSentinelLike> } }).wakeLock.request('screen'));
+        const s = await (
+          navigator as unknown as { wakeLock: { request: (t: 'screen') => Promise<WakeLockSentinelLike> } }
+        ).wakeLock.request('screen');
         if (cancelled) return void s.release();
         sentinel.current = s;
         setWakeActive(true);
@@ -65,17 +67,29 @@ export default function FocusPage() {
     };
   }, [navigate]);
 
-  if (data === undefined) return <div className="min-h-dvh bg-obsidian p-10"><Skeleton className="h-40" /></div>;
+  if (data === undefined)
+    return (
+      <div className="min-h-dvh bg-obsidian p-10">
+        <Skeleton className="h-40" />
+      </div>
+    );
   if (!data || !m)
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-bg p-6 text-center">
         <p className="text-muted">This goal isn't available.</p>
-        <button className="h-11 rounded-[14px] bg-gold px-5 font-semibold text-obsidian" onClick={() => navigate('/app')}>Go home</button>
+        <button
+          className="h-11 rounded-[14px] bg-gold px-5 font-semibold text-obsidian"
+          onClick={() => navigate('/app')}
+        >
+          Go home
+        </button>
       </div>
     );
 
   const next = m.nextMilestone;
-  const nextTasks = next ? data.tasks.filter((t) => t.milestone_id === next.id && !t.done_at).slice(0, 3) : [];
+  const nextTasks = next
+    ? data.tasks.filter((t) => t.milestone_id === next.id && !t.done_at).slice(0, 3)
+    : [];
 
   return (
     <div className="relative flex min-h-dvh flex-col bg-bg text-text">
@@ -93,8 +107,17 @@ export default function FocusPage() {
             </label>
           )}
           {document.fullscreenEnabled && (
-            <IconButton label={fs ? 'Exit full screen' : 'Full screen'} onClick={() => (fs ? void document.exitFullscreen() : void document.documentElement.requestFullscreen())}>
-              {fs ? <Shrink className="size-5" strokeWidth={1.5} /> : <Expand className="size-5" strokeWidth={1.5} />}
+            <IconButton
+              label={fs ? 'Exit full screen' : 'Full screen'}
+              onClick={() =>
+                fs ? void document.exitFullscreen() : void document.documentElement.requestFullscreen()
+              }
+            >
+              {fs ? (
+                <Shrink className="size-5" strokeWidth={1.5} />
+              ) : (
+                <Expand className="size-5" strokeWidth={1.5} />
+              )}
             </IconButton>
           )}
           <IconButton label="Exit focus mode" onClick={() => navigate(`/goals/${data.goal.id}`)}>
@@ -113,8 +136,12 @@ export default function FocusPage() {
           <div className="text-left">
             <p className="eyebrow mb-1">Next milestone</p>
             <p className="max-w-xs font-display text-xl">{next ? next.title : 'All milestones done'}</p>
-            {next && <p className="mt-1 font-mono text-sm tabular text-accent-text">{shortDate(next.target_date)}</p>}
-            <p className="mt-1 text-xs text-muted">{paceLabel(m.pace)} · Day {Math.max(1, m.countdown.dayNumber)} of {m.countdown.totalDays}</p>
+            {next && (
+              <p className="mt-1 font-mono text-sm tabular text-accent-text">{shortDate(next.target_date)}</p>
+            )}
+            <p className="mt-1 text-xs text-muted">
+              {paceLabel(m.pace)} · Day {Math.max(1, m.countdown.dayNumber)} of {m.countdown.totalDays}
+            </p>
           </div>
         </div>
         {nextTasks.length > 0 && (
@@ -124,7 +151,11 @@ export default function FocusPage() {
             ))}
           </ul>
         )}
-        {wake && wakeActive && <p className="text-xs text-muted" role="status">Screen will stay on while this tab is open.</p>}
+        {wake && wakeActive && (
+          <p className="text-xs text-muted" role="status">
+            Screen will stay on while this tab is open.
+          </p>
+        )}
       </main>
     </div>
   );

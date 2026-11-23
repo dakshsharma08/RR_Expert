@@ -20,7 +20,14 @@
  */
 import { FunctionCallingConfigMode, type Content, type FunctionDeclaration, type Part } from '@google/genai';
 import { z } from 'zod';
-import type { CoachChip, CoachContext, CoachProposal, CoachRequest, CoachResponse, RescheduleChange } from '../../shared/api';
+import type {
+  CoachChip,
+  CoachContext,
+  CoachProposal,
+  CoachRequest,
+  CoachResponse,
+  RescheduleChange,
+} from '../../shared/api';
 import { allowedMilestoneDates, computeCapacity } from '../../shared/plan';
 import { WEEKDAY_SHORT, effectiveDeadlineKey, isDayKey, isValidTimeZone, weekdayOf } from '../../shared/time';
 import { AppError, toAppError } from '../lib/errors';
@@ -41,7 +48,13 @@ const MilestoneContextSchema = z.object({
   tasksDone: z.number().int().min(0).max(100),
   tasksTotal: z.number().int().min(0).max(100),
   tasks: z
-    .array(z.object({ title: z.string().max(160), done: z.boolean(), estimatedMinutes: z.number().min(0).max(600) }))
+    .array(
+      z.object({
+        title: z.string().max(160),
+        done: z.boolean(),
+        estimatedMinutes: z.number().min(0).max(600),
+      }),
+    )
     .max(12)
     .optional(),
 });
@@ -66,7 +79,10 @@ export const CoachRequestSchema = z
         timePct: z.number().min(0).max(100),
         pace: z.enum(['ahead', 'on-track', 'behind']),
         streak: z.number().int().min(0).max(10_000),
-        minutesLast7Days: z.number().min(0).max(7 * 24 * 60),
+        minutesLast7Days: z
+          .number()
+          .min(0)
+          .max(7 * 24 * 60),
         daysLeft: z.number().int().min(-3650).max(3650),
       }),
     }),
@@ -92,11 +108,13 @@ void _typecheck;
 export const COACH_TOOLS: FunctionDeclaration[] = [
   {
     name: 'getPlan',
-    description: "Returns the user's goal and all milestones (id, title, targetDate, estimatedHours, status, task counts and tasks).",
+    description:
+      "Returns the user's goal and all milestones (id, title, targetDate, estimatedHours, status, task counts and tasks).",
   },
   {
     name: 'getProgress',
-    description: 'Returns progress: percentDone, timePct (share of the time window used), pace, streak, minutesLast7Days, daysLeft.',
+    description:
+      'Returns progress: percentDone, timePct (share of the time window used), pace, streak, minutesLast7Days, daysLeft.',
   },
   {
     name: 'proposeReschedule',
@@ -148,7 +166,9 @@ export function validateReschedule(args: unknown, context: CoachContext, todayKe
       summary: '',
       changes: [],
       valid: false,
-      errors: parsed.error.issues.slice(0, 6).map((i) => `Arguments: ${i.path.join('.') || '(root)'} ${i.message}`),
+      errors: parsed.error.issues
+        .slice(0, 6)
+        .map((i) => `Arguments: ${i.path.join('.') || '(root)'} ${i.message}`),
     };
   }
   const { summary, changes: proposed } = parsed.data;
@@ -176,7 +196,14 @@ export function validateReschedule(args: unknown, context: CoachContext, todayKe
     seen.add(m.id);
     const label = `Milestone "${m.title}" (${m.id})`;
     const newHours = c.newEstimatedHours ?? m.estimatedHours;
-    changes.push({ milestoneId: m.id, title: m.title, oldDate: m.targetDate, newDate: c.newTargetDate, oldHours: m.estimatedHours, newHours });
+    changes.push({
+      milestoneId: m.id,
+      title: m.title,
+      oldDate: m.targetDate,
+      newDate: c.newTargetDate,
+      oldHours: m.estimatedHours,
+      newHours,
+    });
 
     if (m.status === 'completed') errors.push(`${label} is already completed; leave it unchanged.`);
     if (!(Number.isFinite(newHours) && newHours > 0 && newHours <= 2000)) {
@@ -189,7 +216,8 @@ export function validateReschedule(args: unknown, context: CoachContext, todayKe
     const d = c.newTargetDate;
     const afterToday = sameDay ? d >= todayKey : d > todayKey;
     if (!afterToday) errors.push(`${label} newTargetDate ${d} must be after today (${todayKey}).`);
-    if (d > deadlineKey) errors.push(`${label} newTargetDate ${d} is after the deadline day (${deadlineKey}).`);
+    if (d > deadlineKey)
+      errors.push(`${label} newTargetDate ${d} is after the deadline day (${deadlineKey}).`);
     if (!working.has(weekdayOf(d))) {
       errors.push(
         `${label} newTargetDate ${d} is a ${WEEKDAY_SHORT[weekdayOf(d)]}, which is not a working day (${g.workingDays
@@ -285,14 +313,23 @@ export async function runCoach(
         systemInstruction,
         tools: [{ functionDeclarations: COACH_TOOLS }],
         // On the last round we force a text answer so the loop always ends.
-        toolConfig: { functionCallingConfig: { mode: lastRound ? FunctionCallingConfigMode.NONE : FunctionCallingConfigMode.AUTO } },
+        toolConfig: {
+          functionCallingConfig: {
+            mode: lastRound ? FunctionCallingConfigMode.NONE : FunctionCallingConfigMode.AUTO,
+          },
+        },
       },
     };
 
     let response;
     try {
       // The heavy model gets one attempt (no retries) because we have a fallback.
-      response = await callGemini(call, { kind: 'coach', model, request, retries: model === models.defaultModel ? undefined : 0 });
+      response = await callGemini(call, {
+        kind: 'coach',
+        model,
+        request,
+        retries: model === models.defaultModel ? undefined : 0,
+      });
     } catch (err) {
       const e = toAppError(err, call.signal);
       if (model !== models.defaultModel && e.code !== 'CANCELLED') {

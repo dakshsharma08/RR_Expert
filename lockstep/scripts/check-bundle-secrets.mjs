@@ -49,4 +49,6 @@ if (problems.length) {
   console.error('✖ Secret leak check FAILED:\n' + problems.map((p) => '  - ' + p).join('\n'));
   process.exit(1);
 }
-console.log(`✓ Secret leak check passed (${files.length} files scanned, ${secrets.length} secret value(s) checked).`);
+console.log(
+  `✓ Secret leak check passed (${files.length} files scanned, ${secrets.length} secret value(s) checked).`,
+);

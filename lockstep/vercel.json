@@ -3,7 +3,10 @@
   "framework": "vite",
   "outputDirectory": "dist",
   "functions": {
-    "api/index.js": { "maxDuration": 300, "includeFiles": "{dist-server/**,node_modules/@fontsource*/**/files/*latin-*normal.woff2}" }
+    "api/index.js": {
+      "maxDuration": 300,
+      "includeFiles": "{dist-server/**,node_modules/@fontsource*/**/files/*latin-*normal.woff2}"
+    }
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },

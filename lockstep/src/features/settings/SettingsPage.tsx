@@ -3,7 +3,18 @@ import { useRef, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Bell, CalendarDays, Database, Download, Link2, Moon, ShieldAlert, Sparkles, Upload, Globe2 } from 'lucide-react';
+import {
+  Bell,
+  CalendarDays,
+  Database,
+  Download,
+  Link2,
+  Moon,
+  ShieldAlert,
+  Sparkles,
+  Upload,
+  Globe2,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/dialog';
 import { Segmented, SwitchRow } from '@/components/ui/controls';
@@ -33,14 +44,22 @@ export default function SettingsPage() {
 
   async function exportJson() {
     const data = await exportAll();
-    downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), `lockstep-export-${new Date().toISOString().slice(0, 10)}.json`);
+    downloadBlob(
+      new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
+      `lockstep-export-${new Date().toISOString().slice(0, 10)}.json`,
+    );
     toast.success('Exported your data');
   }
   async function exportIcs() {
-    const [g, m] = await Promise.all([db.goals.filter((x) => x.status === 'active' || x.status === 'completed').toArray(), db.milestones.toArray()]);
+    const [g, m] = await Promise.all([
+      db.goals.filter((x) => x.status === 'active' || x.status === 'completed').toArray(),
+      db.milestones.toArray(),
+    ]);
     if (!g.length) return toast.error('Approve a plan first. There are no dates to export yet.');
     downloadBlob(new Blob([buildIcs(g, m)], { type: 'text/calendar' }), 'lockstep-milestones.ics');
-    toast.success('Calendar file downloaded', { description: 'Open it to add your milestones to your calendar.' });
+    toast.success('Calendar file downloaded', {
+      description: 'Open it to add your milestones to your calendar.',
+    });
   }
   async function onImport(f: File | undefined) {
     if (!f) return;
@@ -64,13 +83,18 @@ export default function SettingsPage() {
   async function toggleReminders(on: boolean) {
     if (on && notificationsSupported()) {
       const p = await requestNotificationPermission();
-      if (p === 'denied') toast('Notifications are blocked', { description: 'You will still get in-app reminders while LOCKSTEP is open.' });
+      if (p === 'denied')
+        toast('Notifications are blocked', {
+          description: 'You will still get in-app reminders while LOCKSTEP is open.',
+        });
     }
     ui.setReminders(on);
   }
 
   const okRuns = (runs ?? []).filter((r) => r.ok);
-  const avgLatency = okRuns.length ? Math.round(okRuns.reduce((s, r) => s + r.latency_ms, 0) / okRuns.length) : null;
+  const avgLatency = okRuns.length
+    ? Math.round(okRuns.reduce((s, r) => s + r.latency_ms, 0) / okRuns.length)
+    : null;
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-5 px-4 pb-12 pt-6 sm:px-6 md:pt-10">
@@ -97,10 +121,24 @@ export default function SettingsPage() {
         />
       </Section>
 
-      <Section icon={<Globe2 className="size-4" />} title="Default time zone" description="Used for new goals. Each goal keeps its own zone, so travelling never moves a deadline.">
+      <Section
+        icon={<Globe2 className="size-4" />}
+        title="Default time zone"
+        description="Used for new goals. Each goal keeps its own zone, so travelling never moves a deadline."
+      >
         <div className="flex gap-2">
-          <Input list="settings-tz" value={tz} onChange={(e) => setTz(e.target.value.trim())} aria-label="Default time zone" aria-invalid={!isValidTimeZone(tz)} />
-          <datalist id="settings-tz">{zones.map((z) => <option key={z} value={z} />)}</datalist>
+          <Input
+            list="settings-tz"
+            value={tz}
+            onChange={(e) => setTz(e.target.value.trim())}
+            aria-label="Default time zone"
+            aria-invalid={!isValidTimeZone(tz)}
+          />
+          <datalist id="settings-tz">
+            {zones.map((z) => (
+              <option key={z} value={z} />
+            ))}
+          </datalist>
           <Button
             variant="secondary"
             onClick={() => {
@@ -116,24 +154,48 @@ export default function SettingsPage() {
       </Section>
 
       <Section icon={<Bell className="size-4" />} title="Reminders">
-        <SwitchRow checked={ui.remindersEnabled} onChange={(v) => void toggleReminders(v)} label="Daily reminder" description="A nudge about today's focus at the time below, while LOCKSTEP is open." />
+        <SwitchRow
+          checked={ui.remindersEnabled}
+          onChange={(v) => void toggleReminders(v)}
+          label="Daily reminder"
+          description="A nudge about today's focus at the time below, while LOCKSTEP is open."
+        />
         <div className="mt-2 flex items-center gap-3">
-          <label htmlFor="rem-time" className="text-sm text-muted">Time</label>
-          <Input id="rem-time" type="time" value={ui.reminderTime} onChange={(e) => ui.setReminders(ui.remindersEnabled, e.target.value || '19:00')} className="w-36" />
+          <label htmlFor="rem-time" className="text-sm text-muted">
+            Time
+          </label>
+          <Input
+            id="rem-time"
+            type="time"
+            value={ui.reminderTime}
+            onChange={(e) => ui.setReminders(ui.remindersEnabled, e.target.value || '19:00')}
+            className="w-36"
+          />
         </div>
-        <p className="mt-2 text-xs text-muted">On iPhone, notifications need LOCKSTEP added to the Home Screen (Share → Add to Home Screen).</p>
+        <p className="mt-2 text-xs text-muted">
+          On iPhone, notifications need LOCKSTEP added to the Home Screen (Share → Add to Home Screen).
+        </p>
       </Section>
 
-      <Section icon={<Link2 className="size-4" />} title="Living Wallpaper links" description="Private links that always return today's wallpaper. Revoke any link to make it stop working immediately.">
+      <Section
+        icon={<Link2 className="size-4" />}
+        title="Living Wallpaper links"
+        description="Private links that always return today's wallpaper. Revoke any link to make it stop working immediately."
+      >
         {!shares?.length ? (
           <p className="text-sm text-muted">No links yet. Create one in the Studio's Export tab.</p>
         ) : (
           <ul className="space-y-2">
             {shares.map((s) => (
-              <li key={s.id} className="flex items-center justify-between gap-3 rounded-[14px] border border-hairline p-3">
+              <li
+                key={s.id}
+                className="flex items-center justify-between gap-3 rounded-[14px] border border-hairline p-3"
+              >
                 <div className="min-w-0">
                   <p className="truncate text-sm">{s.name}</p>
-                  <p className="text-xs text-muted">{s.revoked_at ? 'Revoked' : 'Active'} · {s.device_preset}</p>
+                  <p className="text-xs text-muted">
+                    {s.revoked_at ? 'Revoked' : 'Active'} · {s.device_preset}
+                  </p>
                 </div>
                 {!s.revoked_at && (
                   <Button variant="destructive" size="sm" onClick={() => setRevoking(s)}>
@@ -148,10 +210,36 @@ export default function SettingsPage() {
 
       <Section id="data" icon={<Database className="size-4" />} title="Your data">
         <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={() => void exportJson()} icon={<Download className="size-4" strokeWidth={1.5} />}>Export JSON</Button>
-          <Button variant="secondary" onClick={() => void exportIcs()} icon={<CalendarDays className="size-4" strokeWidth={1.5} />}>Export .ics</Button>
-          <Button variant="ghost" onClick={() => fileRef.current?.click()} icon={<Upload className="size-4" strokeWidth={1.5} />}>Import JSON</Button>
-          <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" tabIndex={-1} aria-hidden onChange={(e) => void onImport(e.target.files?.[0])} />
+          <Button
+            variant="secondary"
+            onClick={() => void exportJson()}
+            icon={<Download className="size-4" strokeWidth={1.5} />}
+          >
+            Export JSON
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => void exportIcs()}
+            icon={<CalendarDays className="size-4" strokeWidth={1.5} />}
+          >
+            Export .ics
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => fileRef.current?.click()}
+            icon={<Upload className="size-4" strokeWidth={1.5} />}
+          >
+            Import JSON
+          </Button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            className="sr-only"
+            tabIndex={-1}
+            aria-hidden
+            onChange={(e) => void onImport(e.target.files?.[0])}
+          />
         </div>
         <p className="mt-3 text-xs text-muted">{goals?.length ?? 0} goals stored on this device.</p>
       </Section>
@@ -161,18 +249,39 @@ export default function SettingsPage() {
       <Section icon={<Sparkles className="size-4" />} title="AI transparency">
         <p className="text-sm text-muted">
           Gemini on this server:{' '}
-          <span className="text-text">{health.data ? (health.data.ai.configured ? `connected${health.data.ai.model ? ` (${health.data.ai.model})` : ''}` : 'not connected') : health.isLoading ? 'checking…' : 'server unreachable'}</span>
+          <span className="text-text">
+            {health.data
+              ? health.data.ai.configured
+                ? `connected${health.data.ai.model ? ` (${health.data.ai.model})` : ''}`
+                : 'not connected'
+              : health.isLoading
+                ? 'checking…'
+                : 'server unreachable'}
+          </span>
         </p>
         <p className="mt-1 text-sm text-muted">
           AI calls from this device: <span className="font-mono tabular text-text">{runs?.length ?? 0}</span>
-          {avgLatency !== null && <> · average <span className="font-mono tabular text-text">{(avgLatency / 1000).toFixed(1)} s</span></>}
+          {avgLatency !== null && (
+            <>
+              {' '}
+              · average{' '}
+              <span className="font-mono tabular text-text">{(avgLatency / 1000).toFixed(1)} s</span>
+            </>
+          )}
         </p>
-        <p className="mt-2 text-xs text-muted">We log only the model, timing and token count of each call. Never your text or files. No third-party tracking.</p>
+        <p className="mt-2 text-xs text-muted">
+          We log only the model, timing and token count of each call. Never your text or files. No third-party
+          tracking.
+        </p>
       </Section>
 
       <Section icon={<ShieldAlert className="size-4 text-danger" />} title="Danger zone">
-        <Button variant="destructive" onClick={() => setConfirmWipe(true)}>Delete all data</Button>
-        <p className="mt-2 text-xs text-muted">Removes every goal, plan, wallpaper and setting from this device and revokes your wallpaper links.</p>
+        <Button variant="destructive" onClick={() => setConfirmWipe(true)}>
+          Delete all data
+        </Button>
+        <p className="mt-2 text-xs text-muted">
+          Removes every goal, plan, wallpaper and setting from this device and revokes your wallpaper links.
+        </p>
       </Section>
 
       <ConfirmDialog
@@ -181,7 +290,9 @@ export default function SettingsPage() {
         title="Revoke this wallpaper link?"
         description="The link stops working immediately, including in any Shortcuts automation that uses it. You can create a new link later."
         confirmLabel="Revoke link"
-        onConfirm={() => revoking && void revokeLivingWallpaper(revoking).then(() => toast.success('Link revoked'))}
+        onConfirm={() =>
+          revoking && void revokeLivingWallpaper(revoking).then(() => toast.success('Link revoked'))
+        }
       />
       <ConfirmDialog
         open={confirmWipe}
@@ -195,11 +306,25 @@ export default function SettingsPage() {
   );
 }
 
-function Section({ icon, title, description, children, id }: { icon: React.ReactNode; title: string; description?: string; children: React.ReactNode; id?: string }) {
+function Section({
+  icon,
+  title,
+  description,
+  children,
+  id,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  id?: string;
+}) {
   return (
     <section id={id} className="card p-5" aria-labelledby={`${title}-h`}>
       <h2 id={`${title}-h`} className="mb-1 flex items-center gap-2 font-sans text-base font-semibold">
-        <span className="text-accent-text" aria-hidden>{icon}</span>
+        <span className="text-accent-text" aria-hidden>
+          {icon}
+        </span>
         {title}
       </h2>
       {description && <p className="mb-3 text-sm text-muted">{description}</p>}

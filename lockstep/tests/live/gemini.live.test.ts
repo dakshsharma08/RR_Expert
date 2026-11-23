@@ -12,13 +12,21 @@ import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../server/app';
-import type { ApiError, CoachResponse, HealthResponse, MotivationResponse, PlanResult } from '../../shared/api';
+import type {
+  ApiError,
+  CoachResponse,
+  HealthResponse,
+  MotivationResponse,
+  PlanResult,
+} from '../../shared/api';
 import { addDays, dayKey } from '../../shared/time';
 
 const hasKey = !!process.env.GEMINI_API_KEY?.trim();
 
 if (!hasKey) {
-  process.stdout.write('\nSKIPPED: no GEMINI_API_KEY — the live Gemini smoke test did not run (this is NOT a pass).\n\n');
+  process.stdout.write(
+    '\nSKIPPED: no GEMINI_API_KEY — the live Gemini smoke test did not run (this is NOT a pass).\n\n',
+  );
 }
 
 describe.skipIf(!hasKey)('live Gemini smoke test', () => {
@@ -70,7 +78,8 @@ describe.skipIf(!hasKey)('live Gemini smoke test', () => {
       }))
       .filter((e) => e.event && e.data);
     const last = events.at(-1)!;
-    if (last.event === 'error') throw new Error(`Plan failed: ${JSON.stringify(JSON.parse(last.data!) as ApiError)}`);
+    if (last.event === 'error')
+      throw new Error(`Plan failed: ${JSON.stringify(JSON.parse(last.data!) as ApiError)}`);
     expect(last.event).toBe('result');
     const result = JSON.parse(last.data!) as PlanResult;
     const milestoneEvents = events.filter((e) => e.event === 'milestone').length;
@@ -120,9 +129,24 @@ describe.skipIf(!hasKey)('live Gemini smoke test', () => {
           },
           todayKey: today,
           milestones: [
-            { id: 'm1', title: 'Chapters 1-4', targetDate: addDays(today, 4), estimatedHours: 5, status: 'pending', tasksDone: 1, tasksTotal: 4 },
+            {
+              id: 'm1',
+              title: 'Chapters 1-4',
+              targetDate: addDays(today, 4),
+              estimatedHours: 5,
+              status: 'pending',
+              tasksDone: 1,
+              tasksTotal: 4,
+            },
           ],
-          progress: { percentDone: 20, timePct: 25, pace: 'on-track', streak: 3, minutesLast7Days: 240, daysLeft: 14 },
+          progress: {
+            percentDone: 20,
+            timePct: 25,
+            pace: 'on-track',
+            streak: 3,
+            minutesLast7Days: 240,
+            daysLeft: 14,
+          },
         },
       }),
     });

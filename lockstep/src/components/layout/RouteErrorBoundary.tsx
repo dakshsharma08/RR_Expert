@@ -19,7 +19,9 @@ export class RouteErrorBoundary extends Component<{ children: ReactNode }, { err
           <AlertTriangle className="size-5" strokeWidth={1.5} />
         </div>
         <h1 className="text-2xl">This screen hit a snag</h1>
-        <p className="text-sm text-muted">Your data is safe on this device. Reload the screen to try again.</p>
+        <p className="text-sm text-muted">
+          Your data is safe on this device. Reload the screen to try again.
+        </p>
         <p className="max-w-full truncate font-mono text-xs text-muted/80">{this.state.error.message}</p>
         <div className="flex gap-2">
           <Button onClick={() => this.setState({ error: null })}>Try again</Button>

@@ -21,13 +21,19 @@ import { formatInZone, type Countdown, type TimeParts } from '@shared/time';
 /** Live metrics (re-computed every second via the shared ticker). */
 export function useLiveMetrics(data: GoalData | null | undefined): GoalMetrics | null {
   const now = useNow();
-  return useMemo(() => (data ? goalMetrics(data.goal, data.milestones, data.tasks, data.logs, now) : null), [data, now]);
+  return useMemo(
+    () => (data ? goalMetrics(data.goal, data.milestones, data.tasks, data.logs, now) : null),
+    [data, now],
+  );
 }
 
 /** Minute-resolution metrics for things that don't need seconds. */
 export function useMinuteMetrics(data: GoalData | null | undefined): GoalMetrics | null {
   const now = useMinute();
-  return useMemo(() => (data ? goalMetrics(data.goal, data.milestones, data.tasks, data.logs, now) : null), [data, now]);
+  return useMemo(
+    () => (data ? goalMetrics(data.goal, data.milestones, data.tasks, data.logs, now) : null),
+    [data, now],
+  );
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -36,7 +42,15 @@ const pad = (n: number) => String(n).padStart(2, '0');
  * Big serif countdown. Seconds tick visually, but the accessible text only changes
  * once a minute so screen readers aren't flooded.
  */
-export function CountdownDigits({ c, size = 'lg', showSeconds = true }: { c: Countdown; size?: 'md' | 'lg' | 'xl'; showSeconds?: boolean }) {
+export function CountdownDigits({
+  c,
+  size = 'lg',
+  showSeconds = true,
+}: {
+  c: Countdown;
+  size?: 'md' | 'lg' | 'xl';
+  showSeconds?: boolean;
+}) {
   const p: TimeParts = c.parts;
   const units: [string, string][] = [
     [String(p.days), p.days === 1 ? 'day' : 'days'],
@@ -44,8 +58,18 @@ export function CountdownDigits({ c, size = 'lg', showSeconds = true }: { c: Cou
     [pad(p.minutes), 'min'],
   ];
   if (showSeconds) units.push([pad(p.seconds), 'sec']);
-  const num = size === 'xl' ? 'text-[clamp(56px,13vw,160px)]' : size === 'lg' ? 'text-[clamp(44px,9vw,96px)]' : 'text-[40px]';
-  const srText = c.state === 'expired' ? 'Deadline passed' : c.state === 'completed' ? 'Goal completed' : `${p.days} days, ${p.hours} hours and ${p.minutes} minutes left`;
+  const num =
+    size === 'xl'
+      ? 'text-[clamp(56px,13vw,160px)]'
+      : size === 'lg'
+        ? 'text-[clamp(44px,9vw,96px)]'
+        : 'text-[40px]';
+  const srText =
+    c.state === 'expired'
+      ? 'Deadline passed'
+      : c.state === 'completed'
+        ? 'Goal completed'
+        : `${p.days} days, ${p.hours} hours and ${p.minutes} minutes left`;
   if (c.state === 'expired' || c.state === 'completed') {
     return (
       <p className={cn('font-display leading-none text-text', num)}>
@@ -61,9 +85,18 @@ export function CountdownDigits({ c, size = 'lg', showSeconds = true }: { c: Cou
       <div className="flex items-start gap-[0.32em]" aria-hidden style={{ fontSize: 'inherit' }}>
         {units.map(([v, label], i) => (
           <div key={label} className="flex items-start">
-            {i > 0 && <span className={cn('mr-[0.14em] font-display font-light leading-[0.9] text-gold-deep/80', num)}>:</span>}
+            {i > 0 && (
+              <span
+                className={cn('mr-[0.14em] font-display font-light leading-[0.9] text-gold-deep/80', num)}
+              >
+                :
+              </span>
+            )}
             <div className="flex flex-col items-center">
-              <span className={cn('font-display font-light leading-[0.9] tabular text-text', num)} style={{ fontVariationSettings: '"opsz" 144' }}>
+              <span
+                className={cn('font-display font-light leading-[0.9] tabular text-text', num)}
+                style={{ fontVariationSettings: '"opsz" 144' }}
+              >
                 {v}
               </span>
               <span className="mt-2 text-[11px] uppercase tracking-[0.18em] text-muted">{label}</span>
@@ -75,10 +108,28 @@ export function CountdownDigits({ c, size = 'lg', showSeconds = true }: { c: Cou
   );
 }
 
-export function StatPill({ icon, label, value, tone }: { icon: React.ReactNode; label: string; value: React.ReactNode; tone?: 'good' | 'warn' | 'bad' }) {
+export function StatPill({
+  icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  tone?: 'good' | 'warn' | 'bad';
+}) {
   return (
     <div className="flex min-h-11 items-center gap-2 rounded-full border border-hairline px-3 py-1.5 text-sm">
-      <span className={cn('text-accent-text', tone === 'good' && 'text-success', tone === 'warn' && 'text-warning', tone === 'bad' && 'text-danger')} aria-hidden>
+      <span
+        className={cn(
+          'text-accent-text',
+          tone === 'good' && 'text-success',
+          tone === 'warn' && 'text-warning',
+          tone === 'bad' && 'text-danger',
+        )}
+        aria-hidden
+      >
         {icon}
       </span>
       <span className="text-muted">{label}</span>
@@ -92,14 +143,26 @@ export function GoalHero({ data, m, compact }: { data: GoalData; m: GoalMetrics;
   const c = m.countdown;
   return (
     <section className="card relative overflow-hidden p-5 sm:p-8" aria-labelledby={`hero-${goal.id}`}>
-      <div className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full border border-hairline" aria-hidden />
-      <div className="pointer-events-none absolute -right-10 -top-10 size-44 rounded-full border border-hairline" aria-hidden />
+      <div
+        className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full border border-hairline"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -right-10 -top-10 size-44 rounded-full border border-hairline"
+        aria-hidden
+      />
       <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <p className="eyebrow mb-2">
             {stateLabel(c)} · Day {Math.max(1, c.dayNumber)} of {c.totalDays}
           </p>
-          <h1 id={`hero-${goal.id}`} className={cn('mb-5 leading-tight', compact ? 'text-xl sm:text-2xl' : 'text-[28px] sm:text-[40px]')}>
+          <h1
+            id={`hero-${goal.id}`}
+            className={cn(
+              'mb-5 leading-tight',
+              compact ? 'text-xl sm:text-2xl' : 'text-[28px] sm:text-[40px]',
+            )}
+          >
             {goal.title}
           </h1>
           <CountdownDigits c={c} size={compact ? 'md' : 'lg'} />
@@ -117,9 +180,22 @@ export function GoalHero({ data, m, compact }: { data: GoalData; m: GoalMetrics;
         </div>
       </div>
       <div className="relative mt-6 flex flex-wrap gap-2">
-        <StatPill icon={<Gauge className="size-4" strokeWidth={1.5} />} label={paceLabel(m.pace)} value={`${Math.round(c.timePct * 100)}% time`} tone={m.pace === 'behind' ? 'warn' : m.pace === 'ahead' ? 'good' : undefined} />
-        <StatPill icon={<Flame className="size-4" strokeWidth={1.5} />} label="Streak" value={`${m.streak} day${m.streak === 1 ? '' : 's'}`} />
-        <StatPill icon={<Check className="size-4" strokeWidth={1.5} />} label="Milestones" value={`${m.milestonesDone}/${m.milestonesTotal}`} />
+        <StatPill
+          icon={<Gauge className="size-4" strokeWidth={1.5} />}
+          label={paceLabel(m.pace)}
+          value={`${Math.round(c.timePct * 100)}% time`}
+          tone={m.pace === 'behind' ? 'warn' : m.pace === 'ahead' ? 'good' : undefined}
+        />
+        <StatPill
+          icon={<Flame className="size-4" strokeWidth={1.5} />}
+          label="Streak"
+          value={`${m.streak} day${m.streak === 1 ? '' : 's'}`}
+        />
+        <StatPill
+          icon={<Check className="size-4" strokeWidth={1.5} />}
+          label="Milestones"
+          value={`${m.milestonesDone}/${m.milestonesTotal}`}
+        />
       </div>
     </section>
   );
@@ -138,12 +214,19 @@ export function TodayFocus({ goal, m }: { goal: GoalRow; m: GoalMetrics }) {
             {allDone ? 'Done for today' : m.nextMilestone ? m.nextMilestone.title : 'All milestones done'}
           </h2>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => setLogOpen(true)} icon={<Plus className="size-4" strokeWidth={1.5} />}>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setLogOpen(true)}
+          icon={<Plus className="size-4" strokeWidth={1.5} />}
+        >
           Log time
         </Button>
       </div>
       {m.todayFocus.length === 0 ? (
-        <p className="text-sm text-muted">No open tasks. Add tasks to your milestones, or log time directly.</p>
+        <p className="text-sm text-muted">
+          No open tasks. Add tasks to your milestones, or log time directly.
+        </p>
       ) : (
         <ul className="space-y-1">
           {m.todayFocus.map((t) => (
@@ -151,7 +234,9 @@ export function TodayFocus({ goal, m }: { goal: GoalRow; m: GoalMetrics }) {
           ))}
         </ul>
       )}
-      {m.todayMinutesLogged > 0 && <p className="mt-4 text-xs text-muted">Logged today: {minutesLabel(m.todayMinutesLogged)}</p>}
+      {m.todayMinutesLogged > 0 && (
+        <p className="mt-4 text-xs text-muted">Logged today: {minutesLabel(m.todayMinutesLogged)}</p>
+      )}
       <LogTimeDialog open={logOpen} onOpenChange={setLogOpen} goalId={goal.id} />
     </section>
   );
@@ -161,8 +246,12 @@ export function TaskCheck({ task }: { task: TaskRow }) {
   const done = !!task.done_at;
   const onToggle = async () => {
     const r = await toggleTask(task.id, !done);
-    if (r.goalCompleted) toast.success('Goal complete. Every milestone is done.', { description: 'Refresh your wallpaper to celebrate.' });
-    else if (r.milestoneCompleted) toast.success('Milestone complete', { description: 'Your progress and wallpaper data just updated.' });
+    if (r.goalCompleted)
+      toast.success('Goal complete. Every milestone is done.', {
+        description: 'Refresh your wallpaper to celebrate.',
+      });
+    else if (r.milestoneCompleted)
+      toast.success('Milestone complete', { description: 'Your progress and wallpaper data just updated.' });
   };
   return (
     <li>
@@ -171,7 +260,9 @@ export function TaskCheck({ task }: { task: TaskRow }) {
         <span
           className={cn(
             'flex size-6 shrink-0 items-center justify-center rounded-full border transition-colors duration-200 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--focus)]',
-            done ? 'border-gold bg-gold text-obsidian' : 'border-line-strong text-transparent group-hover:border-gold',
+            done
+              ? 'border-gold bg-gold text-obsidian'
+              : 'border-line-strong text-transparent group-hover:border-gold',
           )}
           aria-hidden
         >
@@ -179,14 +270,26 @@ export function TaskCheck({ task }: { task: TaskRow }) {
             <Check className="size-3.5" strokeWidth={3} />
           </motion.span>
         </span>
-        <span className={cn('flex-1 text-sm transition-colors', done ? 'text-muted line-through' : 'text-text')}>{task.title}</span>
+        <span
+          className={cn('flex-1 text-sm transition-colors', done ? 'text-muted line-through' : 'text-text')}
+        >
+          {task.title}
+        </span>
         <span className="font-mono text-xs tabular text-muted">{minutesLabel(task.estimated_minutes)}</span>
       </label>
     </li>
   );
 }
 
-export function LogTimeDialog({ open, onOpenChange, goalId }: { open: boolean; onOpenChange: (o: boolean) => void; goalId: string }) {
+export function LogTimeDialog({
+  open,
+  onOpenChange,
+  goalId,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  goalId: string;
+}) {
   const [minutes, setMinutes] = useState('30');
   const [note, setNote] = useState('');
   const submit = async () => {
@@ -205,17 +308,37 @@ export function LogTimeDialog({ open, onOpenChange, goalId }: { open: boolean; o
       description="Count work that isn't a task: reading, revision, practice."
       footer={
         <>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
           <Button onClick={() => void submit()}>Log time</Button>
         </>
       }
     >
       <div className="space-y-4">
         <Field label="Minutes">
-          {({ id }) => <Input id={id} type="number" min={1} max={1440} inputMode="numeric" value={minutes} onChange={(e) => setMinutes(e.target.value)} />}
+          {({ id }) => (
+            <Input
+              id={id}
+              type="number"
+              min={1}
+              max={1440}
+              inputMode="numeric"
+              value={minutes}
+              onChange={(e) => setMinutes(e.target.value)}
+            />
+          )}
         </Field>
         <Field label="Note" optional>
-          {({ id }) => <Input id={id} value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} placeholder="What did you work on?" />}
+          {({ id }) => (
+            <Input
+              id={id}
+              value={note}
+              maxLength={300}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="What did you work on?"
+            />
+          )}
         </Field>
       </div>
     </Dialog>
@@ -230,9 +353,14 @@ export function UpcomingMilestones({ data, limit = 3 }: { data: GoalData; limit?
       <div className="mb-4 flex items-end justify-between">
         <div>
           <p className="eyebrow mb-1">Upcoming</p>
-          <h2 id="upcoming-title" className="text-xl">Next milestones</h2>
+          <h2 id="upcoming-title" className="text-xl">
+            Next milestones
+          </h2>
         </div>
-        <Link to={`/goals/${data.goal.id}`} className="inline-flex min-h-11 items-center text-sm text-accent-text hover:underline">
+        <Link
+          to={`/goals/${data.goal.id}`}
+          className="inline-flex min-h-11 items-center text-sm text-accent-text hover:underline"
+        >
           Full plan
         </Link>
       </div>
@@ -245,7 +373,12 @@ export function UpcomingMilestones({ data, limit = 3 }: { data: GoalData; limit?
             const done = t.filter((x) => x.done_at).length;
             return (
               <li key={m.id} className="flex items-center gap-3">
-                <ProgressRing value={t.length ? done / t.length : 0} size={36} stroke={2.5} label={`${m.title} progress`} />
+                <ProgressRing
+                  value={t.length ? done / t.length : 0}
+                  size={36}
+                  stroke={2.5}
+                  label={`${m.title} progress`}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{m.title}</p>
                   <p className="text-xs text-muted">
@@ -265,9 +398,13 @@ export function UpcomingMilestones({ data, limit = 3 }: { data: GoalData; limit?
  * Motivation line from REAL numbers. Uses Gemini when the server has a key (cached
  * per goal per day); otherwise a plain sentence built from the same numbers.
  */
-export function useMotivation(goal: GoalRow | undefined | null, m: GoalMetrics | null): { line: string | null; source: 'ai' | 'local' | null } {
+export function useMotivation(
+  goal: GoalRow | undefined | null,
+  m: GoalMetrics | null,
+): { line: string | null; source: 'ai' | 'local' | null } {
   const dateKey = m?.countdown.todayKey;
-  const cacheKey = goal && dateKey ? `motivation:${goal.id}:${dateKey}:${Math.round((m?.progress ?? 0) * 20)}` : null;
+  const cacheKey =
+    goal && dateKey ? `motivation:${goal.id}:${dateKey}:${Math.round((m?.progress ?? 0) * 20)}` : null;
   const health = useQuery({ queryKey: ['health'], queryFn: getHealth, staleTime: 60_000 });
   const local = m && goal ? localMotivation(m) : null;
   const [cached, setCached] = useState<string | null>(null);
@@ -283,7 +420,8 @@ export function useMotivation(goal: GoalRow | undefined | null, m: GoalMetrics |
   }, [cacheKey]);
 
   useEffect(() => {
-    if (!goal || !m || !cacheKey || cached || !health.data?.ai.configured || asked.current === cacheKey) return;
+    if (!goal || !m || !cacheKey || cached || !health.data?.ai.configured || asked.current === cacheKey)
+      return;
     if (goal.status !== 'active') return;
     asked.current = cacheKey;
     const ctrl = new AbortController();
@@ -322,7 +460,8 @@ export function localMotivation(m: GoalMetrics): string {
   if (c.state === 'expired') return 'The deadline passed. Close it out or set a new one.';
   if (c.state === 'due-today') return `Final day. ${pct}% done; finish the last steps.`;
   const next = m.nextMilestone ? `Next: ${m.nextMilestone.title}.` : '';
-  if (m.pace === 'behind') return `${c.daysLeft} days, ${pct}% done. One focused session closes the gap.`.trim();
+  if (m.pace === 'behind')
+    return `${c.daysLeft} days, ${pct}% done. One focused session closes the gap.`.trim();
   if (m.pace === 'ahead') return `${pct}% done with ${c.daysLeft} days to go. Keep the lead. ${next}`.trim();
   return `${c.daysLeft} days left · ${pct}% done. ${next}`.trim();
 }
@@ -336,7 +475,10 @@ export function MotivationCard({ line, source }: { line: string | null; source: 
         <blockquote className="font-display text-lg italic leading-snug text-text">{line}</blockquote>
         <figcaption className="mt-1 text-xs text-muted">
           {source === 'ai' ? (
-            <span className="inline-flex items-center gap-1"><Sparkles className="size-3" strokeWidth={1.5} aria-hidden /> ✦ AI suggestion · Gemini, from your real numbers</span>
+            <span className="inline-flex items-center gap-1">
+              <Sparkles className="size-3" strokeWidth={1.5} aria-hidden /> ✦ AI suggestion · Gemini, from
+              your real numbers
+            </span>
           ) : (
             'From your real numbers'
           )}

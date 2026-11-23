@@ -44,7 +44,10 @@ export function Dialog({
               )}
             </div>
             <D.Close asChild>
-              <button aria-label="Close" className="-mr-2 -mt-2 inline-flex size-11 items-center justify-center rounded-[14px] text-muted hover:bg-surface-2 hover:text-text">
+              <button
+                aria-label="Close"
+                className="-mr-2 -mt-2 inline-flex size-11 items-center justify-center rounded-[14px] text-muted hover:bg-surface-2 hover:text-text"
+              >
                 <X className="size-5" strokeWidth={1.5} />
               </button>
             </D.Close>

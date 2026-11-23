@@ -26,20 +26,33 @@ let server: Server;
 let base = '';
 const inner = memoryStore();
 const puts: { design: { background: { kind: string } } }[] = [];
-const store = { ...inner, put: async (k: string, v: Parameters<typeof inner.put>[1]) => { puts.push(v as never); return inner.put(k, v); } };
+const store = {
+  ...inner,
+  put: async (k: string, v: Parameters<typeof inner.put>[1]) => {
+    puts.push(v as never);
+    return inner.put(k, v);
+  },
+};
 
 beforeAll(async () => {
-  server = createApp({ env: { ALLOWED_ORIGINS: '' }, now: () => NOW, wallpapers: store }).listen(0, '127.0.0.1');
+  server = createApp({ env: { ALLOWED_ORIGINS: '' }, now: () => NOW, wallpapers: store }).listen(
+    0,
+    '127.0.0.1',
+  );
   await new Promise((r) => server.once('listening', r));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 });
 afterAll(() => server.close());
 
 const json = (method: string, path: string, body?: unknown, headers: Record<string, string> = {}) =>
-  fetch(base + path, { method, headers: { 'Content-Type': 'application/json', ...headers }, body: body ? JSON.stringify(body) : undefined });
+  fetch(base + path, {
+    method,
+    headers: { 'Content-Type': 'application/json', ...headers },
+    body: body ? JSON.stringify(body) : undefined,
+  });
 
 describe('living wallpaper', () => {
-  it('computes today\'s data from the snapshot (server clock, goal zone)', () => {
+  it("computes today's data from the snapshot (server clock, goal zone)", () => {
     const d = wallpaperDataFromSnapshot(snapshot, NOW);
     expect(d.daysLeft).toBe(11);
     expect(d.dayNumber).toBe(4);
@@ -48,7 +61,10 @@ describe('living wallpaper', () => {
   });
 
   it('creates, renders, updates with the secret, and revokes', async () => {
-    const design = { ...defaultDesign('orbit', undefined, 'android-1080'), background: { kind: 'image', image: { src: 'data:x', blur: 0, dim: 0, zoom: 1, x: 0, y: 0 }, grain: 0 } };
+    const design = {
+      ...defaultDesign('orbit', undefined, 'android-1080'),
+      background: { kind: 'image', image: { src: 'data:x', blur: 0, dim: 0, zoom: 1, x: 0, y: 0 }, grain: 0 },
+    };
     const created = await json('POST', '/api/wallpaper', { design, snapshot });
     expect(created.status).toBe(201);
     const { token, secret, url } = (await created.json()) as { token: string; secret: string; url: string };
@@ -62,13 +78,22 @@ describe('living wallpaper', () => {
     const buf = Buffer.from(await png.arrayBuffer());
     expect([buf.readUInt32BE(16), buf.readUInt32BE(20)]).toEqual([1080, 2400]);
 
-
     // Photos never leave the device: the stored design falls back to the theme background.
     expect(puts.at(-1)!.design.background.kind).toBe('theme');
 
-    const wrong = await json('PUT', `/api/wallpaper/${token}`, { design, snapshot }, { 'X-Wallpaper-Secret': 'nope' });
+    const wrong = await json(
+      'PUT',
+      `/api/wallpaper/${token}`,
+      { design, snapshot },
+      { 'X-Wallpaper-Secret': 'nope' },
+    );
     expect(wrong.status).toBe(404);
-    const ok = await json('PUT', `/api/wallpaper/${token}`, { design, snapshot: { ...snapshot, progressPct: 0.5 } }, { 'X-Wallpaper-Secret': secret });
+    const ok = await json(
+      'PUT',
+      `/api/wallpaper/${token}`,
+      { design, snapshot: { ...snapshot, progressPct: 0.5 } },
+      { 'X-Wallpaper-Secret': secret },
+    );
     expect(ok.status).toBe(200);
 
     const del = await json('DELETE', `/api/wallpaper/${token}`, undefined, { 'X-Wallpaper-Secret': secret });
@@ -78,7 +103,11 @@ describe('living wallpaper', () => {
 
   it('strips everything but hex colours and caps link sizes', async () => {
     const { safeDesign } = await import('../../server/wallpaper/living');
-    const d = safeDesign({ ...defaultDesign('monolith', undefined, 'custom'), custom: { width: 4096, height: 4096 }, colors: { accent: 'x'.repeat(1000), text: '#ffffff', junk: 'y' } } as never);
+    const d = safeDesign({
+      ...defaultDesign('monolith', undefined, 'custom'),
+      custom: { width: 4096, height: 4096 },
+      colors: { accent: 'x'.repeat(1000), text: '#ffffff', junk: 'y' },
+    } as never);
     expect(d.colors).toEqual({ text: '#ffffff' });
     expect(d.custom).toEqual({ width: 1600, height: 3600 });
   });
@@ -89,7 +118,10 @@ describe('living wallpaper', () => {
   });
 
   it('rejects bad input and unknown tokens', async () => {
-    expect((await json('POST', '/api/wallpaper', { design: {}, snapshot: { ...snapshot, timezone: 'Mars/Base' } })).status).toBe(400);
+    expect(
+      (await json('POST', '/api/wallpaper', { design: {}, snapshot: { ...snapshot, timezone: 'Mars/Base' } }))
+        .status,
+    ).toBe(400);
     expect((await fetch(`${base}/api/wallpaper/${'a'.repeat(32)}.png`)).status).toBe(404);
     expect((await fetch(`${base}/api/wallpaper/short.png`)).status).toBe(404);
   });

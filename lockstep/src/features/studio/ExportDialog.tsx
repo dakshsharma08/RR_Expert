@@ -69,7 +69,11 @@ export function ExportDialog({
   useEffect(() => () => void (url && URL.revokeObjectURL(url)), [url]);
 
   const file = result ? new File([result.blob], filename, { type: 'image/png' }) : null;
-  const canShareFiles = !!file && typeof navigator !== 'undefined' && 'canShare' in navigator && navigator.canShare?.({ files: [file] });
+  const canShareFiles =
+    !!file &&
+    typeof navigator !== 'undefined' &&
+    'canShare' in navigator &&
+    navigator.canShare?.({ files: [file] });
 
   async function share() {
     if (!file) return;
@@ -93,11 +97,22 @@ export function ExportDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} title="Preview & export" description={`${device.label} · ${device.width} × ${device.height} px`} wide>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Preview & export"
+      description={`${device.label} · ${device.width} × ${device.height} px`}
+      wide
+    >
       <div className="grid gap-6 md:grid-cols-[minmax(0,240px)_1fr]">
         <div className="mx-auto w-full max-w-[240px]">
-          <div className="relative overflow-hidden rounded-[28px] border border-line-strong bg-surface-2" style={{ aspectRatio: `${device.width} / ${device.height}` }}>
-            {url && <img src={url} alt={`Exported wallpaper for ${goalTitle}`} className="size-full object-cover" />}
+          <div
+            className="relative overflow-hidden rounded-[28px] border border-line-strong bg-surface-2"
+            style={{ aspectRatio: `${device.width} / ${device.height}` }}
+          >
+            {url && (
+              <img src={url} alt={`Exported wallpaper for ${goalTitle}`} className="size-full object-cover" />
+            )}
             {busy && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                 <Loader2 className="size-6 animate-spin text-gold" strokeWidth={1.5} aria-label="Rendering" />
@@ -106,21 +121,38 @@ export function ExportDialog({
           </div>
         </div>
         <div className="min-w-0 space-y-4">
-          {error && <p role="alert" className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">{error}</p>}
+          {error && (
+            <p
+              role="alert"
+              className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
+            >
+              {error}
+            </p>
+          )}
           {result && (
             <p className="flex items-center gap-2 text-sm text-success" role="status">
-              <Check className="size-4" strokeWidth={2} aria-hidden /> {result.width} × {result.height} px, checked from the PNG header · {(result.blob.size / 1024 / 1024).toFixed(2)} MB
+              <Check className="size-4" strokeWidth={2} aria-hidden /> {result.width} × {result.height} px,
+              checked from the PNG header · {(result.blob.size / 1024 / 1024).toFixed(2)} MB
             </p>
           )}
           <p className="break-all font-mono text-xs text-muted">{filename}</p>
           {result && <ReadabilityNotes warnings={result.report.warnings} />}
           <div className="flex flex-wrap gap-2">
             {canShareFiles && (
-              <Button onClick={() => void share()} disabled={!result} icon={<Share2 className="size-4" strokeWidth={1.5} />}>
+              <Button
+                onClick={() => void share()}
+                disabled={!result}
+                icon={<Share2 className="size-4" strokeWidth={1.5} />}
+              >
                 Share / Save Image
               </Button>
             )}
-            <Button variant={canShareFiles ? 'secondary' : 'primary'} onClick={download} disabled={!result} icon={<Download className="size-4" strokeWidth={1.5} />}>
+            <Button
+              variant={canShareFiles ? 'secondary' : 'primary'}
+              onClick={download}
+              disabled={!result}
+              icon={<Download className="size-4" strokeWidth={1.5} />}
+            >
               Download PNG
             </Button>
             <Button
@@ -136,11 +168,19 @@ export function ExportDialog({
             </Button>
           </div>
           <p className="text-xs text-muted">
-            Shows {data.state === 'active' ? `${data.daysLeft} days left` : data.state.replace('-', ' ')}, {Math.round(data.progressPct * 100)}% done
-            {data.nextMilestone ? `, next: ${data.nextMilestone.title}` : ''}. {data.updatedLabel}. Wallpapers are a snapshot: refresh after you make progress.
+            Shows {data.state === 'active' ? `${data.daysLeft} days left` : data.state.replace('-', ' ')},{' '}
+            {Math.round(data.progressPct * 100)}% done
+            {data.nextMilestone ? `, next: ${data.nextMilestone.title}` : ''}. {data.updatedLabel}. Wallpapers
+            are a snapshot: refresh after you make progress.
           </p>
           <div className="border-t border-hairline pt-4">
-            <Button variant="ghost" size="sm" onClick={() => setGuide((g) => !g)} aria-expanded={guide} icon={<BookOpen className="size-4" strokeWidth={1.5} />}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setGuide((g) => !g)}
+              aria-expanded={guide}
+              icon={<BookOpen className="size-4" strokeWidth={1.5} />}
+            >
               {guide ? 'Hide' : 'How to set it as your lock screen'}
             </Button>
             {guide && (

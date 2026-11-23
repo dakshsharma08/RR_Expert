@@ -49,12 +49,18 @@ export function preparePlanJob(intake: Intake, now: Date): PlanJob {
   try {
     conv = localToUtcIso(intake.deadlineDate, intake.deadlineTime, intake.timezone);
   } catch {
-    throw new AppError('INVALID_INPUT', "That deadline date or time isn't valid.", { details: ['deadlineDate/deadlineTime'] });
+    throw new AppError('INVALID_INPUT', "That deadline date or time isn't valid.", {
+      details: ['deadlineDate/deadlineTime'],
+    });
   }
   if (conv.utc.getTime() <= now.getTime()) {
-    throw new AppError('INVALID_INPUT', 'That deadline has already passed. Pick a date and time in the future.', {
-      details: [`deadline ${conv.iso} is not after now (${now.toISOString()})`],
-    });
+    throw new AppError(
+      'INVALID_INPUT',
+      'That deadline has already passed. Pick a date and time in the future.',
+      {
+        details: [`deadline ${conv.iso} is not after now (${now.toISOString()})`],
+      },
+    );
   }
   const todayKey = dayKey(now, intake.timezone);
   const ctx: ValidationContext = {
@@ -81,7 +87,10 @@ export function preparePlanJob(intake: Intake, now: Date): PlanJob {
 const INVALID_JSON_ERROR =
   'The response was not one complete, valid JSON object (it may have been cut off). Return the whole plan as a single JSON object.';
 
-function validateText(text: string, ctx: ValidationContext): ValidationResult | { ok: false; errors: string[] } {
+function validateText(
+  text: string,
+  ctx: ValidationContext,
+): ValidationResult | { ok: false; errors: string[] } {
   const raw = tryParseJson(text);
   if (raw === undefined) return { ok: false, errors: [INVALID_JSON_ERROR] };
   return validatePlan(raw, ctx);
@@ -128,7 +137,10 @@ export async function generatePlan(
     onText: (delta) => {
       for (const ev of parser.push(delta)) {
         if (ev.type === 'feasibility') {
-          emit({ event: 'feasibility', data: { feasibility: ev.feasibility, feasibilityReason: ev.feasibilityReason } });
+          emit({
+            event: 'feasibility',
+            data: { feasibility: ev.feasibility, feasibilityReason: ev.feasibilityReason },
+          });
         } else {
           emit({ event: 'milestone', data: { index: ev.index, milestone: ev.milestone } });
         }

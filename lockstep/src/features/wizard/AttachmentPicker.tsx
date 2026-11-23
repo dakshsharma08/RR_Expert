@@ -9,7 +9,13 @@ import { Button } from '@/components/ui/button';
 
 type Attachment = NonNullable<IntakeInput['attachment']>;
 
-export function AttachmentPicker({ value, onChange }: { value: IntakeInput['attachment']; onChange: (a: IntakeInput['attachment']) => void }) {
+export function AttachmentPicker({
+  value,
+  onChange,
+}: {
+  value: IntakeInput['attachment'];
+  onChange: (a: IntakeInput['attachment']) => void;
+}) {
   const ref = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -45,18 +51,42 @@ export function AttachmentPicker({ value, onChange }: { value: IntakeInput['atta
         <div className="flex items-center gap-3 rounded-[14px] border border-hairline bg-surface-2/60 p-3">
           <FileText className="size-5 text-accent-text" strokeWidth={1.5} aria-hidden />
           <span className="min-w-0 flex-1 truncate text-sm">{value.name}</span>
-          <button type="button" onClick={() => onChange(undefined)} aria-label={`Remove ${value.name}`} className="inline-flex size-11 items-center justify-center rounded-xl text-muted hover:text-text">
+          <button
+            type="button"
+            onClick={() => onChange(undefined)}
+            aria-label={`Remove ${value.name}`}
+            className="inline-flex size-11 items-center justify-center rounded-xl text-muted hover:text-text"
+          >
             <X className="size-4" strokeWidth={1.5} />
           </button>
         </div>
       ) : (
-        <Button variant="subtle" onClick={() => ref.current?.click()} loading={loading} icon={<Paperclip className="size-4" strokeWidth={1.5} />}>
+        <Button
+          variant="subtle"
+          onClick={() => ref.current?.click()}
+          loading={loading}
+          icon={<Paperclip className="size-4" strokeWidth={1.5} />}
+        >
           Add syllabus, notes photo or screenshot
         </Button>
       )}
-      <input ref={ref} type="file" accept={ATTACHMENT_TYPES.join(',')} className="sr-only" tabIndex={-1} aria-hidden onChange={(e) => void onFile(e.target.files?.[0])} />
-      <p className="text-xs text-muted">PDF, PNG, JPG or WEBP up to 10 MB. Gemini reads it once to plan. We don't store it.</p>
-      {error && <p role="alert" className="text-xs text-danger">{error}</p>}
+      <input
+        ref={ref}
+        type="file"
+        accept={ATTACHMENT_TYPES.join(',')}
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden
+        onChange={(e) => void onFile(e.target.files?.[0])}
+      />
+      <p className="text-xs text-muted">
+        PDF, PNG, JPG or WEBP up to 10 MB. Gemini reads it once to plan. We don't store it.
+      </p>
+      {error && (
+        <p role="alert" className="text-xs text-danger">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

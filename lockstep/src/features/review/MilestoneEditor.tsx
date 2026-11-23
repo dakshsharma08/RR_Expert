@@ -22,7 +22,16 @@ interface Props {
   maxDate: string;
 }
 
-export function MilestoneEditor({ open, onOpenChange, goalId, milestone, tasks, defaultDate, minDate, maxDate }: Props) {
+export function MilestoneEditor({
+  open,
+  onOpenChange,
+  goalId,
+  milestone,
+  tasks,
+  defaultDate,
+  minDate,
+  maxDate,
+}: Props) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(defaultDate);
@@ -59,7 +68,13 @@ export function MilestoneEditor({ open, onOpenChange, goalId, milestone, tasks, 
         toast.success('Milestone updated');
       }
     } else {
-      await addMilestone(goalId, { title: title.trim().slice(0, 120), description: description.trim(), target_date: date, estimated_hours: h, difficulty });
+      await addMilestone(goalId, {
+        title: title.trim().slice(0, 120),
+        description: description.trim(),
+        target_date: date,
+        estimated_hours: h,
+        difficulty,
+      });
       toast.success('Milestone added');
     }
     onOpenChange(false);
@@ -67,7 +82,11 @@ export function MilestoneEditor({ open, onOpenChange, goalId, milestone, tasks, 
 
   async function addTaskRow() {
     if (!milestone || newTask.trim().length < 2) return;
-    await addTask(milestone.id, newTask.trim().slice(0, 160), Math.min(600, Math.max(5, Number(newTaskMin) || 30)));
+    await addTask(
+      milestone.id,
+      newTask.trim().slice(0, 160),
+      Math.min(600, Math.max(5, Number(newTaskMin) || 30)),
+    );
     setNewTask('');
   }
 
@@ -79,31 +98,79 @@ export function MilestoneEditor({ open, onOpenChange, goalId, milestone, tasks, 
       description={milestone?.source === 'ai' ? 'Your changes will be marked "Edited by you".' : undefined}
       footer={
         <>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
           <Button onClick={() => void save()}>{milestone ? 'Save changes' : 'Add milestone'}</Button>
         </>
       }
     >
       <div className="space-y-4">
         <Field label="Title" error={error && title.trim().length < 2 ? error : undefined}>
-          {({ id, invalid }) => <Input id={id} aria-invalid={invalid} value={title} maxLength={120} onChange={(e) => setTitle(e.target.value)} autoFocus />}
+          {({ id, invalid }) => (
+            <Input
+              id={id}
+              aria-invalid={invalid}
+              value={title}
+              maxLength={120}
+              onChange={(e) => setTitle(e.target.value)}
+              autoFocus
+            />
+          )}
         </Field>
         <Field label="Description" optional>
-          {({ id }) => <Textarea id={id} value={description} maxLength={600} onChange={(e) => setDescription(e.target.value)} className="min-h-20" />}
+          {({ id }) => (
+            <Textarea
+              id={id}
+              value={description}
+              maxLength={600}
+              onChange={(e) => setDescription(e.target.value)}
+              className="min-h-20"
+            />
+          )}
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Target date" hint={`${minDate} → ${maxDate}`}>
-            {({ id, describedBy }) => <Input id={id} type="date" aria-describedby={describedBy} value={date} min={minDate} max={maxDate} onChange={(e) => setDate(e.target.value)} />}
+            {({ id, describedBy }) => (
+              <Input
+                id={id}
+                type="date"
+                aria-describedby={describedBy}
+                value={date}
+                min={minDate}
+                max={maxDate}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            )}
           </Field>
           <Field label="Hours">
-            {({ id }) => <Input id={id} type="number" inputMode="decimal" min={0.5} step={0.5} value={hours} onChange={(e) => setHours(e.target.value)} />}
+            {({ id }) => (
+              <Input
+                id={id}
+                type="number"
+                inputMode="decimal"
+                min={0.5}
+                step={0.5}
+                value={hours}
+                onChange={(e) => setHours(e.target.value)}
+              />
+            )}
           </Field>
         </div>
         <div className="space-y-2">
           <p className="text-sm font-medium">Difficulty</p>
-          <Segmented label="Difficulty" value={difficulty} onChange={setDifficulty} options={DIFFICULTY.map((d) => ({ value: d, label: d }))} />
+          <Segmented
+            label="Difficulty"
+            value={difficulty}
+            onChange={setDifficulty}
+            options={DIFFICULTY.map((d) => ({ value: d, label: d }))}
+          />
         </div>
-        {error && <p role="alert" className="text-sm text-danger">{error}</p>}
+        {error && (
+          <p role="alert" className="text-sm text-danger">
+            {error}
+          </p>
+        )}
 
         {milestone && (
           <div className="space-y-2 border-t border-hairline pt-4">
@@ -114,8 +181,22 @@ export function MilestoneEditor({ open, onOpenChange, goalId, milestone, tasks, 
               ))}
             </ul>
             <div className="flex gap-2">
-              <Input value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="New task" aria-label="New task title" onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), void addTaskRow())} />
-              <Input value={newTaskMin} onChange={(e) => setNewTaskMin(e.target.value)} type="number" min={5} max={600} className="w-24" aria-label="New task minutes" />
+              <Input
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+                placeholder="New task"
+                aria-label="New task title"
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), void addTaskRow())}
+              />
+              <Input
+                value={newTaskMin}
+                onChange={(e) => setNewTaskMin(e.target.value)}
+                type="number"
+                min={5}
+                max={600}
+                className="w-24"
+                aria-label="New task minutes"
+              />
               <IconButton label="Add task" variant="subtle" onClick={() => void addTaskRow()}>
                 <Plus className="size-4" strokeWidth={1.5} />
               </IconButton>
@@ -136,12 +217,28 @@ function TaskEditRow({ task }: { task: TaskRow }) {
   }, [task.title, task.estimated_minutes]);
   const commit = () => {
     const m = Math.min(600, Math.max(5, Number(min) || task.estimated_minutes));
-    if (title.trim() && (title.trim() !== task.title || m !== task.estimated_minutes)) void updateTask(task.id, { title: title.trim().slice(0, 160), estimated_minutes: m });
+    if (title.trim() && (title.trim() !== task.title || m !== task.estimated_minutes))
+      void updateTask(task.id, { title: title.trim().slice(0, 160), estimated_minutes: m });
   };
   return (
     <li className="flex items-center gap-2">
-      <Input value={title} onChange={(e) => setTitle(e.target.value)} onBlur={commit} aria-label="Task title" className="h-11" />
-      <Input value={min} onChange={(e) => setMin(e.target.value)} onBlur={commit} type="number" min={5} max={600} className="h-11 w-24" aria-label="Task minutes" />
+      <Input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        onBlur={commit}
+        aria-label="Task title"
+        className="h-11"
+      />
+      <Input
+        value={min}
+        onChange={(e) => setMin(e.target.value)}
+        onBlur={commit}
+        type="number"
+        min={5}
+        max={600}
+        className="h-11 w-24"
+        aria-label="Task minutes"
+      />
       <IconButton
         label={`Delete task ${task.title}`}
         onClick={async () => {

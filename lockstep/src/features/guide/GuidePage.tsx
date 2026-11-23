@@ -10,7 +10,11 @@ export default function GuidePage() {
       <p className="eyebrow mb-1">Guide</p>
       <h1 className="mb-6 text-[28px] sm:text-[40px]">Set your lock screen</h1>
       <WallpaperGuide />
-      <Button className="mt-8" onClick={() => navigate('/studio')} icon={<Smartphone className="size-4" strokeWidth={1.5} />}>
+      <Button
+        className="mt-8"
+        onClick={() => navigate('/studio')}
+        icon={<Smartphone className="size-4" strokeWidth={1.5} />}
+      >
         Open the Studio
       </Button>
     </div>

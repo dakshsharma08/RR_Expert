@@ -53,7 +53,11 @@ export function createApp(opts: CreateAppOptions = {}): Express {
   // No key → no client. The AI routes then answer 503 AI_NOT_CONFIGURED; we never fake AI output.
   const gemini = opts.gemini ?? (config.geminiApiKey ? createGeminiClient(config.geminiApiKey) : null);
   const models = gemini
-    ? new ModelResolver(gemini, { pinned: config.model, heavy: config.heavyModel, cacheMs: tuning.modelCacheMs })
+    ? new ModelResolver(gemini, {
+        pinned: config.model,
+        heavy: config.heavyModel,
+        cacheMs: tuning.modelCacheMs,
+      })
     : null;
 
   const app = express();
@@ -69,7 +73,10 @@ export function createApp(opts: CreateAppOptions = {}): Express {
         useDefaults: true,
         directives: {
           // The SPA (served by prod.ts) talks to our API and, optionally, to Supabase.
-          'connect-src': ["'self'", ...(config.supabase ? [config.supabase.url, config.supabase.url.replace(/^http/, 'ws')] : [])],
+          'connect-src': [
+            "'self'",
+            ...(config.supabase ? [config.supabase.url, config.supabase.url.replace(/^http/, 'ws')] : []),
+          ],
           'img-src': ["'self'", 'data:', 'blob:'],
           'font-src': ["'self'", 'data:'],
           'style-src': ["'self'", "'unsafe-inline'"],
@@ -122,7 +129,12 @@ export function createApp(opts: CreateAppOptions = {}): Express {
       now,
       limiter,
       motivationCache: new MotivationCache(),
-      images: models ? new ImageModelResolver(() => models.listedNames(), { pinned: env.GEMINI_IMAGE_MODEL?.trim() || null, cacheMs: tuning.modelCacheMs }) : null,
+      images: models
+        ? new ImageModelResolver(() => models.listedNames(), {
+            pinned: env.GEMINI_IMAGE_MODEL?.trim() || null,
+            cacheMs: tuning.modelCacheMs,
+          })
+        : null,
       wallpaperStore: wallpapers.kind,
     }),
   );
@@ -168,13 +180,29 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   let e: AppError;
   if (err instanceof AppError) {
     e = err;
-  } else if (err && typeof err === 'object' && 'type' in err && (err as { type: unknown }).type === 'entity.too.large') {
+  } else if (
+    err &&
+    typeof err === 'object' &&
+    'type' in err &&
+    (err as { type: unknown }).type === 'entity.too.large'
+  ) {
     e = new AppError('INVALID_INPUT', 'That request is too large (max 15 MB).', { status: 413 });
-  } else if (err && typeof err === 'object' && 'type' in err && (err as { type: unknown }).type === 'entity.parse.failed') {
+  } else if (
+    err &&
+    typeof err === 'object' &&
+    'type' in err &&
+    (err as { type: unknown }).type === 'entity.parse.failed'
+  ) {
     e = new AppError('INVALID_INPUT', 'The request body must be valid JSON.');
   } else {
     // Unexpected bug: log the stack (no request data) and send a generic message.
-    console.error(JSON.stringify({ type: 'unhandled_error', name: (err as Error)?.name, message: (err as Error)?.message }));
+    console.error(
+      JSON.stringify({
+        type: 'unhandled_error',
+        name: (err as Error)?.name,
+        message: (err as Error)?.message,
+      }),
+    );
     e = new AppError('INTERNAL');
   }
   // A cancelled request has no listener left.

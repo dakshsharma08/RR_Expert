@@ -18,8 +18,12 @@ function preloadFonts(): Plugin {
     transformIndexHtml: {
       order: 'post',
       handler(html, ctx) {
-        const files = Object.keys(ctx.bundle ?? {}).filter((f) => /(fraunces|inter)-latin-wght-normal-[\w-]+\.woff2$/.test(f));
-        const links = files.map((f) => `<link rel="preload" href="/${f}" as="font" type="font/woff2" crossorigin>`).join('\n    ');
+        const files = Object.keys(ctx.bundle ?? {}).filter((f) =>
+          /(fraunces|inter)-latin-wght-normal-[\w-]+\.woff2$/.test(f),
+        );
+        const links = files
+          .map((f) => `<link rel="preload" href="/${f}" as="font" type="font/woff2" crossorigin>`)
+          .join('\n    ');
         return html.replace('</title>', `</title>\n    ${links}`);
       },
     },
@@ -94,7 +98,10 @@ export default defineConfig({
           groups: [
             { name: 'icons', test: /node_modules[\\/]lucide-react/ },
             { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler|react-router)[\\/]/ },
-            { name: 'data', test: /node_modules[\\/](dexie|dexie-react-hooks|zod|date-fns|date-fns-tz)[\\/]/ },
+            {
+              name: 'data',
+              test: /node_modules[\\/](dexie|dexie-react-hooks|zod|date-fns|date-fns-tz)[\\/]/,
+            },
           ],
         },
       },

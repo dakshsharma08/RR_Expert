@@ -8,7 +8,9 @@ import { applyMode, useUi } from '@/stores/ui';
 import { router } from './router';
 import { PwaUpdater } from './PwaUpdater';
 // Reminders need the database + schemas: load them after first paint, off the landing's critical path.
-const ReminderScheduler = lazy(() => import('@/features/settings/reminders').then((m) => ({ default: m.ReminderScheduler })));
+const ReminderScheduler = lazy(() =>
+  import('@/features/settings/reminders').then((m) => ({ default: m.ReminderScheduler })),
+);
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false, staleTime: 60_000 } },

@@ -8,7 +8,9 @@ import { addDays, dayKey, diffDays, effectiveDeadlineKey, weekdayOf, workingDays
 
 export function plannedDailyMinutes(goal: GoalRow, milestones: MilestoneRow[]): Map<string, number> {
   const out = new Map<string, number>();
-  const ordered = [...milestones].sort((a, b) => (a.target_date === b.target_date ? a.order - b.order : a.target_date < b.target_date ? -1 : 1));
+  const ordered = [...milestones].sort((a, b) =>
+    a.target_date === b.target_date ? a.order - b.order : a.target_date < b.target_date ? -1 : 1,
+  );
   const startKey = dayKey(goal.approved_at ?? goal.start_utc, goal.timezone);
   let from = startKey;
   for (const m of ordered) {
@@ -34,7 +36,12 @@ export interface ProgressPoint {
   actual: number | null; // null for future days
 }
 
-export function progressSeries(goal: GoalRow, milestones: MilestoneRow[], logs: ProgressLogRow[], nowMs: number): ProgressPoint[] {
+export function progressSeries(
+  goal: GoalRow,
+  milestones: MilestoneRow[],
+  logs: ProgressLogRow[],
+  nowMs: number,
+): ProgressPoint[] {
   const planned = plannedDailyMinutes(goal, milestones);
   const actual = actualDailyMinutes(logs);
   const total = [...planned.values()].reduce((s, v) => s + v, 0) || 1;
@@ -51,7 +58,11 @@ export function progressSeries(goal: GoalRow, milestones: MilestoneRow[], logs: 
     const d = addDays(from, i);
     cp += planned.get(d) ?? 0;
     ca += actual.get(d) ?? 0;
-    pts.push({ date: d, planned: round(Math.min(100, (cp / total) * 100)), actual: d <= today ? round(Math.min(100, (ca / total) * 100)) : null });
+    pts.push({
+      date: d,
+      planned: round(Math.min(100, (cp / total) * 100)),
+      actual: d <= today ? round(Math.min(100, (ca / total) * 100)) : null,
+    });
   }
   return pts;
 }
@@ -80,7 +91,9 @@ export function weeklyBars(goal: GoalRow, milestones: MilestoneRow[], logs: Prog
   };
   planned.forEach((v, d) => add(d, 'planned', v));
   actual.forEach((v, d) => add(d, 'actual', v));
-  return [...weeks.values()].sort((a, b) => (a.weekStart < b.weekStart ? -1 : 1)).map((w) => ({ ...w, planned: round(w.planned), actual: round(w.actual) }));
+  return [...weeks.values()]
+    .sort((a, b) => (a.weekStart < b.weekStart ? -1 : 1))
+    .map((w) => ({ ...w, planned: round(w.planned), actual: round(w.actual) }));
 }
 
 export interface HeatCell {

@@ -2,7 +2,18 @@
  * All writes to the local database go through these functions, so rules like
  * "editing an AI milestone marks it Edited by you" live in exactly one place.
  */
-import { db, nowIso, uid, type GoalRow, type MilestoneRow, type PlanMeta, type ProgressLogRow, type StoredIntake, type TaskRow, type AiRunRow } from './db';
+import {
+  db,
+  nowIso,
+  uid,
+  type GoalRow,
+  type MilestoneRow,
+  type PlanMeta,
+  type ProgressLogRow,
+  type StoredIntake,
+  type TaskRow,
+  type AiRunRow,
+} from './db';
 import type { AiRunMeta, PlanResult, RescheduleChange } from '@shared/api';
 import { computeCapacity, feasibilityFor, round1, suggestFixes, type Difficulty } from '@shared/plan';
 import { dayKey, localToUtcIso } from '@shared/time';
@@ -130,7 +141,12 @@ export async function startManualPlan(goalId: string): Promise<void> {
   const goal = await db.goals.get(goalId);
   if (!goal) return;
   const existing = await db.milestones.where('goal_id').equals(goalId).toArray();
-  const meta = recomputeMeta(goal, existing, goal.plan_meta, await db.tasks.where('goal_id').equals(goalId).toArray());
+  const meta = recomputeMeta(
+    goal,
+    existing,
+    goal.plan_meta,
+    await db.tasks.where('goal_id').equals(goalId).toArray(),
+  );
   await db.goals.update(goalId, {
     plan_meta: { ...meta, source: goal.plan_meta?.source ?? 'manual' },
     status: goal.approved_at ? 'active' : 'review',
@@ -176,7 +192,9 @@ export function recomputeMeta(
     }, 0),
   );
   const started = remaining < total - 0.05;
-  const code = started ? feasibilityFor(remaining, null, capacity, 'Remaining work') : feasibilityFor(total, prev?.fullScopeHours, capacity);
+  const code = started
+    ? feasibilityFor(remaining, null, capacity, 'Remaining work')
+    : feasibilityFor(total, prev?.fullScopeHours, capacity);
   const scope = started ? remaining : Math.max(total, prev?.fullScopeHours ?? 0);
   return {
     source: prev?.source ?? 'manual',
@@ -202,8 +220,14 @@ export function recomputeMeta(
 export async function refreshGoalMeta(goalId: string): Promise<void> {
   const goal = await db.goals.get(goalId);
   if (!goal) return;
-  const [ms, ts] = await Promise.all([db.milestones.where('goal_id').equals(goalId).toArray(), db.tasks.where('goal_id').equals(goalId).toArray()]);
-  await db.goals.update(goalId, { plan_meta: recomputeMeta(goal, ms, goal.plan_meta, ts), updated_at: nowIso() });
+  const [ms, ts] = await Promise.all([
+    db.milestones.where('goal_id').equals(goalId).toArray(),
+    db.tasks.where('goal_id').equals(goalId).toArray(),
+  ]);
+  await db.goals.update(goalId, {
+    plan_meta: recomputeMeta(goal, ms, goal.plan_meta, ts),
+    updated_at: nowIso(),
+  });
 }
 
 export async function approvePlan(goalId: string): Promise<void> {
@@ -244,15 +268,21 @@ export async function renameGoal(goalId: string, title: string): Promise<void> {
 /** Delete a goal and everything that belongs to it. Returns a snapshot for Undo. */
 export async function deleteGoal(goalId: string): Promise<Snapshot> {
   const snap = await snapshotGoal(goalId);
-  await db.transaction('rw', [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers], async () => {
-    await db.tasks.where('goal_id').equals(goalId).delete();
-    await db.milestones.where('goal_id').equals(goalId).delete();
-    await db.progress_logs.where('goal_id').equals(goalId).delete();
-    // Keep wallpaper rows whose link is still live (revoke failed): Settings can retry with their secret.
-    const wps = await db.wallpapers.where('goal_id').equals(goalId).toArray();
-    await db.wallpapers.bulkDelete(wps.filter((w) => !w.share_token || w.revoked_at || !w.share_secret).map((w) => w.id));
-    await db.goals.delete(goalId);
-  });
+  await db.transaction(
+    'rw',
+    [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers],
+    async () => {
+      await db.tasks.where('goal_id').equals(goalId).delete();
+      await db.milestones.where('goal_id').equals(goalId).delete();
+      await db.progress_logs.where('goal_id').equals(goalId).delete();
+      // Keep wallpaper rows whose link is still live (revoke failed): Settings can retry with their secret.
+      const wps = await db.wallpapers.where('goal_id').equals(goalId).toArray();
+      await db.wallpapers.bulkDelete(
+        wps.filter((w) => !w.share_token || w.revoked_at || !w.share_secret).map((w) => w.id),
+      );
+      await db.goals.delete(goalId);
+    },
+  );
   const active = await getKv<string>('activeGoalId');
   if (active === goalId) await db.kv.delete('activeGoalId');
   return snap;
@@ -268,7 +298,7 @@ export interface Snapshot {
 
 async function snapshotGoal(goalId: string): Promise<Snapshot> {
   return {
-    goals: (await db.goals.where('id').equals(goalId).toArray()),
+    goals: await db.goals.where('id').equals(goalId).toArray(),
     milestones: await db.milestones.where('goal_id').equals(goalId).toArray(),
     tasks: await db.tasks.where('goal_id').equals(goalId).toArray(),
     progress_logs: await db.progress_logs.where('goal_id').equals(goalId).toArray(),
@@ -277,27 +307,43 @@ async function snapshotGoal(goalId: string): Promise<Snapshot> {
 }
 
 export async function restoreSnapshot(s: Snapshot): Promise<void> {
-  await db.transaction('rw', [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers], async () => {
-    await db.goals.bulkPut(s.goals);
-    await db.milestones.bulkPut(s.milestones);
-    await db.tasks.bulkPut(s.tasks);
-    await db.progress_logs.bulkPut(s.progress_logs);
-    await db.wallpapers.bulkPut(s.wallpapers);
-  });
+  await db.transaction(
+    'rw',
+    [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers],
+    async () => {
+      await db.goals.bulkPut(s.goals);
+      await db.milestones.bulkPut(s.milestones);
+      await db.tasks.bulkPut(s.tasks);
+      await db.progress_logs.bulkPut(s.progress_logs);
+      await db.wallpapers.bulkPut(s.wallpapers);
+    },
+  );
 }
 
 // ───────────────────────── Milestones ─────────────────────────
 
-export type MilestonePatch = Partial<Pick<MilestoneRow, 'title' | 'description' | 'target_date' | 'estimated_hours' | 'difficulty'>>;
+export type MilestonePatch = Partial<
+  Pick<MilestoneRow, 'title' | 'description' | 'target_date' | 'estimated_hours' | 'difficulty'>
+>;
 
 export async function updateMilestone(id: string, patch: MilestonePatch): Promise<void> {
   const m = await db.milestones.get(id);
   if (!m) return;
   await db.milestones.update(id, { ...patch, edited: true, updated_at: nowIso() });
-  if (patch.estimated_hours !== undefined || patch.target_date !== undefined) await refreshGoalMeta(m.goal_id);
+  if (patch.estimated_hours !== undefined || patch.target_date !== undefined)
+    await refreshGoalMeta(m.goal_id);
 }
 
-export async function addMilestone(goalId: string, data: { title: string; target_date: string; estimated_hours: number; description?: string; difficulty?: Difficulty }): Promise<string> {
+export async function addMilestone(
+  goalId: string,
+  data: {
+    title: string;
+    target_date: string;
+    estimated_hours: number;
+    description?: string;
+    difficulty?: Difficulty;
+  },
+): Promise<string> {
   const now = nowIso();
   const count = await db.milestones.where('goal_id').equals(goalId).count();
   const goal = await db.goals.get(goalId);
@@ -324,7 +370,9 @@ export async function addMilestone(goalId: string, data: { title: string; target
   return id;
 }
 
-export async function deleteMilestone(id: string): Promise<{ milestone: MilestoneRow; tasks: TaskRow[] } | null> {
+export async function deleteMilestone(
+  id: string,
+): Promise<{ milestone: MilestoneRow; tasks: TaskRow[] } | null> {
   const m = await db.milestones.get(id);
   if (!m) return null;
   const tasks = await db.tasks.where('milestone_id').equals(id).toArray();
@@ -342,7 +390,8 @@ export async function restoreMilestone(data: { milestone: MilestoneRow; tasks: T
   await db.transaction('rw', [db.milestones, db.tasks], async () => {
     const ms = await db.milestones.where('goal_id').equals(data.milestone.goal_id).sortBy('order');
     // Re-insert at its old position.
-    for (const m of ms) if (m.order >= data.milestone.order) await db.milestones.update(m.id, { order: m.order + 1 });
+    for (const m of ms)
+      if (m.order >= data.milestone.order) await db.milestones.update(m.id, { order: m.order + 1 });
     await db.milestones.put(data.milestone);
     await db.tasks.bulkPut(data.tasks);
   });
@@ -399,7 +448,10 @@ export async function addTask(milestoneId: string, title: string, minutes: numbe
   if (m.status === 'completed') await setMilestoneCompleted(milestoneId, false);
 }
 
-export async function updateTask(id: string, patch: Partial<Pick<TaskRow, 'title' | 'estimated_minutes'>>): Promise<void> {
+export async function updateTask(
+  id: string,
+  patch: Partial<Pick<TaskRow, 'title' | 'estimated_minutes'>>,
+): Promise<void> {
   await db.tasks.update(id, { ...patch, edited: true, updated_at: nowIso() });
 }
 
@@ -446,7 +498,10 @@ async function syncMilestoneFromTasks(milestoneId: string): Promise<void> {
  * Tick a task on/off. Completing a task also logs its estimated minutes for today
  * (that feeds Insights), and completes the milestone when all its tasks are done.
  */
-export async function toggleTask(id: string, done: boolean): Promise<{ milestoneCompleted: boolean; goalCompleted: boolean }> {
+export async function toggleTask(
+  id: string,
+  done: boolean,
+): Promise<{ milestoneCompleted: boolean; goalCompleted: boolean }> {
   const t = await db.tasks.get(id);
   if (!t) return { milestoneCompleted: false, goalCompleted: false };
   const goal = await db.goals.get(t.goal_id);
@@ -477,7 +532,11 @@ export async function toggleTask(id: string, done: boolean): Promise<{ milestone
         milestoneCompleted = true;
       } else if (!done && !allDone && m.status === 'completed') {
         // Un-ticking a task re-opens its milestone. Ticking never re-opens one you completed by hand.
-        await db.milestones.update(m.id, { status: m.approved_at ? 'approved' : 'pending', completed_at: null, updated_at: now });
+        await db.milestones.update(m.id, {
+          status: m.approved_at ? 'approved' : 'pending',
+          completed_at: null,
+          updated_at: now,
+        });
       }
     }
   });
@@ -502,7 +561,12 @@ async function syncGoalCompletion(goalId: string): Promise<boolean> {
 
 // ───────────────────────── Progress ─────────────────────────
 
-export async function logMinutes(goalId: string, minutes: number, note: string, date?: string): Promise<void> {
+export async function logMinutes(
+  goalId: string,
+  minutes: number,
+  note: string,
+  date?: string,
+): Promise<void> {
   const goal = await db.goals.get(goalId);
   if (!goal) return;
   const now = nowIso();
@@ -539,7 +603,9 @@ export async function applyReschedule(goalId: string, changes: RescheduleChange[
     }
     // keep timeline order chronological after a replan
     const ms = await db.milestones.where('goal_id').equals(goalId).toArray();
-    ms.sort((a, b) => (a.target_date === b.target_date ? a.order - b.order : a.target_date < b.target_date ? -1 : 1));
+    ms.sort((a, b) =>
+      a.target_date === b.target_date ? a.order - b.order : a.target_date < b.target_date ? -1 : 1,
+    );
     await Promise.all(ms.map((m, i) => db.milestones.update(m.id, { order: i })));
   });
   await refreshGoalMeta(goalId);
@@ -595,31 +661,40 @@ export async function exportAll() {
 
 export async function importAll(data: unknown): Promise<{ goals: number }> {
   const d = data as Awaited<ReturnType<typeof exportAll>>;
-  if (!d || d.app !== 'lockstep' || !Array.isArray(d.goals)) throw new Error('This file is not a LOCKSTEP export.');
-  await db.transaction('rw', [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers, db.ai_runs], async () => {
-    await db.goals.bulkPut(d.goals);
-    await db.milestones.bulkPut(d.milestones ?? []);
-    await db.tasks.bulkPut(d.tasks ?? []);
-    await db.progress_logs.bulkPut(d.progress_logs ?? []);
-    await db.wallpapers.bulkPut(d.wallpapers ?? []);
-    await db.ai_runs.bulkPut(d.ai_runs ?? []);
-  });
+  if (!d || d.app !== 'lockstep' || !Array.isArray(d.goals))
+    throw new Error('This file is not a LOCKSTEP export.');
+  await db.transaction(
+    'rw',
+    [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers, db.ai_runs],
+    async () => {
+      await db.goals.bulkPut(d.goals);
+      await db.milestones.bulkPut(d.milestones ?? []);
+      await db.tasks.bulkPut(d.tasks ?? []);
+      await db.progress_logs.bulkPut(d.progress_logs ?? []);
+      await db.wallpapers.bulkPut(d.wallpapers ?? []);
+      await db.ai_runs.bulkPut(d.ai_runs ?? []);
+    },
+  );
   return { goals: d.goals.length };
 }
 
 export async function deleteAllData(): Promise<void> {
-  await db.transaction('rw', [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers, db.ai_runs, db.images, db.kv], async () => {
-    await Promise.all([
-      db.goals.clear(),
-      db.milestones.clear(),
-      db.tasks.clear(),
-      db.progress_logs.clear(),
-      db.wallpapers.clear(),
-      db.ai_runs.clear(),
-      db.images.clear(),
-      db.kv.clear(),
-    ]);
-  });
+  await db.transaction(
+    'rw',
+    [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers, db.ai_runs, db.images, db.kv],
+    async () => {
+      await Promise.all([
+        db.goals.clear(),
+        db.milestones.clear(),
+        db.tasks.clear(),
+        db.progress_logs.clear(),
+        db.wallpapers.clear(),
+        db.ai_runs.clear(),
+        db.images.clear(),
+        db.kv.clear(),
+      ]);
+    },
+  );
   try {
     localStorage.clear();
   } catch {

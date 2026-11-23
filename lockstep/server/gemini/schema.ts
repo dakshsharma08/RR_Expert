@@ -29,7 +29,15 @@ export const PLAN_PROPERTY_ORDER = [
   'dailyRitual',
 ] as const;
 
-const MILESTONE_ORDER = ['id', 'title', 'description', 'targetDate', 'estimatedHours', 'difficulty', 'tasks'] as const;
+const MILESTONE_ORDER = [
+  'id',
+  'title',
+  'description',
+  'targetDate',
+  'estimatedHours',
+  'difficulty',
+  'tasks',
+] as const;
 const TASK_ORDER = ['id', 'title', 'estimatedMinutes'] as const;
 
 /** Above this many allowed dates we describe the rule instead of enumerating dates. */
@@ -55,7 +63,8 @@ export function buildPlanJsonSchema(allowedDates: readonly string[]): Record<str
       fullScopeHours: {
         type: ['number', 'null'],
         minimum: 0,
-        description: 'Hours the COMPLETE goal would need when that exceeds the capacity (so this plan keeps only the essentials). null when the full goal fits.',
+        description:
+          'Hours the COMPLETE goal would need when that exceeds the capacity (so this plan keeps only the essentials). null when the full goal fits.',
       },
       milestones: {
         type: 'array',

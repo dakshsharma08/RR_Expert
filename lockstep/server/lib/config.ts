@@ -38,7 +38,8 @@ export function loadConfig(env: NodeJS.ProcessEnv): ServerConfig {
       .map((s) => s.trim().replace(/\/+$/, ''))
       .filter(Boolean),
     upstash: upstashUrl && upstashToken ? { url: upstashUrl.replace(/\/+$/, ''), token: upstashToken } : null,
-    supabase: supabaseUrl && supabaseKey ? { url: supabaseUrl.replace(/\/+$/, ''), serviceKey: supabaseKey } : null,
+    supabase:
+      supabaseUrl && supabaseKey ? { url: supabaseUrl.replace(/\/+$/, ''), serviceKey: supabaseKey } : null,
   };
 }
 
@@ -79,7 +80,9 @@ export const DEFAULT_TUNING: AiTuning = {
   rateLimit: { windowSec: 10 * 60, windowMax: 20, dayMax: 150 },
 };
 
-export type TuningOverrides = Partial<Omit<AiTuning, 'rateLimit'>> & { rateLimit?: Partial<AiTuning['rateLimit']> };
+export type TuningOverrides = Partial<Omit<AiTuning, 'rateLimit'>> & {
+  rateLimit?: Partial<AiTuning['rateLimit']>;
+};
 
 export function resolveTuning(over: TuningOverrides = {}): AiTuning {
   return { ...DEFAULT_TUNING, ...over, rateLimit: { ...DEFAULT_TUNING.rateLimit, ...over.rateLimit } };

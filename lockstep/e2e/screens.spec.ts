@@ -13,9 +13,17 @@ async function audit(page: Page, name: string) {
   const w = page.viewportSize()?.width ?? 0;
   await page.waitForTimeout(500);
   await page.screenshot({ path: `${OUT}/${w}-${name}.png`, fullPage: false });
-  const res = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
+  const res = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+    .analyze();
   const bad = res.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  const summary = bad.map((v) => `${v.id} (${v.impact}): ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`);
+  const summary = bad.map(
+    (v) =>
+      `${v.id} (${v.impact}): ${v.nodes
+        .slice(0, 3)
+        .map((n) => n.target.join(' '))
+        .join(' | ')}`,
+  );
   expect(summary, `${name}: axe violations`).toEqual([]);
 }
 

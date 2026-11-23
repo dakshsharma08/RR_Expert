@@ -27,12 +27,14 @@ function NotConfigured() {
   return (
     <SyncSection icon={<CloudOff className="size-4" />}>
       <p className="text-sm text-muted">
-        Cloud sync isn't set up on this copy of LOCKSTEP, so everything stays on this device. That's the normal way to use LOCKSTEP:
-        nothing is missing, and no account is needed.
+        Cloud sync isn't set up on this copy of LOCKSTEP, so everything stays on this device. That's the
+        normal way to use LOCKSTEP: nothing is missing, and no account is needed.
       </p>
       <p className="mt-2 text-xs text-muted">
-        Developers can turn on optional sync across devices by setting <code className="font-mono">VITE_SUPABASE_URL</code> and{' '}
-        <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> and running the database migration. See <code className="font-mono">docs/notes/sync.md</code>.
+        Developers can turn on optional sync across devices by setting{' '}
+        <code className="font-mono">VITE_SUPABASE_URL</code> and{' '}
+        <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> and running the database migration. See{' '}
+        <code className="font-mono">docs/notes/sync.md</code>.
       </p>
     </SyncSection>
   );
@@ -78,7 +80,10 @@ function SignedOut() {
   }
 
   return (
-    <SyncSection icon={<Cloud className="size-4" />} description="Optional. Sign in with your email to keep your goals in step across devices. LOCKSTEP keeps working without an account.">
+    <SyncSection
+      icon={<Cloud className="size-4" />}
+      description="Optional. Sign in with your email to keep your goals in step across devices. LOCKSTEP keeps working without an account."
+    >
       <form onSubmit={(e) => void onSubmit(e)} noValidate className="space-y-3">
         <Field label="Email" hint="No password. We email you a one-time sign-in link." error={error}>
           {({ id, describedBy, invalid }) => (
@@ -105,7 +110,9 @@ function SignedOut() {
           ? `Link sent to ${sentTo}. Open it in this browser to finish signing in. It can take a minute, so check spam too.`
           : ''}
       </p>
-      <p className="mt-1 text-xs text-muted">The first time you sync, the goals already on this device are added to your account.</p>
+      <p className="mt-1 text-xs text-muted">
+        The first time you sync, the goals already on this device are added to your account.
+      </p>
     </SyncSection>
   );
 }
@@ -148,11 +155,17 @@ function SignedIn({ userId, email }: { userId: string; email: string }) {
     setDeleting(true);
     try {
       const token = (await getSupabase()?.auth.getSession())?.data.session?.access_token;
-      const res = await fetch('/api/account', { method: 'DELETE', headers: { Authorization: `Bearer ${token ?? ''}` } });
+      const res = await fetch('/api/account', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token ?? ''}` },
+      });
       const body = (await res.json().catch(() => null)) as { message?: string } | null;
       if (!res.ok) throw new Error(body?.message ?? 'Could not delete the account right now.');
       await signOut();
-      toast.success('Cloud account deleted', { description: 'Everything stored in the cloud is gone. Data on this device is untouched. Delete it below if you want.' });
+      toast.success('Cloud account deleted', {
+        description:
+          'Everything stored in the cloud is gone. Data on this device is untouched. Delete it below if you want.',
+      });
     } catch (e) {
       toast.error("Couldn't delete the account", { description: (e as Error).message });
     } finally {
@@ -161,7 +174,10 @@ function SignedIn({ userId, email }: { userId: string; email: string }) {
   }
 
   return (
-    <SyncSection icon={<Cloud className="size-4" />} description="Keeps your goals, plans, progress and wallpaper designs in step across your devices.">
+    <SyncSection
+      icon={<Cloud className="size-4" />}
+      description="Keeps your goals, plans, progress and wallpaper designs in step across your devices."
+    >
       <p className="text-sm">
         Signed in as <span className="font-semibold text-text">{email}</span>
       </p>
@@ -177,17 +193,32 @@ function SignedIn({ userId, email }: { userId: string; email: string }) {
       </p>
       {linkedElsewhere && (
         <p className="mt-2 text-sm text-warning">
-          This device's data is linked to {linked.email ?? 'another account'}. Sync is paused so two accounts never get mixed.
+          This device's data is linked to {linked.email ?? 'another account'}. Sync is paused so two accounts
+          never get mixed.
         </p>
       )}
       <div className="mt-3 flex flex-wrap gap-2">
-        <Button onClick={() => void onSync()} loading={syncing} icon={<RefreshCw className="size-4" strokeWidth={1.5} aria-hidden />}>
+        <Button
+          onClick={() => void onSync()}
+          loading={syncing}
+          icon={<RefreshCw className="size-4" strokeWidth={1.5} aria-hidden />}
+        >
           Sync now
         </Button>
-        <Button variant="ghost" onClick={() => void onSignOut()} loading={signingOut} icon={<LogOut className="size-4" strokeWidth={1.5} aria-hidden />}>
+        <Button
+          variant="ghost"
+          onClick={() => void onSignOut()}
+          loading={signingOut}
+          icon={<LogOut className="size-4" strokeWidth={1.5} aria-hidden />}
+        >
           Sign out
         </Button>
-        <Button variant="destructive" onClick={() => setConfirmDelete(true)} loading={deleting} icon={<UserX className="size-4" strokeWidth={1.5} aria-hidden />}>
+        <Button
+          variant="destructive"
+          onClick={() => setConfirmDelete(true)}
+          loading={deleting}
+          icon={<UserX className="size-4" strokeWidth={1.5} aria-hidden />}
+        >
           Delete account
         </Button>
       </div>
@@ -203,8 +234,8 @@ function SignedIn({ userId, email }: { userId: string; email: string }) {
         {status}
       </p>
       <p className="mt-1 text-xs text-muted">
-        Sync runs when you tap Sync now. If the same item was edited on two devices, the most recent edit wins. Living Wallpaper links,
-        uploaded photos and thumbnails stay on the device that made them.
+        Sync runs when you tap Sync now. If the same item was edited on two devices, the most recent edit
+        wins. Living Wallpaper links, uploaded photos and thumbnails stay on the device that made them.
       </p>
     </SyncSection>
   );
@@ -228,13 +259,23 @@ function useAuthLinkErrorToast() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.hash.slice(1));
     if (!params.get('error_description') && !params.get('error')) return;
-    toast.error("That sign-in link didn't work", { description: 'It may have expired or already been used. Request a new one below.' });
+    toast.error("That sign-in link didn't work", {
+      description: 'It may have expired or already been used. Request a new one below.',
+    });
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
   }, []);
 }
 
 /** Same look as the other Settings sections. */
-function SyncSection({ icon, description, children }: { icon: ReactNode; description?: string; children: ReactNode }) {
+function SyncSection({
+  icon,
+  description,
+  children,
+}: {
+  icon: ReactNode;
+  description?: string;
+  children: ReactNode;
+}) {
   const headingId = useId();
   return (
     <section id="sync" className="card p-5" aria-labelledby={headingId}>

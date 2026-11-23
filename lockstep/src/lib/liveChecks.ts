@@ -25,9 +25,11 @@ export function liveChecks(goal: GoalRow, milestones: MilestoneRow[], nowMs = Da
       else {
         const ok = sameDay ? m.target_date >= today : m.target_date > today;
         if (!ok && goal.status !== 'active') issues.hard.push('Date must be after today.');
-        if (!ok && goal.status === 'active' && m.target_date < today) issues.soft.push('This date has passed — reschedule it or ask the coach to replan.');
+        if (!ok && goal.status === 'active' && m.target_date < today)
+          issues.soft.push('This date has passed — reschedule it or ask the coach to replan.');
         if (m.target_date > deadlineKey) issues.hard.push('Date is after the deadline.');
-        if (!working.has(weekdayOf(m.target_date))) issues.soft.push(`${WEEKDAY_SHORT[weekdayOf(m.target_date)]} isn't one of your working days.`);
+        if (!working.has(weekdayOf(m.target_date)))
+          issues.soft.push(`${WEEKDAY_SHORT[weekdayOf(m.target_date)]} isn't one of your working days.`);
       }
     }
     const prev = ordered[i - 1];

@@ -8,7 +8,12 @@ import { pickNewestStableFlash, supportsThinking } from '../../server/gemini/cli
 import { cleanReply, validateReschedule } from '../../server/gemini/coach';
 import { cleanLine } from '../../server/gemini/motivation';
 import { neutralize, wrapData } from '../../server/gemini/prompts';
-import { PlanStreamParser, extractJsonText, tryParseJson, type ParsedPlanEvent } from '../../server/gemini/streamParser';
+import {
+  PlanStreamParser,
+  extractJsonText,
+  tryParseJson,
+  type ParsedPlanEvent,
+} from '../../server/gemini/streamParser';
 import { MemoryRateLimiter } from '../../server/lib/rateLimit';
 import { backoffDelay, withRetry } from '../../server/lib/retry';
 
@@ -32,7 +37,11 @@ const PLAN = {
   feasibility: 'Tight',
   feasibilityReason: 'Uses 19 of 20 h — "tight" but \\ doable.\nOne missed day hurts.',
   totalEstimatedHours: 6,
-  milestones: [milestone(1, 'Outline with 5 "sections"'), milestone(2, 'Draft }{ intro'), milestone(3, 'Edit ] [ pass')],
+  milestones: [
+    milestone(1, 'Outline with 5 "sections"'),
+    milestone(2, 'Draft }{ intro'),
+    milestone(3, 'Edit ] [ pass'),
+  ],
   risks: ['A "risk" with {braces}'],
   recoveryStrategy: 'Skip polish.',
   dailyRitual: 'Write 300 words.',
@@ -48,8 +57,14 @@ describe('PlanStreamParser', () => {
   it('emits feasibility once, then each milestone in order (whole text at once)', () => {
     const events = feed([TEXT]);
     expect(events.map((e) => e.type)).toEqual(['feasibility', 'milestone', 'milestone', 'milestone']);
-    expect(events[0]).toEqual({ type: 'feasibility', feasibility: 'Tight', feasibilityReason: PLAN.feasibilityReason });
-    const ms = events.filter((e): e is Extract<ParsedPlanEvent, { type: 'milestone' }> => e.type === 'milestone');
+    expect(events[0]).toEqual({
+      type: 'feasibility',
+      feasibility: 'Tight',
+      feasibilityReason: PLAN.feasibilityReason,
+    });
+    const ms = events.filter(
+      (e): e is Extract<ParsedPlanEvent, { type: 'milestone' }> => e.type === 'milestone',
+    );
     expect(ms.map((m) => m.index)).toEqual([0, 1, 2]);
     expect(ms.map((m) => m.milestone.title)).toEqual(PLAN.milestones.map((m) => m.title));
     expect(ms[0]!.milestone.tasks[0]!.title).toBe('Nested {object} with \\ backslash');
@@ -91,7 +106,10 @@ describe('PlanStreamParser', () => {
   });
 
   it('skips (but still counts) a milestone that fails the schema', () => {
-    const bad = { ...PLAN, milestones: [milestone(1, 'ok'), { id: 'm2', title: 'no tasks' }, milestone(3, 'ok too')] };
+    const bad = {
+      ...PLAN,
+      milestones: [milestone(1, 'ok'), { id: 'm2', title: 'no tasks' }, milestone(3, 'ok too')],
+    };
     const ms = feed([JSON.stringify(bad)]).filter((e) => e.type === 'milestone');
     expect(ms.map((m) => (m as { index: number }).index)).toEqual([0, 2]);
   });
@@ -146,18 +164,58 @@ describe('validateReschedule', () => {
     },
     todayKey: '2026-11-23',
     milestones: [
-      { id: 'a', title: 'A', targetDate: '2026-11-20', estimatedHours: 2, status: 'completed', tasksDone: 1, tasksTotal: 1 },
-      { id: 'b', title: 'B', targetDate: '2026-11-21', estimatedHours: 3, status: 'pending', tasksDone: 0, tasksTotal: 2 },
-      { id: 'c', title: 'C', targetDate: '2026-12-01', estimatedHours: 3, status: 'pending', tasksDone: 0, tasksTotal: 2 },
+      {
+        id: 'a',
+        title: 'A',
+        targetDate: '2026-11-20',
+        estimatedHours: 2,
+        status: 'completed',
+        tasksDone: 1,
+        tasksTotal: 1,
+      },
+      {
+        id: 'b',
+        title: 'B',
+        targetDate: '2026-11-21',
+        estimatedHours: 3,
+        status: 'pending',
+        tasksDone: 0,
+        tasksTotal: 2,
+      },
+      {
+        id: 'c',
+        title: 'C',
+        targetDate: '2026-12-01',
+        estimatedHours: 3,
+        status: 'pending',
+        tasksDone: 0,
+        tasksTotal: 2,
+      },
     ],
     progress: { percentDone: 30, timePct: 40, pace: 'behind', streak: 0, minutesLast7Days: 0, daysLeft: 11 },
   };
 
   it('accepts a valid change and reports old → new', () => {
-    const p = validateReschedule({ summary: 'Move B', changes: [{ milestoneId: 'b', newTargetDate: '2026-11-25', newEstimatedHours: 2 }] }, ctx, '2026-11-23');
+    const p = validateReschedule(
+      {
+        summary: 'Move B',
+        changes: [{ milestoneId: 'b', newTargetDate: '2026-11-25', newEstimatedHours: 2 }],
+      },
+      ctx,
+      '2026-11-23',
+    );
     expect(p).toEqual({
       summary: 'Move B',
-      changes: [{ milestoneId: 'b', title: 'B', oldDate: '2026-11-21', newDate: '2026-11-25', oldHours: 3, newHours: 2 }],
+      changes: [
+        {
+          milestoneId: 'b',
+          title: 'B',
+          oldDate: '2026-11-21',
+          newDate: '2026-11-25',
+          oldHours: 3,
+          newHours: 2,
+        },
+      ],
       valid: true,
       errors: [],
     });
@@ -184,9 +242,17 @@ describe('validateReschedule', () => {
     expect(all).toContain('2026-11-28 is a Sat');
     expect(all).toContain('would come before');
     expect(all).toContain('Unknown milestoneId "zzz"');
-    const late = validateReschedule({ summary: 'x', changes: [{ milestoneId: 'c', newTargetDate: '2026-12-07' }] }, ctx, '2026-11-23');
+    const late = validateReschedule(
+      { summary: 'x', changes: [{ milestoneId: 'c', newTargetDate: '2026-12-07' }] },
+      ctx,
+      '2026-11-23',
+    );
     expect(late.errors.join(' ')).toContain('after the deadline day (2026-12-04)');
-    const today = validateReschedule({ summary: 'x', changes: [{ milestoneId: 'b', newTargetDate: '2026-11-23' }] }, ctx, '2026-11-23');
+    const today = validateReschedule(
+      { summary: 'x', changes: [{ milestoneId: 'b', newTargetDate: '2026-11-23' }] },
+      ctx,
+      '2026-11-23',
+    );
     expect(today.errors.join(' ')).toContain('must be after today');
     expect(validateReschedule({ nope: true }, ctx, '2026-11-23').valid).toBe(false);
   });
@@ -194,7 +260,9 @@ describe('validateReschedule', () => {
 
 describe('small helpers', () => {
   it('cleans motivation lines and coach replies', () => {
-    const line = cleanLine('“Eleven days left and a third done — finish the build pages next, then deploy calmly on Friday ✨”');
+    const line = cleanLine(
+      '“Eleven days left and a third done — finish the build pages next, then deploy calmly on Friday ✨”',
+    );
     expect(line.length).toBeLessThanOrEqual(90);
     expect(line).not.toMatch(/[“”✨]/);
     expect(cleanReply('**Bold** advice\n- first\n- second')).toBe('Bold advice\nfirst\nsecond');

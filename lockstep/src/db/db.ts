@@ -6,7 +6,16 @@
  * tables later; `updated_at` on every row enables last-write-wins sync.
  */
 import Dexie, { type EntityTable } from 'dexie';
-import type { Capacity, FeasibilityResult, Feasibility, FixSuggestions, Level, PaceStyle, PlanCheck, Difficulty } from '@shared/plan';
+import type {
+  Capacity,
+  FeasibilityResult,
+  Feasibility,
+  FixSuggestions,
+  Level,
+  PaceStyle,
+  PlanCheck,
+  Difficulty,
+} from '@shared/plan';
 import type { AiKind } from '@shared/api';
 import type { WallpaperDesign } from '@shared/wallpaper/types';
 

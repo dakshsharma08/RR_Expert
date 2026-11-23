@@ -60,9 +60,11 @@ export interface PlanPromptFacts {
 }
 
 const PACE_TEXT: Record<Intake['pace'], string> = {
-  Steady: 'Steady — spread the work evenly across the available days and keep a buffer of about 15% of capacity unused for bad days.',
+  Steady:
+    'Steady — spread the work evenly across the available days and keep a buffer of about 15% of capacity unused for bad days.',
   Balanced: 'Balanced — a roughly even load with a modest buffer; slightly heavier in the middle is fine.',
-  Sprint: 'Sprint — front-load the work: put more of the hours into the first half so the final days are for polish and slack.',
+  Sprint:
+    'Sprint — front-load the work: put more of the hours into the first half so the final days are for polish and slack.',
 };
 
 const LEVEL_TEXT: Record<Intake['level'], string> = {
@@ -81,7 +83,10 @@ function fmtHours(n: number): string {
 
 export function buildPlanSystemInstruction(f: PlanPromptFacts): string {
   const { intake, capacity, allowedDates } = f;
-  const workingDays = [...new Set(intake.workingDays)].sort((a, b) => a - b).map((d) => WEEKDAY_SHORT[d]).join(', ');
+  const workingDays = [...new Set(intake.workingDays)]
+    .sort((a, b) => a - b)
+    .map((d) => WEEKDAY_SHORT[d])
+    .join(', ');
   const sameDay = capacity.toKey === f.todayKey;
   const reduceTo = Math.floor(capacity.capacityHours * 0.85 * 10) / 10;
 
@@ -134,7 +139,10 @@ export function buildPlanSystemInstruction(f: PlanPromptFacts): string {
 }
 
 /** The user turn: goal + constraints as data, then the optional attachment as data. */
-export function buildPlanUserParts(intake: Intake, opts: { includeAttachment: boolean } = { includeAttachment: true }): Part[] {
+export function buildPlanUserParts(
+  intake: Intake,
+  opts: { includeAttachment: boolean } = { includeAttachment: true },
+): Part[] {
   const parts: Part[] = [
     {
       text: [
@@ -234,7 +242,10 @@ export interface CoachFacts {
 
 export function buildCoachSystemInstruction(f: CoachFacts): string {
   const g = f.context.goal;
-  const workingDays = [...new Set(g.workingDays)].sort((a, b) => a - b).map((d) => WEEKDAY_SHORT[d]).join(', ');
+  const workingDays = [...new Set(g.workingDays)]
+    .sort((a, b) => a - b)
+    .map((d) => WEEKDAY_SHORT[d])
+    .join(', ');
   const dates =
     f.allowedDates.length === 0
       ? 'There are no valid dates left before the deadline.'
@@ -247,8 +258,10 @@ export function buildCoachSystemInstruction(f: CoachFacts): string {
     lighten:
       'The user wants a lighter schedule. Read the plan, then call proposeReschedule to reduce estimatedHours and/or spread dates out, without passing the deadline.',
     today: 'Name the one or two most important tasks for today, using real task titles.',
-    'on-track': 'Compare work done with time used and say plainly whether they are ahead, on track or behind.',
-    improve: 'Give one or two specific improvements based on the numbers (e.g. streak, minutes in the last 7 days).',
+    'on-track':
+      'Compare work done with time used and say plainly whether they are ahead, on track or behind.',
+    improve:
+      'Give one or two specific improvements based on the numbers (e.g. streak, minutes in the last 7 days).',
   };
   return [
     "You are LOCKSTEP's coach. You help one person hit one deadline.",
@@ -275,7 +288,10 @@ export function buildCoachSystemInstruction(f: CoachFacts): string {
   ].join('\n');
 }
 
-export function buildCoachUserText(message: string, history: { role: 'user' | 'model'; text: string }[]): string {
+export function buildCoachUserText(
+  message: string,
+  history: { role: 'user' | 'model'; text: string }[],
+): string {
   const lines: string[] = [];
   if (history.length > 0) {
     const transcript = history.map((h) => `${h.role === 'user' ? 'User' : 'Coach'}: ${h.text}`).join('\n');

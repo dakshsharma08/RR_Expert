@@ -38,7 +38,8 @@ const MOBILE_TABS: { id: Tab; label: string }[] = [
 function defaultDeviceFor(): WallpaperDesign['device'] {
   if (typeof navigator === 'undefined') return 'iphone-pro';
   const ua = navigator.userAgent;
-  if (/iPhone/.test(ua)) return screen.height <= 667 ? 'iphone-se' : screen.height >= 932 ? 'iphone-pro-max' : 'iphone-pro';
+  if (/iPhone/.test(ua))
+    return screen.height <= 667 ? 'iphone-se' : screen.height >= 932 ? 'iphone-pro-max' : 'iphone-pro';
   if (/Pixel/.test(ua)) return 'pixel';
   if (/SM-S/.test(ua)) return 'galaxy-s';
   if (/Android/.test(ua)) return 'android-1080';
@@ -60,7 +61,10 @@ function useStudioDesign(goalId: string | undefined) {
     setState(null);
     void getKv<WallpaperDesign>(`studio:${goalId}`).then((saved) => {
       if (cancelled) return;
-      setState({ goalId, design: saved ? normalizeDesign(saved) : defaultDesign('monolith', undefined, defaultDeviceFor()) });
+      setState({
+        goalId,
+        design: saved ? normalizeDesign(saved) : defaultDesign('monolith', undefined, defaultDeviceFor()),
+      });
     });
     return () => {
       cancelled = true;
@@ -77,10 +81,16 @@ function useStudioDesign(goalId: string | undefined) {
     return () => clearTimeout(t);
   }, [state]);
   // Save immediately if the Studio is left with unsaved edits.
-  useEffect(() => () => void (pending.current && setKv(`studio:${pending.current.goalId}`, pending.current.design)), []);
+  useEffect(
+    () => () => void (pending.current && setKv(`studio:${pending.current.goalId}`, pending.current.design)),
+    [],
+  );
   const design = state && state.goalId === goalId ? state.design : null;
   const setDesign = useCallback((d: WallpaperDesign) => setState((s) => (s ? { ...s, design: d } : s)), []);
-  const update: Update = useCallback((fn) => setState((s) => (s ? { ...s, design: normalizeDesign(fn(s.design)) } : s)), []);
+  const update: Update = useCallback(
+    (fn) => setState((s) => (s ? { ...s, design: normalizeDesign(fn(s.design)) } : s)),
+    [],
+  );
   return { design, setDesign, update };
 }
 
@@ -116,7 +126,10 @@ export default function StudioPage() {
   const previewBox = useRef<HTMLDivElement>(null);
   const [previewW, setPreviewW] = useState(300);
 
-  const wpDataMemo = useMemo(() => (data && m ? buildWallpaperData(data, m, motivation.line, Math.max(refreshAt, Date.now())) : null), [data, m, motivation.line, refreshAt]);
+  const wpDataMemo = useMemo(
+    () => (data && m ? buildWallpaperData(data, m, motivation.line, Math.max(refreshAt, Date.now())) : null),
+    [data, m, motivation.line, refreshAt],
+  );
 
   // Fit the phone into the available space.
   const wpData = wpDataMemo;
@@ -142,20 +155,38 @@ export default function StudioPage() {
     setRefreshAt(Date.now());
   }, []);
 
-  if (goals === undefined || activeId === undefined || data === undefined) return <div className="mx-auto max-w-5xl px-4 py-10"><Skeleton className="h-[70vh]" /></div>;
+  if (goals === undefined || activeId === undefined || data === undefined)
+    return (
+      <div className="mx-auto max-w-5xl px-4 py-10">
+        <Skeleton className="h-[70vh]" />
+      </div>
+    );
   const ready = data && (data.goal.status === 'active' || data.goal.status === 'completed');
   if (!data || !ready) {
     return (
       <div className="mx-auto max-w-md px-4 py-16">
         <EmptyState
           icon={<Smartphone className="size-5" strokeWidth={1.5} />}
-          title={data ? 'Approve your plan first. The wallpaper shows your real days left and progress.' : 'Create a goal first. The Studio turns its real countdown into a lock screen.'}
-          action={<Button onClick={() => navigate(data ? `/goals/${data.goal.id}/review` : '/new')}>{data ? 'Review plan' : 'New goal'}</Button>}
+          title={
+            data
+              ? 'Approve your plan first. The wallpaper shows your real days left and progress.'
+              : 'Create a goal first. The Studio turns its real countdown into a lock screen.'
+          }
+          action={
+            <Button onClick={() => navigate(data ? `/goals/${data.goal.id}/review` : '/new')}>
+              {data ? 'Review plan' : 'New goal'}
+            </Button>
+          }
         />
       </div>
     );
   }
-  if (!design || !wpData || !m) return <div className="mx-auto max-w-5xl px-4 py-10"><Skeleton className="h-[70vh]" /></div>;
+  if (!design || !wpData || !m)
+    return (
+      <div className="mx-auto max-w-5xl px-4 py-10">
+        <Skeleton className="h-[70vh]" />
+      </div>
+    );
 
   const eligible = (goals ?? []).filter((g) => g.status === 'active' || g.status === 'completed');
   const warnings = report?.warnings ?? [];
@@ -170,15 +201,43 @@ export default function StudioPage() {
       case 'template':
         return <TemplatePanel design={design} data={wpData} update={update} compact={!desktop} />;
       case 'text':
-        return <TextPanel design={design} update={update} motivation={motivation.line} motivationSource={motivation.source} />;
+        return (
+          <TextPanel
+            design={design}
+            update={update}
+            motivation={motivation.line}
+            motivationSource={motivation.source}
+          />
+        );
       case 'color':
         return <ColorPanel design={design} update={update} warnings={warnings} />;
       case 'background':
         return <BackgroundPanel design={design} update={update} />;
       case 'layout':
-        return <LayoutPanel design={design} update={update} showUi={showUi} setShowUi={setShowUi} showSafe={showSafe} setShowSafe={setShowSafe} warnings={warnings} />;
+        return (
+          <LayoutPanel
+            design={design}
+            update={update}
+            showUi={showUi}
+            setShowUi={setShowUi}
+            showSafe={showSafe}
+            setShowSafe={setShowSafe}
+            warnings={warnings}
+          />
+        );
       case 'export':
-        return <ExportPanel goalId={data.goal.id} goalTitle={data.goal.title} design={design} setDesign={setDesign} onExport={() => setExportOpen(true)} onRefresh={refresh} snapshot={snapshot} makeThumb={makeThumb} />;
+        return (
+          <ExportPanel
+            goalId={data.goal.id}
+            goalTitle={data.goal.title}
+            design={design}
+            setDesign={setDesign}
+            onExport={() => setExportOpen(true)}
+            onRefresh={refresh}
+            snapshot={snapshot}
+            makeThumb={makeThumb}
+          />
+        );
     }
   };
 
@@ -187,22 +246,48 @@ export default function StudioPage() {
       <div className="min-w-0">
         <p className="eyebrow">Lock Screen Studio</p>
         {eligible.length > 1 ? (
-          <select aria-label="Goal" value={data.goal.id} onChange={(e) => navigate(`/studio/${e.target.value}`)} className="mt-1 h-11 max-w-[60vw] truncate rounded-[12px] border border-hairline bg-surface-2 px-3 font-display text-lg text-text">
-            {eligible.map((g) => <option key={g.id} value={g.id}>{g.title}</option>)}
+          <select
+            aria-label="Goal"
+            value={data.goal.id}
+            onChange={(e) => navigate(`/studio/${e.target.value}`)}
+            className="mt-1 h-11 max-w-[60vw] truncate rounded-[12px] border border-hairline bg-surface-2 px-3 font-display text-lg text-text"
+          >
+            {eligible.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.title}
+              </option>
+            ))}
           </select>
         ) : (
           <h1 className="truncate text-xl">{data.goal.title}</h1>
         )}
       </div>
-      <Button onClick={() => setExportOpen(true)} icon={<Download className="size-4" strokeWidth={1.75} />} className="sticky top-4 shrink-0 shadow-[0_8px_24px_-10px_rgba(197,161,90,0.6)]">
+      <Button
+        onClick={() => setExportOpen(true)}
+        icon={<Download className="size-4" strokeWidth={1.75} />}
+        className="sticky top-4 shrink-0 shadow-[0_8px_24px_-10px_rgba(197,161,90,0.6)]"
+      >
         Export
       </Button>
     </div>
   );
 
   const preview = (
-    <div ref={previewBox} className={cn('flex items-center justify-center', desktop ? 'h-[calc(100dvh-120px)]' : 'h-[calc(100dvh-8.5rem-31dvh)] min-h-[300px] pt-1')}>
-      <PhonePreview design={design} data={wpData} width={previewW} showUi={showUi} showSafe={showSafe} onReport={setReport} />
+    <div
+      ref={previewBox}
+      className={cn(
+        'flex items-center justify-center',
+        desktop ? 'h-[calc(100dvh-120px)]' : 'h-[calc(100dvh-8.5rem-31dvh)] min-h-[300px] pt-1',
+      )}
+    >
+      <PhonePreview
+        design={design}
+        data={wpData}
+        width={previewW}
+        showUi={showUi}
+        showSafe={showSafe}
+        onReport={setReport}
+      />
     </div>
   );
 
@@ -211,7 +296,10 @@ export default function StudioPage() {
       <div className="flex min-h-dvh flex-col">
         {header}
         <div className="grid flex-1 grid-cols-[240px_1fr_360px] gap-6 px-6 pb-6">
-          <aside aria-label="Templates" className="max-h-[calc(100dvh-120px)] overflow-y-auto pr-1 scrollbar-none">
+          <aside
+            aria-label="Templates"
+            className="max-h-[calc(100dvh-120px)] overflow-y-auto pr-1 scrollbar-none"
+          >
             <p className="eyebrow mb-3 mt-2">Templates</p>
             <TemplatePanel design={design} data={wpData} update={update} />
           </aside>
@@ -219,15 +307,27 @@ export default function StudioPage() {
             {preview}
             {warnings.length > 0 && (
               <p className="absolute inset-x-0 bottom-2 text-center text-xs text-muted" role="status">
-                Readability: {warnings.filter((w) => w.fixed).length} soft scrim{warnings.filter((w) => w.fixed).length === 1 ? '' : 's'} added so text stays ≥ 4.5:1
+                Readability: {warnings.filter((w) => w.fixed).length} soft scrim
+                {warnings.filter((w) => w.fixed).length === 1 ? '' : 's'} added so text stays ≥ 4.5:1
               </p>
             )}
           </section>
           <aside aria-label="Properties" className="card max-h-[calc(100dvh-120px)] overflow-hidden p-0">
-            <Tabs.Root value={tab === 'template' ? 'text' : tab} onValueChange={(v) => setTab(v as Tab)} className="flex h-full flex-col">
-              <Tabs.List aria-label="Properties" className="grid shrink-0 grid-cols-5 gap-1 border-b border-hairline p-2">
+            <Tabs.Root
+              value={tab === 'template' ? 'text' : tab}
+              onValueChange={(v) => setTab(v as Tab)}
+              className="flex h-full flex-col"
+            >
+              <Tabs.List
+                aria-label="Properties"
+                className="grid shrink-0 grid-cols-5 gap-1 border-b border-hairline p-2"
+              >
                 {MOBILE_TABS.filter((t) => t.id !== 'template').map((t) => (
-                  <Tabs.Trigger key={t.id} value={t.id} className="h-11 min-w-0 truncate rounded-[10px] px-1 text-[13px] text-muted data-[state=active]:bg-surface-2 data-[state=active]:text-accent-text">
+                  <Tabs.Trigger
+                    key={t.id}
+                    value={t.id}
+                    className="h-11 min-w-0 truncate rounded-[10px] px-1 text-[13px] text-muted data-[state=active]:bg-surface-2 data-[state=active]:text-accent-text"
+                  >
                     {t.label}
                   </Tabs.Trigger>
                 ))}
@@ -240,7 +340,16 @@ export default function StudioPage() {
             </Tabs.Root>
           </aside>
         </div>
-        <ExportDialog open={exportOpen} onOpenChange={setExportOpen} design={design} data={wpData} goalTitle={data.goal.title} goalId={data.goal.id} todayKey={m.countdown.todayKey} onRefresh={refresh} />
+        <ExportDialog
+          open={exportOpen}
+          onOpenChange={setExportOpen}
+          design={design}
+          data={wpData}
+          goalTitle={data.goal.title}
+          goalId={data.goal.id}
+          todayKey={m.countdown.todayKey}
+          onRefresh={refresh}
+        />
       </div>
     );
   }
@@ -252,23 +361,49 @@ export default function StudioPage() {
       {/* Spacer so the page can scroll past the sheet's resting height. */}
       <div className="h-[30dvh]" aria-hidden />
       <BottomSheet label="Studio controls" peek={0.31} expanded={sheetOpen} onExpandedChange={setSheetOpen}>
-        <Tabs.Root value={tab} onValueChange={(v) => { setTab(v as Tab); setSheetOpen(true); }} className="flex min-h-0 flex-1 flex-col">
-          <Tabs.List aria-label="Studio sections" className="flex shrink-0 gap-1 overflow-x-auto px-3 pb-2 pt-1 scrollbar-none">
+        <Tabs.Root
+          value={tab}
+          onValueChange={(v) => {
+            setTab(v as Tab);
+            setSheetOpen(true);
+          }}
+          className="flex min-h-0 flex-1 flex-col"
+        >
+          <Tabs.List
+            aria-label="Studio sections"
+            className="flex shrink-0 gap-1 overflow-x-auto px-3 pb-2 pt-1 scrollbar-none"
+          >
             {MOBILE_TABS.map((t) => (
-              <Tabs.Trigger key={t.id} value={t.id} className="h-11 shrink-0 rounded-full border border-hairline px-4 text-sm text-muted data-[state=active]:border-accent data-[state=active]:bg-accent/15 data-[state=active]:text-accent-text">
+              <Tabs.Trigger
+                key={t.id}
+                value={t.id}
+                className="h-11 shrink-0 rounded-full border border-hairline px-4 text-sm text-muted data-[state=active]:border-accent data-[state=active]:bg-accent/15 data-[state=active]:text-accent-text"
+              >
                 {t.label}
               </Tabs.Trigger>
             ))}
           </Tabs.List>
           {MOBILE_TABS.map((t) => (
-            <Tabs.Content key={t.id} value={t.id} className="min-h-0 flex-1 overflow-y-auto px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-2">
+            <Tabs.Content
+              key={t.id}
+              value={t.id}
+              className="min-h-0 flex-1 overflow-y-auto px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-2"
+            >
               {panel(t.id)}
             </Tabs.Content>
           ))}
         </Tabs.Root>
       </BottomSheet>
-      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} design={design} data={wpData} goalTitle={data.goal.title} goalId={data.goal.id} todayKey={m.countdown.todayKey} onRefresh={refresh} />
+      <ExportDialog
+        open={exportOpen}
+        onOpenChange={setExportOpen}
+        design={design}
+        data={wpData}
+        goalTitle={data.goal.title}
+        goalId={data.goal.id}
+        todayKey={m.countdown.todayKey}
+        onRefresh={refresh}
+      />
     </div>
   );
 }
-

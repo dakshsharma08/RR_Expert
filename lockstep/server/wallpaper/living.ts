@@ -19,7 +19,15 @@ import { z } from 'zod';
 import type { LivingWallpaperCreateResponse, WallpaperSnapshot } from '../../shared/api';
 import type { WallpaperData, WallpaperDesign } from '../../shared/wallpaper/types';
 import { normalizeDesign } from '../../shared/wallpaper/templates';
-import { computeCountdown, dayKey, diffDays, formatDayKey, formatInZone, isDayKey, isValidTimeZone } from '../../shared/time';
+import {
+  computeCountdown,
+  dayKey,
+  diffDays,
+  formatDayKey,
+  formatInZone,
+  isDayKey,
+  isValidTimeZone,
+} from '../../shared/time';
 import { AppError } from '../lib/errors';
 import { renderWallpaperPng } from './node-render';
 
@@ -57,7 +65,9 @@ export function fileStore(path: string): WallpaperStore {
   const load = (): Record<string, StoredWallpaper> => {
     if (cache) return cache;
     try {
-      cache = existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as Record<string, StoredWallpaper>) : {};
+      cache = existsSync(path)
+        ? (JSON.parse(readFileSync(path, 'utf8')) as Record<string, StoredWallpaper>)
+        : {};
     } catch {
       cache = {};
     }
@@ -81,7 +91,10 @@ export function fileStore(path: string): WallpaperStore {
 }
 
 /** Serverless: Upstash Redis over REST (no client library needed). */
-export function upstashStore(cfg: { url: string; token: string }, fetchImpl: typeof fetch = fetch): WallpaperStore {
+export function upstashStore(
+  cfg: { url: string; token: string },
+  fetchImpl: typeof fetch = fetch,
+): WallpaperStore {
   const cmd = async (args: (string | number)[]) => {
     const res = await fetchImpl(cfg.url, {
       method: 'POST',
@@ -102,7 +115,10 @@ export function upstashStore(cfg: { url: string; token: string }, fetchImpl: typ
   };
 }
 
-export function storeFromEnv(env: NodeJS.ProcessEnv, upstash: { url: string; token: string } | null): WallpaperStore {
+export function storeFromEnv(
+  env: NodeJS.ProcessEnv,
+  upstash: { url: string; token: string } | null,
+): WallpaperStore {
   if (upstash) return upstashStore(upstash);
   if (env.VERCEL) return memoryStore(); // ephemeral disk: be honest, it's memory
   return fileStore(env.WALLPAPER_STORE_FILE || '.data/wallpapers.json');
@@ -131,7 +147,13 @@ const SnapshotSchema = z.object({
   progressPct: z.number().min(0).max(1),
   motivation: z.string().max(200).nullable(),
   milestones: z
-    .array(z.object({ title: z.string().trim().min(1).max(160), targetDate: z.string().refine(isDayKey, 'Invalid date'), done: z.boolean() }))
+    .array(
+      z.object({
+        title: z.string().trim().min(1).max(160),
+        targetDate: z.string().refine(isDayKey, 'Invalid date'),
+        done: z.boolean(),
+      }),
+    )
     .max(40),
 });
 
@@ -150,10 +172,16 @@ export function safeDesign(raw: unknown): WallpaperDesign {
   const d = normalizeDesign(raw as WallpaperDesign);
   const colors = { accent: hexOr(d.colors.accent), text: hexOr(d.colors.text) };
   const gradient = d.background.gradient
-    ? { from: hexOr(d.background.gradient.from, '#171717')!, to: hexOr(d.background.gradient.to, '#090909')!, angle: d.background.gradient.angle }
+    ? {
+        from: hexOr(d.background.gradient.from, '#171717')!,
+        to: hexOr(d.background.gradient.to, '#090909')!,
+        angle: d.background.gradient.angle,
+      }
     : undefined;
   const kind = d.background.kind === 'image' ? 'theme' : d.background.kind;
-  const custom = d.custom ? { width: Math.min(LINK_MAX.width, d.custom.width), height: Math.min(LINK_MAX.height, d.custom.height) } : undefined;
+  const custom = d.custom
+    ? { width: Math.min(LINK_MAX.width, d.custom.width), height: Math.min(LINK_MAX.height, d.custom.height) }
+    : undefined;
   return {
     ...d,
     ...(custom ? { custom } : {}),
@@ -176,7 +204,9 @@ export function wallpaperDataFromSnapshot(s: WallpaperSnapshot, now: Date): Wall
     timezone: s.timezone,
     completed: s.completed,
   });
-  const ordered = [...s.milestones].sort((a, b) => (a.targetDate < b.targetDate ? -1 : a.targetDate > b.targetDate ? 1 : 0));
+  const ordered = [...s.milestones].sort((a, b) =>
+    a.targetDate < b.targetDate ? -1 : a.targetDate > b.targetDate ? 1 : 0,
+  );
   const next = ordered.find((m) => !m.done) ?? null;
   const span = Math.max(1, diffDays(c.startKey, c.deadlineKey));
   return {
@@ -185,12 +215,26 @@ export function wallpaperDataFromSnapshot(s: WallpaperSnapshot, now: Date): Wall
     state: c.state,
     dayNumber: Math.max(1, c.dayNumber),
     totalDays: c.totalDays,
-    deadlineLabel: formatInZone(s.deadlineUtc, s.timezone, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }),
-    nextMilestone: next ? { title: next.title, dateLabel: formatDayKey(next.targetDate, { weekday: 'short', day: 'numeric', month: 'short' }) } : null,
+    deadlineLabel: formatInZone(s.deadlineUtc, s.timezone, {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }),
+    nextMilestone: next
+      ? {
+          title: next.title,
+          dateLabel: formatDayKey(next.targetDate, { weekday: 'short', day: 'numeric', month: 'short' }),
+        }
+      : null,
     progressPct: s.completed ? 1 : s.progressPct,
     motivation: s.motivation,
     updatedLabel: `Updated ${formatDayKey(dayKey(now, s.timezone), { day: 'numeric', month: 'short' })}`,
-    milestones: ordered.map((m) => ({ title: m.title, at: Math.min(1, Math.max(0, diffDays(c.startKey, m.targetDate) / span)), done: m.done })),
+    milestones: ordered.map((m) => ({
+      title: m.title,
+      at: Math.min(1, Math.max(0, diffDays(c.startKey, m.targetDate) / span)),
+      done: m.done,
+    })),
   };
 }
 
@@ -209,7 +253,8 @@ const pass: RequestHandler = (_req, _res, next) => next();
 /** Refuse oversized bodies (express.json allows 15 MB for plan attachments). */
 const sizeCap: RequestHandler = (req, _res, next) => {
   const len = Number(req.headers['content-length'] ?? 0);
-  if (len > MAX_BODY_BYTES) return next(new AppError('INVALID_INPUT', 'That wallpaper is too large.', { status: 413 }));
+  if (len > MAX_BODY_BYTES)
+    return next(new AppError('INVALID_INPUT', 'That wallpaper is too large.', { status: 413 }));
   next();
 };
 
@@ -234,7 +279,10 @@ export function createWallpaperRouter(deps: WallpaperRouterDeps): Router {
   r.post('/wallpaper', writeLimit, sizeCap, async (req, res, next) => {
     try {
       const parsed = BodySchema.safeParse(req.body);
-      if (!parsed.success) throw new AppError('INVALID_INPUT', undefined, { details: parsed.error.issues.slice(0, 6).map((i) => `${i.path.join('.')}: ${i.message}`) });
+      if (!parsed.success)
+        throw new AppError('INVALID_INPUT', undefined, {
+          details: parsed.error.issues.slice(0, 6).map((i) => `${i.path.join('.')}: ${i.message}`),
+        });
       const token = randomBytes(24).toString('base64url'); // 192 bits: unguessable
       const secret = randomBytes(24).toString('base64url');
       const now = deps.now().toISOString();
@@ -245,7 +293,11 @@ export function createWallpaperRouter(deps: WallpaperRouterDeps): Router {
         createdAt: now,
         updatedAt: now,
       });
-      const body: LivingWallpaperCreateResponse = { token, secret, url: `${baseUrl(req, deps.publicUrl)}/api/wallpaper/${token}.png` };
+      const body: LivingWallpaperCreateResponse = {
+        token,
+        secret,
+        url: `${baseUrl(req, deps.publicUrl)}/api/wallpaper/${token}.png`,
+      };
       res.status(201).json(body);
     } catch (e) {
       next(e);
@@ -258,10 +310,19 @@ export function createWallpaperRouter(deps: WallpaperRouterDeps): Router {
       const rec = TOKEN_RE.test(token) ? await deps.store.get(keyFor(token)) : null;
       const secret = String(req.header('x-wallpaper-secret') ?? '');
       // Wrong secret → 404, so nobody can probe which tokens exist.
-      if (!rec || !secret || !sameHash(sha256(secret), rec.secretHash)) throw new AppError('NOT_FOUND', 'That wallpaper link no longer exists.');
+      if (!rec || !secret || !sameHash(sha256(secret), rec.secretHash))
+        throw new AppError('NOT_FOUND', 'That wallpaper link no longer exists.');
       const parsed = BodySchema.safeParse(req.body);
-      if (!parsed.success) throw new AppError('INVALID_INPUT', undefined, { details: parsed.error.issues.slice(0, 6).map((i) => `${i.path.join('.')}: ${i.message}`) });
-      await deps.store.put(keyFor(token), { ...rec, design: safeDesign(parsed.data.design), snapshot: parsed.data.snapshot, updatedAt: deps.now().toISOString() });
+      if (!parsed.success)
+        throw new AppError('INVALID_INPUT', undefined, {
+          details: parsed.error.issues.slice(0, 6).map((i) => `${i.path.join('.')}: ${i.message}`),
+        });
+      await deps.store.put(keyFor(token), {
+        ...rec,
+        design: safeDesign(parsed.data.design),
+        snapshot: parsed.data.snapshot,
+        updatedAt: deps.now().toISOString(),
+      });
       res.json({ ok: true });
     } catch (e) {
       next(e);
@@ -273,7 +334,8 @@ export function createWallpaperRouter(deps: WallpaperRouterDeps): Router {
       const token = String(req.params.token);
       const rec = TOKEN_RE.test(token) ? await deps.store.get(keyFor(token)) : null;
       const secret = String(req.header('x-wallpaper-secret') ?? '');
-      if (!rec || !secret || !sameHash(sha256(secret), rec.secretHash)) throw new AppError('NOT_FOUND', 'That wallpaper link no longer exists.');
+      if (!rec || !secret || !sameHash(sha256(secret), rec.secretHash))
+        throw new AppError('NOT_FOUND', 'That wallpaper link no longer exists.');
       await deps.store.delete(keyFor(token));
       res.json({ ok: true, revoked: true });
     } catch (e) {
@@ -291,7 +353,8 @@ export function createWallpaperRouter(deps: WallpaperRouterDeps): Router {
       const cacheKey = `${key}:${dayKey(now, rec.snapshot.timezone)}:${rec.updatedAt}`;
       let png = pngCache.get(cacheKey);
       if (!png) {
-        png = (await renderWallpaperPng(safeDesign(rec.design), wallpaperDataFromSnapshot(rec.snapshot, now))).png;
+        png = (await renderWallpaperPng(safeDesign(rec.design), wallpaperDataFromSnapshot(rec.snapshot, now)))
+          .png;
         cachePng(cacheKey, png);
       }
       res.setHeader('Content-Type', 'image/png');

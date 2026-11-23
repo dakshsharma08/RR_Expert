@@ -18,16 +18,33 @@ const mock = setupServer(
     HttpResponse.json({
       models: [
         { name: 'models/gemini-3-flash', supportedActions: ['generateContent'] },
-        ...(imageListed ? [{ name: 'models/gemini-3-flash-image', supportedActions: ['generateContent'] }, { name: 'models/gemini-3-pro-image-preview', supportedActions: ['generateContent'] }] : []),
+        ...(imageListed
+          ? [
+              { name: 'models/gemini-3-flash-image', supportedActions: ['generateContent'] },
+              { name: 'models/gemini-3-pro-image-preview', supportedActions: ['generateContent'] },
+            ]
+          : []),
       ],
     }),
   ),
   http.post(GEN, async ({ request }) => {
     const model = GEN.exec(request.url)![1]!;
     sent.push({ model, body: (await request.json()) as never });
-    if (!imageWorks) return HttpResponse.json({ error: { code: 400, message: 'Model does not support image output', status: 'INVALID_ARGUMENT' } }, { status: 400 });
+    if (!imageWorks)
+      return HttpResponse.json(
+        { error: { code: 400, message: 'Model does not support image output', status: 'INVALID_ARGUMENT' } },
+        { status: 400 },
+      );
     return HttpResponse.json({
-      candidates: [{ content: { role: 'model', parts: [{ inlineData: { mimeType: 'image/png', data: 'iVBORw0KGgo=' } }] }, finishReason: 'STOP' }],
+      candidates: [
+        {
+          content: {
+            role: 'model',
+            parts: [{ inlineData: { mimeType: 'image/png', data: 'iVBORw0KGgo=' } }],
+          },
+          finishReason: 'STOP',
+        },
+      ],
       usageMetadata: { totalTokenCount: 1290 },
     });
   }),
@@ -36,8 +53,17 @@ const mock = setupServer(
 let server: Server;
 let base = '';
 beforeAll(async () => {
-  mock.listen({ onUnhandledFrame({ frame, defaults }) { const r = (frame.data as { request?: Request }).request; if (r && new URL(r.url).hostname === '127.0.0.1') return; defaults.error(); } });
-  server = createApp({ env: { GEMINI_API_KEY: 'test-key', ALLOWED_ORIGINS: '' }, tuning: { retryBaseMs: 1, retryMaxMs: 2 } }).listen(0, '127.0.0.1');
+  mock.listen({
+    onUnhandledFrame({ frame, defaults }) {
+      const r = (frame.data as { request?: Request }).request;
+      if (r && new URL(r.url).hostname === '127.0.0.1') return;
+      defaults.error();
+    },
+  });
+  server = createApp({
+    env: { GEMINI_API_KEY: 'test-key', ALLOWED_ORIGINS: '' },
+    tuning: { retryBaseMs: 1, retryMaxMs: 2 },
+  }).listen(0, '127.0.0.1');
   await new Promise((r) => server.once('listening', r));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 });
@@ -46,11 +72,23 @@ afterAll(() => {
   mock.close();
 });
 
-const post = (body: unknown) => fetch(`${base}/api/background`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+const post = (body: unknown) =>
+  fetch(`${base}/api/background`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
 
 describe('AI backgrounds', () => {
   it('picks the newest stable image model (flash over pro)', () => {
-    expect(pickImageModel(['models/gemini-2.5-flash-image', 'models/gemini-3-pro-image-preview', 'models/gemini-3-flash-image', 'models/gemini-3-pro-image'])).toBe('gemini-3-flash-image');
+    expect(
+      pickImageModel([
+        'models/gemini-2.5-flash-image',
+        'models/gemini-3-pro-image-preview',
+        'models/gemini-3-flash-image',
+        'models/gemini-3-pro-image',
+      ]),
+    ).toBe('gemini-3-flash-image');
     expect(pickImageModel(['models/gemini-3-flash'])).toBeNull();
   });
 

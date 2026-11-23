@@ -29,16 +29,28 @@ describe('DELETE /api/account', () => {
     const fake = (async (url: string, init: RequestInit = {}) => {
       const h = new Headers(init.headers);
       calls.push({ url, method: init.method ?? 'GET', auth: h.get('authorization') });
-      if (url.endsWith('/auth/v1/user')) return h.get('authorization') === 'Bearer user-token' ? Response.json({ id: UID }) : new Response('no', { status: 401 });
+      if (url.endsWith('/auth/v1/user'))
+        return h.get('authorization') === 'Bearer user-token'
+          ? Response.json({ id: UID })
+          : new Response('no', { status: 401 });
       return Response.json({});
     }) as typeof fetch;
-    const { base, close } = await serve({ url: 'https://proj.supabase.test', serviceKey: 'service-key' }, fake);
+    const { base, close } = await serve(
+      { url: 'https://proj.supabase.test', serviceKey: 'service-key' },
+      fake,
+    );
 
-    const bad = await fetch(`${base}/api/account`, { method: 'DELETE', headers: { Authorization: 'Bearer stolen' } });
+    const bad = await fetch(`${base}/api/account`, {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer stolen' },
+    });
     expect(bad.status).toBe(400);
     expect(calls.some((c) => c.method === 'DELETE')).toBe(false);
 
-    const ok = await fetch(`${base}/api/account`, { method: 'DELETE', headers: { Authorization: 'Bearer user-token' } });
+    const ok = await fetch(`${base}/api/account`, {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer user-token' },
+    });
     expect(ok.status).toBe(200);
     const del = calls.find((c) => c.method === 'DELETE')!;
     expect(del.url).toBe(`https://proj.supabase.test/auth/v1/admin/users/${UID}`);

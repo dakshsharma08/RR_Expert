@@ -48,28 +48,35 @@ export function buildCoachContext(data: GoalData, m: GoalMetrics): CoachContext 
     },
     todayKey: today,
     // The API accepts up to 20 milestones: send every open one first, then the latest completed.
-    milestones: [...data.milestones.filter((x) => x.status !== 'completed'), ...data.milestones.filter((x) => x.status === 'completed').reverse()]
+    milestones: [
+      ...data.milestones.filter((x) => x.status !== 'completed'),
+      ...data.milestones.filter((x) => x.status === 'completed').reverse(),
+    ]
       .slice(0, 20)
       .sort((a, b) => a.order - b.order)
       .map((ms) => {
-      const t = data.tasks.filter((x) => x.milestone_id === ms.id);
-      return {
-        id: ms.id,
-        title: ms.title,
-        targetDate: ms.target_date,
-        estimatedHours: ms.estimated_hours,
-        status: ms.status,
-        tasksDone: t.filter((x) => x.done_at).length,
-        tasksTotal: t.length,
-        tasks: t.slice(0, 8).map((x) => ({ title: x.title, done: !!x.done_at, estimatedMinutes: x.estimated_minutes })),
-      };
-    }),
+        const t = data.tasks.filter((x) => x.milestone_id === ms.id);
+        return {
+          id: ms.id,
+          title: ms.title,
+          targetDate: ms.target_date,
+          estimatedHours: ms.estimated_hours,
+          status: ms.status,
+          tasksDone: t.filter((x) => x.done_at).length,
+          tasksTotal: t.length,
+          tasks: t
+            .slice(0, 8)
+            .map((x) => ({ title: x.title, done: !!x.done_at, estimatedMinutes: x.estimated_minutes })),
+        };
+      }),
     progress: {
       percentDone: Math.round(m.progress * 100),
       timePct: Math.round(m.countdown.timePct * 100),
       pace: m.pace,
       streak: m.streak,
-      minutesLast7Days: data.logs.filter((l) => l.date >= weekAgo && l.date <= today).reduce((s, l) => s + l.minutes, 0),
+      minutesLast7Days: data.logs
+        .filter((l) => l.date >= weekAgo && l.date <= today)
+        .reduce((s, l) => s + l.minutes, 0),
       daysLeft: m.countdown.daysLeft,
     },
   };
@@ -91,9 +98,17 @@ export function CoachCard({ data, m }: { data: GoalData; m: GoalMetrics }) {
     setInput('');
     setBusy(true);
     try {
-      const res = await askCoach({ message: message.slice(0, 1000), chip, context: buildCoachContext(data, m), history });
+      const res = await askCoach({
+        message: message.slice(0, 1000),
+        chip,
+        context: buildCoachContext(data, m),
+        history,
+      });
       await recordRuns(res.runs, data.goal.id);
-      setTurns((t) => [...t, { role: 'model', text: res.reply, proposal: res.proposal, tools: res.toolCalls }]);
+      setTurns((t) => [
+        ...t,
+        { role: 'model', text: res.reply, proposal: res.proposal, tools: res.toolCalls },
+      ]);
     } catch (e) {
       setError(e instanceof ApiCallError ? e.error.message : 'The coach could not answer. Try again.');
       setTurns((t) => t.slice(0, -1));
@@ -107,7 +122,9 @@ export function CoachCard({ data, m }: { data: GoalData; m: GoalMetrics }) {
     if (!turn?.proposal) return;
     if (accept) {
       await applyReschedule(data.goal.id, turn.proposal.changes);
-      toast.success('Plan updated', { description: `${turn.proposal.changes.length} milestone${turn.proposal.changes.length === 1 ? '' : 's'} rescheduled. Marked "Edited by you".` });
+      toast.success('Plan updated', {
+        description: `${turn.proposal.changes.length} milestone${turn.proposal.changes.length === 1 ? '' : 's'} rescheduled. Marked "Edited by you".`,
+      });
     }
     setTurns((t) => t.map((x, j) => (j === i ? { ...x, decided: accept ? 'accepted' : 'rejected' } : x)));
   }
@@ -116,34 +133,52 @@ export function CoachCard({ data, m }: { data: GoalData; m: GoalMetrics }) {
     <section className="card flex flex-col p-5 sm:p-6" aria-labelledby="coach-title">
       <div className="mb-3 flex items-center gap-2">
         <MessageCircle className="size-5 text-accent-text" strokeWidth={1.5} aria-hidden />
-        <h2 id="coach-title" className="text-xl">Coach</h2>
+        <h2 id="coach-title" className="text-xl">
+          Coach
+        </h2>
         <span className="ml-auto text-[11px] text-muted">Gemini · reads your plan & progress</span>
       </div>
 
       {!ready && health.isFetched ? (
         <p className="rounded-[14px] border border-hairline p-4 text-sm text-muted">
-          The coach needs Gemini, which isn't connected on this server yet. Your plan, countdown and wallpaper all keep working.
+          The coach needs Gemini, which isn't connected on this server yet. Your plan, countdown and wallpaper
+          all keep working.
         </p>
       ) : (
         <>
           {turns.length > 0 && (
             <ol className="mb-3 max-h-96 space-y-3 overflow-y-auto pr-1" aria-live="polite">
               {turns.map((t, i) => (
-                <li key={i} className={cn('text-sm', t.role === 'user' ? 'ml-8 rounded-[14px] bg-surface-2 px-3 py-2 text-text' : 'text-text')}>
+                <li
+                  key={i}
+                  className={cn(
+                    'text-sm',
+                    t.role === 'user' ? 'ml-8 rounded-[14px] bg-surface-2 px-3 py-2 text-text' : 'text-text',
+                  )}
+                >
                   {t.role === 'model' && (
                     <p className="mb-1 inline-flex items-center gap-1 text-[11px] text-accent-text">
-                      <Sparkles className="size-3" strokeWidth={1.5} aria-hidden /> ✦ AI suggestion{t.tools?.length ? ` · checked ${t.tools.filter((x) => x !== 'proposeReschedule').join(', ') || 'your plan'}` : ''}
+                      <Sparkles className="size-3" strokeWidth={1.5} aria-hidden /> ✦ AI suggestion
+                      {t.tools?.length
+                        ? ` · checked ${t.tools.filter((x) => x !== 'proposeReschedule').join(', ') || 'your plan'}`
+                        : ''}
                     </p>
                   )}
                   <p className="whitespace-pre-line leading-relaxed">{t.text}</p>
                   {t.proposal && t.proposal.changes.length > 0 && (
-                    <ProposalDiff proposal={t.proposal} decided={t.decided} onAccept={() => void decide(i, true)} onReject={() => void decide(i, false)} />
+                    <ProposalDiff
+                      proposal={t.proposal}
+                      decided={t.decided}
+                      onAccept={() => void decide(i, true)}
+                      onReject={() => void decide(i, false)}
+                    />
                   )}
                 </li>
               ))}
               {busy && (
                 <li className="flex items-center gap-2 text-sm text-muted">
-                  <Loader2 className="size-4 animate-spin" strokeWidth={1.5} aria-hidden /> Thinking with your data…
+                  <Loader2 className="size-4 animate-spin" strokeWidth={1.5} aria-hidden /> Thinking with your
+                  data…
                 </li>
               )}
             </ol>
@@ -167,19 +202,40 @@ export function CoachCard({ data, m }: { data: GoalData; m: GoalMetrics }) {
               void send(input);
             }}
           >
-            <Input value={input} onChange={(e) => setInput(e.target.value)} maxLength={1000} placeholder="Ask the coach…" aria-label="Message the coach" disabled={busy} />
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              maxLength={1000}
+              placeholder="Ask the coach…"
+              aria-label="Message the coach"
+              disabled={busy}
+            />
             <IconButton label="Send" type="submit" variant="primary" disabled={busy || !input.trim()}>
               <Send className="size-4" strokeWidth={1.75} />
             </IconButton>
           </form>
-          {error && <p role="alert" className="mt-2 text-xs text-danger">{error}</p>}
+          {error && (
+            <p role="alert" className="mt-2 text-xs text-danger">
+              {error}
+            </p>
+          )}
         </>
       )}
     </section>
   );
 }
 
-function ProposalDiff({ proposal, decided, onAccept, onReject }: { proposal: CoachProposal; decided?: 'accepted' | 'rejected'; onAccept: () => void; onReject: () => void }) {
+function ProposalDiff({
+  proposal,
+  decided,
+  onAccept,
+  onReject,
+}: {
+  proposal: CoachProposal;
+  decided?: 'accepted' | 'rejected';
+  onAccept: () => void;
+  onReject: () => void;
+}) {
   return (
     <div className="mt-3 rounded-[14px] border border-accent/50 p-3">
       <p className="mb-2 text-xs font-medium text-accent-text">Proposed change · {proposal.summary}</p>
@@ -204,14 +260,32 @@ function ProposalDiff({ proposal, decided, onAccept, onReject }: { proposal: Coa
         ))}
       </ul>
       {!proposal.valid && (
-        <p className="mt-2 text-xs text-warning">This proposal breaks a rule ({proposal.errors[0]}). You can still reject it, or ask again.</p>
+        <p className="mt-2 text-xs text-warning">
+          This proposal breaks a rule ({proposal.errors[0]}). You can still reject it, or ask again.
+        </p>
       )}
       {decided ? (
-        <p className="mt-3 text-xs text-muted">{decided === 'accepted' ? 'Accepted. Your plan is updated.' : 'Rejected. Nothing changed.'}</p>
+        <p className="mt-3 text-xs text-muted">
+          {decided === 'accepted' ? 'Accepted. Your plan is updated.' : 'Rejected. Nothing changed.'}
+        </p>
       ) : (
         <div className="mt-3 flex gap-2">
-          <Button size="sm" onClick={onAccept} disabled={!proposal.valid} icon={<Check className="size-4" strokeWidth={2} />}>Accept</Button>
-          <Button size="sm" variant="ghost" onClick={onReject} icon={<X className="size-4" strokeWidth={1.5} />}>Reject</Button>
+          <Button
+            size="sm"
+            onClick={onAccept}
+            disabled={!proposal.valid}
+            icon={<Check className="size-4" strokeWidth={2} />}
+          >
+            Accept
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onReject}
+            icon={<X className="size-4" strokeWidth={1.5} />}
+          >
+            Reject
+          </Button>
         </div>
       )}
     </div>
