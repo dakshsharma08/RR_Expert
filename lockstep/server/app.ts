@@ -26,6 +26,7 @@ import { loadConfig, resolveTuning, type TuningOverrides } from './lib/config';
 import { AppError } from './lib/errors';
 import { createRateLimiter, rulesFrom } from './lib/rateLimit';
 
+import { createAccountRouter } from './account';
 import { ImageModelResolver } from './gemini/background';
 import { createWallpaperRouter, storeFromEnv, type WallpaperStore } from './wallpaper/living';
 export type { GeminiLike } from './gemini/client';
@@ -121,6 +122,9 @@ export function createApp(opts: CreateAppOptions = {}): Express {
       wallpaperStore: wallpapers.kind,
     }),
   );
+
+  // Cloud account deletion (only when Supabase is configured server-side).
+  app.use('/api', createAccountRouter({ supabase: config.supabase }));
 
   // Living Wallpaper links (create / update / revoke / today's PNG).
   app.use('/api', createWallpaperRouter({ store: wallpapers, now, publicUrl: env.PUBLIC_APP_URL?.trim() || null }));
