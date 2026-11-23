@@ -10,3 +10,7 @@ playwright-report
 coverage
 *.tsbuildinfo
 .vercel
+# Full-size sample renders (≈2–4 MB each, regenerate with `npx tsx scripts/render-samples.ts`).
+# The small _sheet-* contact sheets stay tracked as evidence.
+docs/evidence/wallpapers/*.png
+!docs/evidence/wallpapers/_sheet-*.png
