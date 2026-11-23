@@ -12,6 +12,7 @@ import type { WallpaperData, WallpaperDesign } from '@shared/wallpaper/types';
 import { getDevice } from '@shared/wallpaper/devices';
 import { exportFilename, exportPng, type ExportResult } from './canvas';
 import { ReadabilityNotes } from './Panels';
+import { setKv } from '@/db/repo';
 
 export function ExportDialog({
   open,
@@ -19,6 +20,7 @@ export function ExportDialog({
   design,
   data,
   goalTitle,
+  goalId,
   todayKey,
   onRefresh,
 }: {
@@ -27,6 +29,7 @@ export function ExportDialog({
   design: WallpaperDesign;
   data: WallpaperData;
   goalTitle: string;
+  goalId: string;
   todayKey: string;
   onRefresh: () => Promise<void>;
 }) {
@@ -70,6 +73,7 @@ export function ExportDialog({
     if (!file) return;
     try {
       await navigator.share({ files: [file], title: 'LOCKSTEP wallpaper' });
+      void setKv(`exported:${goalId}`, new Date().toISOString());
     } catch (e) {
       if ((e as Error).name !== 'AbortError') download();
     }
@@ -82,6 +86,7 @@ export function ExportDialog({
     document.body.appendChild(a);
     a.click();
     a.remove();
+    void setKv(`exported:${goalId}`, new Date().toISOString());
     toast.success('Wallpaper saved', { description: `${filename}. Next: set it as your lock screen.` });
   }
 

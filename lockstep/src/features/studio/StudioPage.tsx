@@ -223,7 +223,7 @@ export default function StudioPage() {
             </Tabs.Root>
           </aside>
         </div>
-        <ExportDialog open={exportOpen} onOpenChange={setExportOpen} design={design} data={wpData} goalTitle={data.goal.title} todayKey={m.countdown.todayKey} onRefresh={refresh} />
+        <ExportDialog open={exportOpen} onOpenChange={setExportOpen} design={design} data={wpData} goalTitle={data.goal.title} goalId={data.goal.id} todayKey={m.countdown.todayKey} onRefresh={refresh} />
       </div>
     );
   }
@@ -250,7 +250,7 @@ export default function StudioPage() {
           ))}
         </Tabs.Root>
       </BottomSheet>
-      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} design={design} data={wpData} goalTitle={data.goal.title} todayKey={m.countdown.todayKey} onRefresh={refresh} />
+      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} design={design} data={wpData} goalTitle={data.goal.title} goalId={data.goal.id} todayKey={m.countdown.todayKey} onRefresh={refresh} />
     </div>
   );
 }

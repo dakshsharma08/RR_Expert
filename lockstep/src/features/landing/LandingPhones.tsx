@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PhonePreview } from '@/features/studio/PhonePreview';
-import { defaultDesign } from '@shared/wallpaper/templates';
+import { defaultDesign, getTemplate } from '@shared/wallpaper/templates';
 import type { TemplateId, WallpaperData } from '@shared/wallpaper/types';
 
 const CYCLE: TemplateId[] = ['monolith', 'orbit', 'ledger', 'constellation', 'aurora', 'ivory-paper'];
@@ -48,7 +48,7 @@ export function LandingPhones() {
           <PhonePreview design={defaultDesign(t, undefined, 'iphone-pro')} data={EXAMPLE} width={w} showUi label={`Example lock screen, ${t} template`} />
         </motion.div>
       </AnimatePresence>
-      <p className="mt-4 text-xs text-muted">Example · {CYCLE.length} of 8 templates</p>
+      <p className="mt-4 text-xs text-muted" aria-live="off">Example wallpaper · {getTemplate(t).label} template · 8 templates in the Studio</p>
     </div>
   );
 }

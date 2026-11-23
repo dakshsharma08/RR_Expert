@@ -1,5 +1,5 @@
 /** Landing: obsidian hero, gold ring, headline, CTA, 3-step explainer, phone mockup cycling templates. */
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import { ArrowRight, CalendarCheck2, ShieldCheck, Smartphone, Sparkles, Target } from 'lucide-react';
@@ -7,6 +7,8 @@ import { Wordmark } from '@/components/layout/Wordmark';
 import { Button } from '@/components/ui/button';
 import { useGoals } from '@/db/hooks';
 import { LandingPhones } from './LandingPhones';
+
+const HeroRing3D = lazy(() => import('./HeroRing3D'));
 
 function useCan3D() {
   const [ok, setOk] = useState(false);
@@ -54,7 +56,13 @@ export default function LandingPage() {
         <section className="relative overflow-hidden pb-16 pt-28 sm:pt-36" aria-labelledby="hero-title">
           {/* Static gold ring (always present; the 3D ring replaces it on capable desktops) */}
           <div className="pointer-events-none absolute right-[-30vw] top-[-10vw] size-[90vw] max-w-[1000px] opacity-90 md:right-[-12vw] md:top-[-6vw] md:size-[62vw]" aria-hidden>
-            <StaticRing animated={can3D} />
+            {can3D ? (
+              <Suspense fallback={<StaticRing />}>
+                <HeroRing3D />
+              </Suspense>
+            ) : (
+              <StaticRing />
+            )}
           </div>
           <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.15fr_0.85fr]">
             <div>
@@ -144,9 +152,9 @@ export default function LandingPage() {
   );
 }
 
-function StaticRing({ animated }: { animated?: boolean }) {
+function StaticRing() {
   return (
-    <svg viewBox="0 0 400 400" className={animated ? 'size-full animate-[spin_120s_linear_infinite]' : 'size-full'} aria-hidden>
+    <svg viewBox="0 0 400 400" className="size-full" aria-hidden>
       <defs>
         <linearGradient id="ring-g" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#E5CC91" />

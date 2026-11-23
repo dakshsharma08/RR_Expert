@@ -14,6 +14,7 @@ import { GoalHero, MotivationCard, TaskCheck, TodayFocus, useLiveMetrics, useMot
 import { minutesLabel, shortDate } from '@/lib/metrics';
 import { cn } from '@/lib/cn';
 import { CoachCard } from '@/features/coach/CoachCard';
+import { AchievementsCard } from './Achievements';
 
 export default function GoalPage() {
   const { goalId } = useParams();
@@ -90,6 +91,8 @@ export default function GoalPage() {
         <TodayFocus goal={goal} m={m} />
         <CoachCard data={data} m={m} />
       </div>
+
+      <AchievementsCard data={data} m={m} />
 
       <section aria-labelledby="plan-title" className="pt-4">
         <div className="mb-4 flex items-end justify-between">

@@ -2,7 +2,7 @@
   "name": "lockstep",
   "private": true,
   "version": "1.0.0",
-  "description": "LOCKSTEP \u2014 Gemini-planned countdown lock screen. Turns a deadline into a milestone plan, a live countdown and a lock-screen wallpaper.",
+  "description": "LOCKSTEP — Gemini-planned countdown lock screen. Turns a deadline into a milestone plan, a live countdown and a lock-screen wallpaper.",
   "type": "module",
   "engines": {
     "node": ">=20.19"
@@ -45,6 +45,9 @@
     "@radix-ui/react-tabs": "1.2.1",
     "@radix-ui/react-toggle-group": "1.2.1",
     "@radix-ui/react-tooltip": "1.4.1",
+    "@react-three/drei": "10.7.9",
+    "@react-three/fiber": "9.8.2",
+    "@supabase/supabase-js": "2.119.2",
     "@tanstack/react-query": "5.108.3",
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
@@ -64,11 +67,13 @@
     "recharts": "3.11.0",
     "sonner": "2.0.8",
     "tailwind-merge": "3.7.1",
+    "three": "0.187.0",
     "tsx": "4.23.15",
     "zod": "4.6.7",
     "zustand": "5.1.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.17",
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.63.0",
     "@tailwindcss/vite": "4.3.5",
@@ -81,6 +86,7 @@
     "@types/node": "22.19.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@types/three": "0.187.0",
     "@vitejs/plugin-react": "6.3.0",
     "concurrently": "10.0.7",
     "esbuild": "0.28.2",

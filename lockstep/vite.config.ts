@@ -37,6 +37,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
+        // The 3D hero is desktop-only decoration: never precache ~1 MB of three.js on phones.
+        globIgnores: ['**/HeroRing3D-*.js'],
         // Never cache API calls: plans must be fresh, and AI errors must be honest.
         navigateFallbackDenylist: [/^\/api\//],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,

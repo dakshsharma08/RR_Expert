@@ -15,6 +15,7 @@ import { getKv, recordRuns, setActiveGoal, setKv } from '@/db/repo';
 import { minutesLabel, shortDate } from '@/lib/metrics';
 import { formatDayKey } from '@shared/time';
 import { cn } from '@/lib/cn';
+import { AchievementsCard } from '@/features/goals/Achievements';
 
 const AXIS = { fontSize: 11, fill: 'var(--text-muted)' };
 
@@ -136,6 +137,8 @@ export default function InsightsPage() {
           <Heatmap cols={heat} />
         </section>
       </div>
+
+      <AchievementsCard data={data} m={m} />
 
       <section className="card p-5 sm:p-6" aria-labelledby="ins-ms">
         <h2 id="ins-ms" className="mb-4 text-xl">Milestone completion</h2>
