@@ -1,0 +1,12 @@
+node_modules
+dist
+dev-dist
+.env
+.env.*
+!.env.example
+.data
+test-results
+playwright-report
+coverage
+*.tsbuildinfo
+.vercel
