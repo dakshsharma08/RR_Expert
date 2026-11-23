@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { ArrowRight, CalendarCheck2, ShieldCheck, Smartphone, Sparkles, Target } from 'lucide-react';
 import { Wordmark } from '@/components/layout/Wordmark';
 import { Button } from '@/components/ui/button';
-import { useGoals } from '@/db/hooks';
 import { LandingPhones } from './LandingPhones';
 
 const HeroRing3D = lazy(() => import('./HeroRing3D'));
@@ -34,9 +33,7 @@ function useCan3D() {
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const goals = useGoals();
   const can3D = useCan3D();
-  const hasGoals = (goals?.length ?? 0) > 0;
 
   return (
     <div className="min-h-dvh bg-bg text-text">
@@ -46,7 +43,7 @@ export default function LandingPage() {
           <nav className="flex items-center gap-1" aria-label="Site">
             <a href="#how" className="hidden min-h-11 items-center rounded-xl px-3 text-sm text-muted hover:text-text sm:inline-flex">How it works</a>
             <Link to="/app" className="inline-flex min-h-11 items-center rounded-xl px-3 text-sm text-muted hover:text-text">
-              {hasGoals ? 'Open app' : 'Dashboard'}
+              Open app
             </Link>
           </nav>
         </div>
@@ -71,8 +68,8 @@ export default function LandingPage() {
               </motion.p>
               <motion.h1
                 id="hero-title"
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ y: 10 }}
+                animate={{ y: 0 }}
                 transition={{ delay: 0.05 }}
                 className="text-[44px] font-light leading-[1.02] tracking-[-0.02em] sm:text-[64px] lg:text-[88px]"
               >
@@ -80,7 +77,7 @@ export default function LandingPage() {
                 <br />
                 <span className="italic text-accent-text">locked in.</span>
               </motion.h1>
-              <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mt-6 max-w-xl text-base text-muted sm:text-lg">
+              <motion.p initial={{ y: 10 }} animate={{ y: 0 }} transition={{ delay: 0.12 }} className="mt-6 max-w-xl text-base text-muted sm:text-lg">
                 LOCKSTEP turns a distant deadline into a feasibility-checked milestone plan, a live countdown, and a lock-screen wallpaper that shows your real progress every time you unlock your phone.
               </motion.p>
               <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="mt-9 flex flex-wrap gap-3">

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { RouterProvider } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
@@ -7,7 +7,8 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { applyMode, useUi } from '@/stores/ui';
 import { router } from './router';
 import { PwaUpdater } from './PwaUpdater';
-import { ReminderScheduler } from '@/features/settings/reminders';
+// Reminders need the database + schemas: load them after first paint, off the landing's critical path.
+const ReminderScheduler = lazy(() => import('@/features/settings/reminders').then((m) => ({ default: m.ReminderScheduler })));
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false, staleTime: 60_000 } },
@@ -32,7 +33,9 @@ export function App() {
           <RouterProvider router={router} />
           <Toaster position="top-center" closeButton toastOptions={{ duration: 4500 }} />
           <PwaUpdater />
-          <ReminderScheduler />
+          <Suspense fallback={null}>
+            <ReminderScheduler />
+          </Suspense>
         </TooltipProvider>
       </MotionConfig>
     </QueryClientProvider>

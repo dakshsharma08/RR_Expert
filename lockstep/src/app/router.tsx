@@ -3,7 +3,6 @@
  * so the first load stays small.
  */
 import { createBrowserRouter, type RouteObject } from 'react-router';
-import { AppShell } from '@/components/layout/AppShell';
 import { RouteFallback, NotFound } from './RouteFallback';
 
 const lazy = (load: () => Promise<{ default: React.ComponentType }>) => async () => ({ Component: (await load()).default });
@@ -13,7 +12,8 @@ const routes: RouteObject[] = [
   { path: '/cover', lazy: lazy(() => import('@/features/cover/CoverPage')), HydrateFallback: RouteFallback },
   { path: '/focus/:goalId', lazy: lazy(() => import('@/features/focus/FocusPage')), HydrateFallback: RouteFallback },
   {
-    element: <AppShell />,
+    // The app frame is lazy too, so the landing page doesn't download the sidebar/palette code.
+    lazy: async () => ({ Component: (await import('@/components/layout/AppShell')).AppShell }),
     HydrateFallback: RouteFallback,
     children: [
       { path: '/app', lazy: lazy(() => import('@/features/dashboard/DashboardPage')) },

@@ -4,6 +4,27 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath } from 'node:url';
+import type { Plugin } from 'vite';
+
+/**
+ * Preload the two latin font files the first screen uses (Fraunces + Inter), so text
+ * renders in the right font without waiting for the CSS to be parsed first.
+ * (Improves Largest Contentful Paint on slow phones.)
+ */
+function preloadFonts(): Plugin {
+  return {
+    name: 'lockstep-preload-fonts',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, ctx) {
+        const files = Object.keys(ctx.bundle ?? {}).filter((f) => /(fraunces|inter)-latin-wght-normal-[\w-]+\.woff2$/.test(f));
+        const links = files.map((f) => `<link rel="preload" href="/${f}" as="font" type="font/woff2" crossorigin>`).join('\n    ');
+        return html.replace('</title>', `</title>\n    ${links}`);
+      },
+    },
+  };
+}
 
 // Why this file matters (for learners):
 // - `react()` compiles JSX, `tailwindcss()` turns our utility classes into CSS.
@@ -15,6 +36,7 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    preloadFonts(),
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
@@ -64,6 +86,19 @@ export default defineConfig({
     target: 'es2022',
     sourcemap: false,
     chunkSizeWarningLimit: 900,
+    rolldownOptions: {
+      output: {
+        // Fewer, better-grouped chunks: one icon chunk instead of ~40 tiny requests,
+        // and stable vendor groups that cache well between deploys.
+        codeSplitting: {
+          groups: [
+            { name: 'icons', test: /node_modules[\\/]lucide-react/ },
+            { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler|react-router)[\\/]/ },
+            { name: 'data', test: /node_modules[\\/](dexie|dexie-react-hooks|zod|date-fns|date-fns-tz)[\\/]/ },
+          ],
+        },
+      },
+    },
   },
   test: {
     globals: true,
