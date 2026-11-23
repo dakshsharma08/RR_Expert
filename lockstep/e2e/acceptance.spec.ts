@@ -153,3 +153,31 @@ test('Android 1080×2400 export has native dimensions', async ({ page }) => {
   await download.saveAs(file);
   expect(pngSize(file)).toEqual({ width: 1080, height: 2400 });
 });
+
+test('Living Wallpaper link: create in Studio → URL returns today\'s PNG → revoke in Settings', async ({ page, request }) => {
+  await page.goto('/new');
+  await page.getByRole('button', { name: 'Try a sample goal' }).click();
+  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Plan with Gemini' }).click();
+  await page.waitForURL(/\/review$/, { timeout: 60_000 });
+  await page.getByRole('button', { name: 'Approve plan' }).click();
+  await page.waitForURL(/\/goals\/[^/]+$/);
+  await page.goto(page.url().replace('/goals/', '/studio/'));
+  await page.getByRole('tab', { name: 'Export' }).click();
+  await page.getByRole('button', { name: 'Create Living Wallpaper link' }).click();
+  const link = page.locator('p.font-mono', { hasText: '/api/wallpaper/' }).first();
+  await expect(link).toBeVisible();
+  const url = (await link.textContent())!.trim();
+  expect(url).toMatch(/\/api\/wallpaper\/[A-Za-z0-9_-]{32}\.png$/);
+  const res = await request.get(url.replace(/^https?:\/\/[^/]+/, 'http://localhost:4173'));
+  expect(res.status()).toBe(200);
+  const buf = await res.body();
+  expect(buf.subarray(1, 4).toString()).toBe('PNG');
+  await page.screenshot({ path: `${EVIDENCE}/${page.viewportSize()?.width}-12-living-link.png` });
+
+  await page.goto('/settings');
+  await page.getByRole('button', { name: 'Revoke' }).first().click();
+  await expect(page.getByText('Revoked').first()).toBeVisible();
+  const gone = await request.get(url.replace(/^https?:\/\/[^/]+/, 'http://localhost:4173'));
+  expect(gone.status()).toBe(404);
+});

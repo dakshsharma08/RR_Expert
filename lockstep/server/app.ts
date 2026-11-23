@@ -18,7 +18,6 @@
 import cors, { type CorsOptions } from 'cors';
 import express, { type ErrorRequestHandler, type Express, type Request } from 'express';
 import helmet from 'helmet';
-import type { HealthResponse } from '../shared/api';
 import { createGeminiClient, ModelResolver, type GeminiLike } from './gemini/client';
 import { MotivationCache } from './gemini/motivation';
 import { createAiRouter } from './gemini/routes';
@@ -27,6 +26,7 @@ import { loadConfig, resolveTuning, type TuningOverrides } from './lib/config';
 import { AppError } from './lib/errors';
 import { createRateLimiter, rulesFrom } from './lib/rateLimit';
 
+import { createWallpaperRouter, storeFromEnv, type WallpaperStore } from './wallpaper/living';
 export type { GeminiLike } from './gemini/client';
 
 export interface CreateAppOptions {
@@ -38,8 +38,8 @@ export interface CreateAppOptions {
   env?: NodeJS.ProcessEnv;
   /** Timeouts, backoff and rate limits. Defaults are the product spec. */
   tuning?: TuningOverrides;
-  /** Where wallpapers are stored (reported by /api/health). */
-  wallpaperStore?: HealthResponse['wallpaperStore'];
+  /** Where Living Wallpaper links are stored. Defaults: Upstash → file (local) → memory (serverless). */
+  wallpapers?: WallpaperStore;
 }
 
 export function createApp(opts: CreateAppOptions = {}): Express {
@@ -92,7 +92,7 @@ export function createApp(opts: CreateAppOptions = {}): Express {
         allowed = false;
       }
     }
-    cb(null, { origin: allowed, methods: ['GET', 'POST', 'OPTIONS'], maxAge: 600 });
+    cb(null, { origin: allowed, methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], maxAge: 600 });
   };
   app.use('/api', cors(corsFor));
 
@@ -105,6 +105,7 @@ export function createApp(opts: CreateAppOptions = {}): Express {
   });
 
   const limiter = createRateLimiter(config.upstash, rulesFrom(tuning.rateLimit));
+  const wallpapers = opts.wallpapers ?? storeFromEnv(env, config.upstash);
   app.use(
     '/api',
     createAiRouter({
@@ -115,9 +116,12 @@ export function createApp(opts: CreateAppOptions = {}): Express {
       now,
       limiter,
       motivationCache: new MotivationCache(),
-      wallpaperStore: opts.wallpaperStore ?? (config.upstash ? 'upstash' : 'memory'),
+      wallpaperStore: wallpapers.kind,
     }),
   );
+
+  // Living Wallpaper links (create / update / revoke / today's PNG).
+  app.use('/api', createWallpaperRouter({ store: wallpapers, now, publicUrl: env.PUBLIC_APP_URL?.trim() || null }));
 
   // Unknown /api routes → JSON 404 (only /api; prod.ts adds the SPA after this).
   app.use('/api', (_req, _res, next) => next(new AppError('NOT_FOUND')));
