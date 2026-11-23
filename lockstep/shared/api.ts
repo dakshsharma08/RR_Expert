@@ -195,3 +195,29 @@ export interface WeeklyInsightResponse {
   summary: string;
   run: AiRunMeta;
 }
+
+// ───────────── Living Wallpaper (POST/PUT/DELETE /api/wallpaper, GET /api/wallpaper/:token.png) ─────────────
+/**
+ * What the server needs to redraw today's wallpaper on its own. The server recomputes
+ * days left / Day X of Y / next milestone from the clock every time the URL is fetched;
+ * progress updates whenever the app re-publishes the snapshot.
+ */
+export interface WallpaperSnapshot {
+  goalTitle: string;
+  deadlineUtc: string;
+  startUtc: string;
+  timezone: string;
+  completed: boolean;
+  progressPct: number; // 0..1
+  motivation: string | null;
+  milestones: { title: string; targetDate: string; done: boolean }[];
+}
+export interface LivingWallpaperCreateRequest {
+  design: unknown; // WallpaperDesign (validated + normalized server-side)
+  snapshot: WallpaperSnapshot;
+}
+export interface LivingWallpaperCreateResponse {
+  token: string; // unguessable, in the URL
+  secret: string; // edit/revoke key, kept only on the device that created it
+  url: string; // absolute URL of today's PNG
+}

@@ -17,8 +17,7 @@
     "verbatimModuleSyntax": true,
     "noEmit": true,
     "types": ["vite/client", "vite-plugin-pwa/client"],
-    "baseUrl": ".",
-    "paths": { "@/*": ["src/*"], "@shared/*": ["shared/*"] }
+    "paths": { "@/*": ["./src/*"], "@shared/*": ["./shared/*"] }
   },
   "include": ["src", "shared"]
 }

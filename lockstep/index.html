@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" data-mode="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#090909" />
+    <meta name="description" content="LOCKSTEP turns your deadline into a Gemini-planned set of milestones, a live countdown, and a lock-screen wallpaper that shows your real progress." />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:title" content="LOCKSTEP — Your deadline, locked in." />
+    <meta property="og:description" content="Gemini-planned milestones, a live countdown and a lock screen that shows real progress." />
+    <title>LOCKSTEP — Your deadline, locked in.</title>
+    <script>
+      // Apply saved light/dark mode before first paint (prevents a flash).
+      try {
+        var s = JSON.parse(localStorage.getItem('lockstep-ui') || '{}').state || {};
+        var m = s.mode || 'dark';
+        if (m === 'system') m = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.mode = m;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>LOCKSTEP needs JavaScript to run.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
