@@ -4,7 +4,7 @@
 **Project root:** `lockstep/` inside the `RR_Expert` repo · branch `ccr-d3fe6a20-92epng` (see DECISIONS.md).
 
 ## Current phase
-**P9 (bug sweep).** Tiers 1, 2 and 3 are built and tested. Deploy is **BLOCKED** by the environment (no Vercel/Firebase/Supabase access, no Gemini key); everything is ready for the developer (`docs/SETUP.md`). Last update: 05:05 UTC.
+**P9 (bug sweep + polish).** Tiers 1, 2 and 3 are built and tested. An independent code review found 15 defects (2 high); **all are fixed and verified**. Deploy is **BLOCKED** by the environment (no Vercel/Firebase/Supabase access, no Gemini key); everything is ready for the developer (`docs/SETUP.md`). Last update: 05:55 UTC.
 
 ## Environment facts (checked 03:23 UTC)
 - No `GEMINI_API_KEY` → AI is built and tested against MSW mocks **in tests only**; the live smoke test reports **SKIPPED**. The running app shows an honest "Gemini isn't connected" state and offers the manual plan path.
@@ -35,7 +35,7 @@
 | **Accessibility sweep**: axe-core (WCAG 2.2 AA, serious/critical) on 12 screens, dark + light, at 360/390/430/1440 | `npx playwright test e2e/screens.spec.ts` | pass at all 4 widths · `docs/evidence/screens/` |
 | **Lighthouse mobile** (simulated slow 4G) | `npx lighthouse http://localhost:4173/<path>` | landing perf 93–97 / a11y 100 / BP 100; /new 95–98 / 100 / 100; /guide 96 / 100 / 100; empty /app on a cold profile 84–86 / 100 / 100 |
 | 3D hero (desktop, lazy, not precached) renders without errors | Playwright + SwiftShader screenshot | pass |
-| All unit + integration tests | `npx vitest run` | **238 passed, 3 skipped (live Gemini)** |
+| All unit + integration tests | `npx vitest run` | **248 passed, 3 skipped (live Gemini)** |
 | All E2E | `npm run build && npx playwright test --trace off` | **16/16 pass** |
 | **Submission assets v1** | `node scripts/submission.mjs` | lockscreen.png 1206×2622 ✓, lockscreen-android.png 1080×2400 ✓, cover.png 2400×1600 ✓, description 338 chars. Mode **manual-no-key**: the Gemini sentence is marked PENDING (see `submission/CHECKLIST.md`) |
 
@@ -45,7 +45,7 @@
 - **Tier 3:** ✅ optional Supabase auth + sync + RLS (PGlite-proven), 3D landing hero, AI backgrounds (only when an image model exists), achievements, in-app + local notifications. Web Push is not built: it needs VAPID keys and a push service, so it's documented only.
 
 ## Next step
-Act on the independent code review, then re-run every suite and regenerate the submission assets.
+Apply the visual design critique (in progress), re-run every suite, regenerate the submission assets, and write the final report.
 
 ## Known issues
 - No real-Gemini run has happened (no key). After adding a key: `npm run test:live` and `npm run submission -- --url <live-url>`.
