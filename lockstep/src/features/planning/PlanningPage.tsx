@@ -91,7 +91,15 @@ export default function PlanningPage() {
     void run();
   }, [goal, run, navigate]);
 
-  useEffect(() => () => ctrl.current?.abort(), []);
+  // On unmount, stop the stream AND forget that we started it, so a remount
+  // (React StrictMode in dev, or coming back to this page) starts a fresh one.
+  useEffect(
+    () => () => {
+      ctrl.current?.abort();
+      startedFor.current = null;
+    },
+    [],
+  );
 
   const cancel = () => {
     ctrl.current?.abort();

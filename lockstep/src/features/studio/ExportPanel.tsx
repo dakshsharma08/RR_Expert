@@ -6,7 +6,8 @@ import { toast } from 'sonner';
 import { Link } from 'react-router';
 import { Button, IconButton } from '@/components/ui/button';
 import { db, nowIso, uid, type WallpaperRow } from '@/db/db';
-import { ApiCallError } from '@/lib/api';
+import { ApiCallError, getHealth } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
 import type { WallpaperSnapshot } from '@shared/api';
 import type { WallpaperDesign } from '@shared/wallpaper/types';
 import { getDevice } from '@shared/wallpaper/devices';
@@ -37,6 +38,8 @@ export function ExportPanel({
   const saved = useLiveQuery(() => db.wallpapers.where('goal_id').equals(goalId).reverse().sortBy('updated_at'), [goalId]);
   const [busy, setBusy] = useState<string | null>(null);
   const [confirmRevoke, setConfirmRevoke] = useState(false);
+  const health = useQuery({ queryKey: ['health'], queryFn: getHealth, staleTime: 60_000 });
+  const volatileStore = health.data?.wallpaperStore === 'memory';
   const device = getDevice(design.device, design.custom);
   const live = saved?.find((w) => w.share_token && !w.revoked_at) ?? null;
 
@@ -122,6 +125,12 @@ export function ExportPanel({
           </Button>
         )}
         {design.background.kind === 'image' && <p className="text-xs text-muted">Photos stay on your device, so the link uses the theme background instead.</p>}
+        {volatileStore && (
+          <p className="text-xs text-warning">
+            This server keeps links in memory only, so they can stop working after a restart. (Developer: add Upstash Redis. See SETUP.md.)
+          </p>
+        )}
+        {health.isFetched && !health.data && <p className="text-xs text-warning">The LOCKSTEP server isn't reachable, so links can't be created right now.</p>}
       </Group>
 
       <ConfirmDialog
