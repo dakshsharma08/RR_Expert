@@ -17,6 +17,8 @@ export interface PreviewProps {
   /** CSS width of the phone screen. */
   width: number;
   showUi?: boolean;
+  /** Draw the three widget placeholders (kept in the Studio, where they show placement). */
+  widgets?: boolean;
   showSafe?: boolean;
   onReport?: (r: RenderReport) => void;
   className?: string;
@@ -39,6 +41,7 @@ export function PhonePreview({
   data,
   width,
   showUi,
+  widgets = true,
   showSafe,
   onReport,
   className,
@@ -120,7 +123,14 @@ export function PhonePreview({
         {error && <p className="absolute inset-x-4 top-1/2 text-center text-xs text-danger">{error}</p>}
 
         {showUi && (
-          <LockScreenUi width={width} height={height} ios={ios} safe={device.safe} light={lightBg} />
+          <LockScreenUi
+            width={width}
+            height={height}
+            ios={ios}
+            safe={device.safe}
+            light={lightBg}
+            widgets={widgets}
+          />
         )}
 
         {showSafe && (
@@ -179,12 +189,14 @@ function LockScreenUi({
   ios,
   safe,
   light,
+  widgets,
 }: {
   width: number;
   height: number;
   ios: boolean;
   safe: ReturnType<typeof getDevice>['safe'];
   light?: boolean;
+  widgets: boolean;
 }) {
   const clockTop = safe.clock[0] * height;
   const clockH = (safe.clock[1] - safe.clock[0]) * height;
@@ -231,20 +243,22 @@ function LockScreenUi({
           {time}
         </span>
       </div>
-      <div
-        className="absolute inset-x-[10%] flex justify-center gap-[3%]"
-        style={{
-          top: safe.widgets[0] * height + 4,
-          height: (safe.widgets[1] - safe.widgets[0]) * height - 10,
-        }}
-      >
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className={cn('flex-1 rounded-[22%] backdrop-blur-sm', light ? 'bg-black/8' : 'bg-white/12')}
-          />
-        ))}
-      </div>
+      {widgets && (
+        <div
+          className="absolute inset-x-[10%] flex justify-center gap-[3%]"
+          style={{
+            top: safe.widgets[0] * height + 4,
+            height: (safe.widgets[1] - safe.widgets[0]) * height - 10,
+          }}
+        >
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className={cn('flex-1 rounded-[22%] backdrop-blur-sm', light ? 'bg-black/8' : 'bg-white/12')}
+            />
+          ))}
+        </div>
+      )}
       <div
         className="absolute flex w-full justify-between px-[12%]"
         style={{ top: (safe.bottomControls[0] + 0.03) * height }}

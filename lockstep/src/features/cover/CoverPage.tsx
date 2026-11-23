@@ -65,6 +65,7 @@ export default function CoverPage() {
                   data={wp}
                   width={i === 1 ? 380 : 340}
                   showUi
+                  widgets={false}
                 />
               </div>
             ))

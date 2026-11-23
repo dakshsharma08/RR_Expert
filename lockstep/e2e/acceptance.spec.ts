@@ -216,3 +216,47 @@ test("Living Wallpaper link: create in Studio → URL returns today's PNG → re
   const gone = await request.get(url.replace(/^https?:\/\/[^/]+/, 'http://localhost:4173'));
   expect(gone.status()).toBe(404);
 });
+
+test('countdown accuracy: the screen-reader countdown matches an independent calculation from the stored deadline', async ({
+  page,
+}) => {
+  await page.goto('/new');
+  await page.getByRole('button', { name: 'Try a sample goal' }).click();
+  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Plan with Gemini' }).click();
+  await page.waitForURL(/\/review$/, { timeout: 60_000 });
+  await page.getByRole('button', { name: 'Approve plan' }).click();
+  await page.waitForURL(/\/goals\/[^/]+$/);
+
+  // The deadline exactly as stored (UTC ISO), read straight from the app's database.
+  const deadline = await page.evaluate(
+    () =>
+      new Promise<string>((resolve, reject) => {
+        const req = indexedDB.open('lockstep');
+        req.onerror = () => reject(req.error);
+        req.onsuccess = () => {
+          const all = req.result.transaction('goals').objectStore('goals').getAll();
+          all.onsuccess = () => resolve((all.result[0] as { deadline_utc: string }).deadline_utc);
+        };
+      }),
+  );
+  const label = page
+    .locator('p[aria-live="polite"]', { hasText: /days, \d+ hours and \d+ minutes left/ })
+    .first();
+  await expect(label).toBeAttached();
+  const text = (await label.textContent())!;
+  const [, d, h, m] = /(\d+) days, (\d+) hours and (\d+) minutes left/.exec(text)!.map(Number) as [
+    number,
+    number,
+    number,
+    number,
+  ];
+  // Independent maths: whole minutes between "now" and the deadline.
+  const shown = (d * 24 + h) * 60 + m;
+  const expected = Math.floor((Date.parse(deadline) - Date.now()) / 60_000);
+  // The label refreshes once a minute, so allow a 2-minute window.
+  expect(
+    Math.abs(shown - expected),
+    `shown ${shown} min vs expected ${expected} min (${text})`,
+  ).toBeLessThanOrEqual(2);
+});

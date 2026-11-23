@@ -133,7 +133,7 @@ export function StatPill({
         {icon}
       </span>
       <span className="text-muted">{label}</span>
-      <span className="font-mono tabular text-text">{value}</span>
+      <span className="tabular font-medium text-text">{value}</span>
     </div>
   );
 }
@@ -183,7 +183,7 @@ export function GoalHero({ data, m, compact }: { data: GoalData; m: GoalMetrics;
         <StatPill
           icon={<Gauge className="size-4" strokeWidth={1.5} />}
           label={paceLabel(m.pace)}
-          value={`${Math.round(c.timePct * 100)}% time`}
+          value={`${Math.round(c.timePct * 100)}% of time used`}
           tone={m.pace === 'behind' ? 'warn' : m.pace === 'ahead' ? 'good' : undefined}
         />
         <StatPill

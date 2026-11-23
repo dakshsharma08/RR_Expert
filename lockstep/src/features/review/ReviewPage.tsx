@@ -284,14 +284,10 @@ export default function ReviewPage() {
               </span>
             ) : (
               <>
-                <span className="font-mono tabular text-text">{meta?.totalEstimatedHours ?? 0} h</span>{' '}
-                planned
-                {meta?.capacity && (
-                  <>
-                    {' '}
-                    of <span className="font-mono tabular">{meta.capacity.capacityHours} h</span> available
-                  </>
-                )}
+                <span className="tabular whitespace-nowrap">
+                  <span className="font-medium text-text">{meta?.totalEstimatedHours ?? 0}</span>
+                  {meta?.capacity && <> of {meta.capacity.capacityHours}</>} h planned
+                </span>
               </>
             )}
           </p>

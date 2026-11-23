@@ -13,6 +13,14 @@ async function audit(page: Page, name: string) {
   const w = page.viewportSize()?.width ?? 0;
   await page.waitForTimeout(500);
   await page.screenshot({ path: `${OUT}/${w}-${name}.png`, fullPage: false });
+  // Responsiveness: nothing may force sideways scrolling at this width.
+  const overflow = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+  }));
+  expect(overflow.scrollWidth, `${name} @${w}px scrolls horizontally`).toBeLessThanOrEqual(
+    overflow.innerWidth,
+  );
   const res = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
     .analyze();

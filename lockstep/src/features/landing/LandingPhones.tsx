@@ -72,6 +72,7 @@ export function LandingPhones() {
               data={EXAMPLE}
               width={w}
               showUi
+              widgets={false}
               label={`Example lock screen, ${t} template`}
             />
           </motion.div>

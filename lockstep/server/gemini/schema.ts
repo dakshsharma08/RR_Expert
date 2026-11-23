@@ -61,10 +61,10 @@ export function buildPlanJsonSchema(allowedDates: readonly string[]): Record<str
       feasibilityReason: { type: 'string', description: 'One or two sentences with the real numbers.' },
       totalEstimatedHours: { type: 'number', minimum: 0, description: 'Sum of milestone estimatedHours.' },
       fullScopeHours: {
-        type: ['number', 'null'],
+        type: 'number',
         minimum: 0,
         description:
-          'Hours the COMPLETE goal would need when that exceeds the capacity (so this plan keeps only the essentials). null when the full goal fits.',
+          'Hours the COMPLETE goal would need when that exceeds the capacity (so this plan keeps only the essentials). Use 0 when the full goal fits.',
       },
       milestones: {
         type: 'array',

@@ -33,7 +33,13 @@ export function App() {
       <MotionConfig reducedMotion="user" transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
         <TooltipProvider>
           <RouterProvider router={router} />
-          <Toaster position="top-center" closeButton toastOptions={{ duration: 4500 }} />
+          <Toaster
+            position="top-center"
+            visibleToasts={1}
+            offset={16}
+            mobileOffset={{ top: 64, left: 12, right: 12 }}
+            toastOptions={{ duration: 4500 }}
+          />
           <PwaUpdater />
           <Suspense fallback={null}>
             <ReminderScheduler />

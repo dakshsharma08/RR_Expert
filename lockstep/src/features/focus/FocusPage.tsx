@@ -98,11 +98,11 @@ export default function FocusPage() {
         <div className="absolute left-1/2 top-1/2 size-[80vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-hairline" />
       </div>
       <header className="safe-top relative z-10 flex items-center justify-between p-4">
-        <p className="eyebrow">Focus · {stateLabel(m.countdown)}</p>
+        <p className="eyebrow whitespace-nowrap">Focus · {stateLabel(m.countdown)}</p>
         <div className="flex items-center gap-1">
           {wakeSupported && (
             <label className="mr-2 flex min-h-11 items-center gap-2 text-xs text-muted">
-              Keep screen on
+              <span className="hidden sm:inline">Keep screen on</span>
               <Switch checked={wake} onChange={setWake} label="Keep screen on" />
             </label>
           )}

@@ -295,7 +295,7 @@ export default function StudioPage() {
     return (
       <div className="flex min-h-dvh flex-col">
         {header}
-        <div className="grid flex-1 grid-cols-[240px_1fr_360px] gap-6 px-6 pb-6">
+        <div className="grid flex-1 grid-cols-[240px_1fr_400px] gap-6 px-6 pb-6">
           <aside
             aria-label="Templates"
             className="max-h-[calc(100dvh-120px)] overflow-y-auto pr-1 scrollbar-none"

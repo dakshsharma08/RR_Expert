@@ -105,7 +105,7 @@ export function ExportDialog({
       wide
     >
       <div className="grid gap-6 md:grid-cols-[minmax(0,240px)_1fr]">
-        <div className="mx-auto w-full max-w-[240px]">
+        <div className="mx-auto w-full max-w-[150px] md:max-w-[240px]">
           <div
             className="relative overflow-hidden rounded-[28px] border border-line-strong bg-surface-2"
             style={{ aspectRatio: `${device.width} / ${device.height}` }}
@@ -135,7 +135,9 @@ export function ExportDialog({
               checked from the PNG header · {(result.blob.size / 1024 / 1024).toFixed(2)} MB
             </p>
           )}
-          <p className="break-all font-mono text-xs text-muted">{filename}</p>
+          <p className="truncate font-mono text-xs text-muted" title={filename}>
+            {filename}
+          </p>
           {result && <ReadabilityNotes warnings={result.report.warnings} />}
           <div className="flex flex-wrap gap-2">
             {canShareFiles && (

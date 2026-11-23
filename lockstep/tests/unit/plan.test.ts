@@ -159,6 +159,11 @@ describe('trimmed scope', () => {
     expect(r.scopeHours).toBe(60);
     expect(r.checks.find((c) => c.id === 'capacity')!.ok).toBe(true); // the plan itself fits
   });
+  it('treats fullScopeHours = 0 (what Gemini is told to send when nothing was cut) as "fits"', () => {
+    const r = validatePlan(plan({ fullScopeHours: 0 }), ctx);
+    expect(r.code.feasibility).toBe('Achievable');
+    expect(r.scopeHours).toBe(12);
+  });
   it('ignores a full-scope estimate that is not larger than the plan', () => {
     const r = validatePlan(plan({ fullScopeHours: null }), ctx);
     expect(r.code.feasibility).toBe('Achievable');
