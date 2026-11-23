@@ -16,7 +16,7 @@ import { getHealth } from '@/lib/api';
 import { createGoalDraft, startManualPlan, setActiveGoal } from '@/db/repo';
 import { usePlanner } from '@/stores/planner';
 import type { StoredIntake } from '@/db/db';
-import { LEVELS, LIMITS, PACES, computeCapacity, IntakeSchema, type IntakeInput } from '@shared/plan';
+import { LEVELS, LIMITS, PACES, MAX_HORIZON_DAYS, allowedMilestoneDates, computeCapacity, IntakeSchema, type IntakeInput } from '@shared/plan';
 import { addDays, dayKey, deviceTimeZone, formatInZone, isValidTimeZone, listTimeZones, localToUtcIso, zoneLabel, computeCountdown } from '@shared/time';
 import { SAMPLE_GOALS } from './samples';
 import { useUi } from '@/stores/ui';
@@ -24,6 +24,8 @@ import { AttachmentPicker } from './AttachmentPicker';
 import { VoiceButton } from './VoiceButton';
 
 const DRAFT_KEY = 'lockstep-wizard-draft';
+/** Marker for a deadline beyond the planning horizon (skips the day-by-day maths). */
+const TOO_FAR = { tooFar: true, past: false, plannableDays: 0 } as const;
 const STEPS = ['Goal', 'Deadline', 'Your time', 'Details'] as const;
 
 function preferredZone(): string {
@@ -85,6 +87,8 @@ export default function WizardPage() {
   // Live deadline preview + capacity, recomputed in code as the user types.
   const preview = useMemo(() => {
     if (!isValidTimeZone(draft.timezone)) return null;
+    // Don't walk millions of days for a typo like year 9999: validation reports it instead.
+    if (draft.deadlineDate > addDays(dayKey(Date.now(), draft.timezone), MAX_HORIZON_DAYS + 1)) return TOO_FAR;
     try {
       const conv = localToUtcIso(draft.deadlineDate, draft.deadlineTime, draft.timezone);
       const now = Date.now();
@@ -96,7 +100,14 @@ export default function WizardPage() {
         hoursPerDay: draft.hoursPerDay,
         workingDays: draft.workingDays,
       });
-      return { conv, c, cap, past: conv.utc.getTime() <= now };
+      return {
+        conv,
+        c,
+        cap,
+        past: conv.utc.getTime() <= now,
+        tooFar: draft.deadlineDate > addDays(dayKey(now, draft.timezone), MAX_HORIZON_DAYS) as boolean,
+        plannableDays: allowedMilestoneDates(cap).length,
+      };
     } catch {
       return null;
     }
@@ -113,9 +124,12 @@ export default function WizardPage() {
       if (!isValidTimeZone(draft.timezone)) e.timezone = 'Pick a time zone from the list.';
       else if (!preview) e.deadlineDate = 'Enter a real date and time.';
       else if (preview.past) e.deadlineDate = 'The deadline has to be in the future.';
+      else if (preview.tooFar || !('cap' in preview)) e.deadlineDate = 'Pick a deadline within the next 3 years.';
     }
     if (s === 2) {
       if (draft.workingDays.length === 0) e.workingDays = 'Pick at least one working day.';
+      else if (preview && !preview.past && preview.plannableDays === 0)
+        e.workingDays = 'None of these working days fall between today and the deadline. Add a day or move the deadline.';
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -279,7 +293,7 @@ export default function WizardPage() {
                     </div>
                   )}
                 </Field>
-                {preview && !preview.past && (
+                {preview && 'cap' in preview && !preview.past && (
                   <div className="card flex items-start gap-3 p-4" aria-live="polite">
                     <CalendarClock className="mt-0.5 size-5 shrink-0 text-accent-text" strokeWidth={1.5} aria-hidden />
                     <div className="text-sm">
@@ -324,7 +338,7 @@ export default function WizardPage() {
                     options={PACES.map((p) => ({ value: p, label: p, hint: p === 'Steady' ? 'even + buffer' : p === 'Balanced' ? 'default' : 'front-loaded' }))}
                   />
                 </div>
-                {preview && !preview.past && (
+                {preview && 'cap' in preview && !preview.past && (
                   <p className="text-sm text-muted" aria-live="polite">
                     That's <span className="font-mono tabular text-text">{preview.cap.workingDayCount}</span> working days ×{' '}
                     <span className="font-mono tabular text-text">{draft.hoursPerDay}</span> h ≈{' '}
@@ -347,7 +361,7 @@ export default function WizardPage() {
                 <div className="card space-y-2 p-4 text-sm">
                   <p className="eyebrow">Summary</p>
                   <p className="text-text">{draft.goal || '—'}</p>
-                  {preview && (
+                  {preview && 'cap' in preview && (
                     <p className="text-muted">
                       Due {formatInZone(preview.conv.utc, draft.timezone)} · {draft.level} · {draft.hoursPerDay} h/day · {draft.pace} · {preview.cap.capacityHours} h available
                     </p>

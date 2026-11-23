@@ -14,7 +14,7 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { Router, type Request } from 'express';
+import { Router, type Request, type RequestHandler } from 'express';
 import { z } from 'zod';
 import type { LivingWallpaperCreateResponse, WallpaperSnapshot } from '../../shared/api';
 import type { WallpaperData, WallpaperDesign } from '../../shared/wallpaper/types';
@@ -52,14 +52,19 @@ export function memoryStore(): WallpaperStore {
 
 /** Local/Cloud Run: a JSON file survives restarts (not for serverless, whose disk is ephemeral). */
 export function fileStore(path: string): WallpaperStore {
+  // Parsed once and kept in memory (this process is the only writer).
+  let cache: Record<string, StoredWallpaper> | null = null;
   const load = (): Record<string, StoredWallpaper> => {
+    if (cache) return cache;
     try {
-      return existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as Record<string, StoredWallpaper>) : {};
+      cache = existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as Record<string, StoredWallpaper>) : {};
     } catch {
-      return {};
+      cache = {};
     }
+    return cache;
   };
   const save = (data: Record<string, StoredWallpaper>) => {
+    cache = data;
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, JSON.stringify(data));
   };
@@ -132,11 +137,34 @@ const SnapshotSchema = z.object({
 
 const BodySchema = z.object({ design: z.record(z.string(), z.unknown()), snapshot: SnapshotSchema });
 
-/** Only theme/gradient backgrounds: photos stay on the user's device. */
-function safeDesign(raw: unknown): WallpaperDesign {
+const HEX = /^#[0-9a-fA-F]{6}$/;
+const hexOr = (v: unknown, fallback?: string) => (typeof v === 'string' && HEX.test(v) ? v : fallback);
+/** Links render on our server, so cap custom sizes to real-phone dimensions. */
+export const LINK_MAX = { width: 1600, height: 3600 };
+
+/**
+ * Only what a wallpaper needs: theme/gradient backgrounds (photos stay on the user's
+ * device), hex colours only, phone-sized custom dimensions. Everything else is dropped.
+ */
+export function safeDesign(raw: unknown): WallpaperDesign {
   const d = normalizeDesign(raw as WallpaperDesign);
-  return d.background.kind === 'image' ? { ...d, background: { ...d.background, kind: 'theme', image: undefined } } : d;
+  const colors = { accent: hexOr(d.colors.accent), text: hexOr(d.colors.text) };
+  const gradient = d.background.gradient
+    ? { from: hexOr(d.background.gradient.from, '#171717')!, to: hexOr(d.background.gradient.to, '#090909')!, angle: d.background.gradient.angle }
+    : undefined;
+  const kind = d.background.kind === 'image' ? 'theme' : d.background.kind;
+  const custom = d.custom ? { width: Math.min(LINK_MAX.width, d.custom.width), height: Math.min(LINK_MAX.height, d.custom.height) } : undefined;
+  return {
+    ...d,
+    ...(custom ? { custom } : {}),
+    colors: Object.fromEntries(Object.entries(colors).filter(([, v]) => v)) as WallpaperDesign['colors'],
+    background: { kind, grain: d.background.grain, ...(gradient ? { gradient } : {}) },
+    text: { ...d.text, custom: String(d.text.custom ?? '').slice(0, 120) },
+  };
 }
+
+/** Requests over this size are refused before parsing (a design + snapshot is ~3 KB). */
+export const MAX_BODY_BYTES = 64 * 1024;
 
 // ───────────────────────── Today's data from a snapshot ─────────────────────────
 
@@ -172,6 +200,24 @@ export interface WallpaperRouterDeps {
   store: WallpaperStore;
   now: () => Date;
   publicUrl: string | null;
+  writeLimit?: RequestHandler;
+  readLimit?: RequestHandler;
+}
+
+const pass: RequestHandler = (_req, _res, next) => next();
+
+/** Refuse oversized bodies (express.json allows 15 MB for plan attachments). */
+const sizeCap: RequestHandler = (req, _res, next) => {
+  const len = Number(req.headers['content-length'] ?? 0);
+  if (len > MAX_BODY_BYTES) return next(new AppError('INVALID_INPUT', 'That wallpaper is too large.', { status: 413 }));
+  next();
+};
+
+/** Today's PNG per link, so repeated fetches don't re-render (small LRU). */
+const pngCache = new Map<string, Buffer>();
+function cachePng(key: string, png: Buffer) {
+  if (pngCache.size >= 32) pngCache.delete(pngCache.keys().next().value!);
+  pngCache.set(key, png);
 }
 
 function baseUrl(req: Request, publicUrl: string | null): string {
@@ -182,8 +228,10 @@ function baseUrl(req: Request, publicUrl: string | null): string {
 
 export function createWallpaperRouter(deps: WallpaperRouterDeps): Router {
   const r = Router();
+  const writeLimit = deps.writeLimit ?? pass;
+  const readLimit = deps.readLimit ?? pass;
 
-  r.post('/wallpaper', async (req, res, next) => {
+  r.post('/wallpaper', writeLimit, sizeCap, async (req, res, next) => {
     try {
       const parsed = BodySchema.safeParse(req.body);
       if (!parsed.success) throw new AppError('INVALID_INPUT', undefined, { details: parsed.error.issues.slice(0, 6).map((i) => `${i.path.join('.')}: ${i.message}`) });
@@ -204,7 +252,7 @@ export function createWallpaperRouter(deps: WallpaperRouterDeps): Router {
     }
   });
 
-  r.put('/wallpaper/:token', async (req, res, next) => {
+  r.put('/wallpaper/:token', writeLimit, sizeCap, async (req, res, next) => {
     try {
       const token = String(req.params.token);
       const rec = TOKEN_RE.test(token) ? await deps.store.get(keyFor(token)) : null;
@@ -220,7 +268,7 @@ export function createWallpaperRouter(deps: WallpaperRouterDeps): Router {
     }
   });
 
-  r.delete('/wallpaper/:token', async (req, res, next) => {
+  r.delete('/wallpaper/:token', writeLimit, async (req, res, next) => {
     try {
       const token = String(req.params.token);
       const rec = TOKEN_RE.test(token) ? await deps.store.get(keyFor(token)) : null;
@@ -233,12 +281,19 @@ export function createWallpaperRouter(deps: WallpaperRouterDeps): Router {
     }
   });
 
-  r.get('/wallpaper/:file', async (req, res, next) => {
+  r.get('/wallpaper/:file', readLimit, async (req, res, next) => {
     try {
       const m = /^([A-Za-z0-9_-]{32,64})\.png$/.exec(String(req.params.file));
-      const rec = m ? await deps.store.get(keyFor(m[1]!)) : null;
-      if (!rec) throw new AppError('NOT_FOUND', 'This wallpaper link was revoked or never existed.');
-      const { png } = await renderWallpaperPng(rec.design, wallpaperDataFromSnapshot(rec.snapshot, deps.now()));
+      const key = m ? keyFor(m[1]!) : null;
+      const rec = key ? await deps.store.get(key) : null;
+      if (!rec || !key) throw new AppError('NOT_FOUND', 'This wallpaper link was revoked or never existed.');
+      const now = deps.now();
+      const cacheKey = `${key}:${dayKey(now, rec.snapshot.timezone)}:${rec.updatedAt}`;
+      let png = pngCache.get(cacheKey);
+      if (!png) {
+        png = (await renderWallpaperPng(safeDesign(rec.design), wallpaperDataFromSnapshot(rec.snapshot, now))).png;
+        cachePng(cacheKey, png);
+      }
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('Content-Length', String(png.length));
       res.setHeader('Content-Disposition', 'inline; filename="lockstep-today.png"');

@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState, Skeleton } from '@/components/ui/misc';
 import { cn } from '@/lib/cn';
 import { defaultDesign, normalizeDesign } from '@shared/wallpaper/templates';
+import { getDevice } from '@shared/wallpaper/devices';
 import type { RenderReport, WallpaperDesign } from '@shared/wallpaper/types';
 import { buildWallpaperData } from './wallpaperData';
 import { PhonePreview } from './PhonePreview';
@@ -45,26 +46,41 @@ function defaultDeviceFor(): WallpaperDesign['device'] {
 }
 
 function useStudioDesign(goalId: string | undefined) {
-  const [design, setDesign] = useState<WallpaperDesign | null>(null);
-  const key = goalId ? `studio:${goalId}` : null;
+  // The design is stored WITH the goal it belongs to, so a save can never land on another goal.
+  const [state, setState] = useState<{ goalId: string; design: WallpaperDesign } | null>(null);
+  const pending = useRef<{ goalId: string; design: WallpaperDesign } | null>(null);
   useEffect(() => {
-    if (!key) return;
+    if (!goalId) return;
     let cancelled = false;
-    void getKv<WallpaperDesign>(key).then((saved) => {
+    // Switching goals: flush the previous goal's unsaved edits first.
+    if (pending.current && pending.current.goalId !== goalId) {
+      void setKv(`studio:${pending.current.goalId}`, pending.current.design);
+      pending.current = null;
+    }
+    setState(null);
+    void getKv<WallpaperDesign>(`studio:${goalId}`).then((saved) => {
       if (cancelled) return;
-      setDesign(saved ? normalizeDesign(saved) : defaultDesign('monolith', undefined, defaultDeviceFor()));
+      setState({ goalId, design: saved ? normalizeDesign(saved) : defaultDesign('monolith', undefined, defaultDeviceFor()) });
     });
     return () => {
       cancelled = true;
     };
-  }, [key]);
+  }, [goalId]);
   // Autosave (debounced) so a design survives reloads.
   useEffect(() => {
-    if (!key || !design) return;
-    const t = setTimeout(() => void setKv(key, design), 400);
+    if (!state) return;
+    pending.current = state;
+    const t = setTimeout(() => {
+      void setKv(`studio:${state.goalId}`, state.design);
+      pending.current = null;
+    }, 400);
     return () => clearTimeout(t);
-  }, [key, design]);
-  const update: Update = useCallback((fn) => setDesign((d) => (d ? normalizeDesign(fn(d)) : d)), []);
+  }, [state]);
+  // Save immediately if the Studio is left with unsaved edits.
+  useEffect(() => () => void (pending.current && setKv(`studio:${pending.current.goalId}`, pending.current.design)), []);
+  const design = state && state.goalId === goalId ? state.design : null;
+  const setDesign = useCallback((d: WallpaperDesign) => setState((s) => (s ? { ...s, design: d } : s)), []);
+  const update: Update = useCallback((fn) => setState((s) => (s ? { ...s, design: normalizeDesign(fn(s.design)) } : s)), []);
   return { design, setDesign, update };
 }
 
@@ -110,7 +126,8 @@ export default function StudioPage() {
     if (!el || !design) return;
     const ro = new ResizeObserver(() => {
       const r = el.getBoundingClientRect();
-      const aspect = design.device === 'iphone-se' ? 1334 / 750 : 2.17;
+      const dev = getDevice(design.device, design.custom);
+      const aspect = dev.height / dev.width;
       const byH = (r.height - 24) / aspect;
       const w = Math.max(180, Math.min(desktop ? 400 : 340, r.width - 24, byH));
       setPreviewW(Math.floor(w));
@@ -119,7 +136,7 @@ export default function StudioPage() {
     return () => ro.disconnect();
     // Re-measure when the preview mounts, the device (aspect) changes, or the layout switches.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasPreview, design?.device, desktop]);
+  }, [hasPreview, design?.device, design?.custom?.width, design?.custom?.height, desktop]);
 
   const refresh = useCallback(async () => {
     setRefreshAt(Date.now());

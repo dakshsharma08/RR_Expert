@@ -14,6 +14,8 @@ import { GoalHero, MotivationCard, TaskCheck, TodayFocus, useLiveMetrics, useMot
 import { minutesLabel, shortDate } from '@/lib/metrics';
 import { cn } from '@/lib/cn';
 import { CoachCard } from '@/features/coach/CoachCard';
+import { revokeLivingWallpaper } from '@/features/studio/living';
+import { db } from '@/db/db';
 import { AchievementsCard } from './Achievements';
 
 export default function GoalPage() {
@@ -47,6 +49,10 @@ export default function GoalPage() {
   }
 
   async function onDelete() {
+    // Public wallpaper links must stop working too. Only this device holds their secrets.
+    const live = (await db.wallpapers.where('goal_id').equals(goal.id).toArray()).filter((w) => w.share_token && !w.revoked_at);
+    const failed = (await Promise.allSettled(live.map((w) => revokeLivingWallpaper(w)))).filter((r) => r.status === 'rejected').length;
+    if (failed) toast.error("Some wallpaper links couldn't be revoked (offline?)", { description: 'Revoke them later in Settings → Living Wallpaper links.' });
     const snap = await deleteGoal(goal.id);
     navigate('/goals');
     toast('Goal deleted', { description: goal.title, action: { label: 'Undo', onClick: () => void restoreSnapshot(snap) } });
@@ -158,7 +164,7 @@ export default function GoalPage() {
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
         title="Delete this goal?"
-        description={`"${goal.title}" and its milestones, tasks, progress and wallpapers will be deleted from this device. You can undo for a few seconds.`}
+        description={`"${goal.title}" and its milestones, tasks, progress and wallpapers will be deleted from this device, and any Living Wallpaper links for it will stop working. You can undo the deletion for a few seconds.`}
         confirmLabel="Delete goal"
         onConfirm={() => void onDelete()}
       />

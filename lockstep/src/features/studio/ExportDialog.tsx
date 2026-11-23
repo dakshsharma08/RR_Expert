@@ -58,11 +58,13 @@ export function ExportDialog({
     }
   }, [design, data]);
 
+  // Render on open, and again whenever the wallpaper's DATA or DESIGN really changes
+  // (e.g. "Refresh with today's progress"). Then Download/Share always get the image you see.
+  const dataKey = JSON.stringify(data) + JSON.stringify(design);
   useEffect(() => {
     if (open) void render();
-    // only on open
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, dataKey]);
 
   useEffect(() => () => void (url && URL.revokeObjectURL(url)), [url]);
 

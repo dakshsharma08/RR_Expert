@@ -6,8 +6,8 @@ import { Dialog } from '@/components/ui/dialog';
 import { Button, IconButton } from '@/components/ui/button';
 import { Field, Input, Textarea } from '@/components/ui/form';
 import { Segmented } from '@/components/ui/controls';
-import { db, type MilestoneRow, type TaskRow } from '@/db/db';
-import { addMilestone, addTask, deleteTask, updateMilestone, updateTask } from '@/db/repo';
+import type { MilestoneRow, TaskRow } from '@/db/db';
+import { addMilestone, addTask, deleteTask, restoreTask, updateMilestone, updateTask } from '@/db/repo';
 import { DIFFICULTY, type Difficulty } from '@shared/plan';
 import { isDayKey } from '@shared/time';
 
@@ -146,7 +146,7 @@ function TaskEditRow({ task }: { task: TaskRow }) {
         label={`Delete task ${task.title}`}
         onClick={async () => {
           const t = await deleteTask(task.id);
-          if (t) toast('Task deleted', { action: { label: 'Undo', onClick: () => void db.tasks.put(t) } });
+          if (t) toast('Task deleted', { action: { label: 'Undo', onClick: () => void restoreTask(t) } });
         }}
       >
         <Trash2 className="size-4" strokeWidth={1.5} />

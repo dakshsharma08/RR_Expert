@@ -81,15 +81,20 @@ export function goalMetrics(
     const list = (tasksByMilestone.get(m.id) ?? []).sort((a, b) => a.order - b.order);
     if (m.status === 'completed') {
       // Keep today's ticks visible (satisfying, and lets you undo), skip the rest.
-      for (const t of list) if (t.done_at && dayKey(t.done_at, goal.timezone) === today) todayFocus.push(t);
+      for (const t of list)
+        if (t.done_at && dayKey(t.done_at, goal.timezone) === today) {
+          todayFocus.push(t);
+          used += t.estimated_minutes;
+        }
       continue;
     }
     for (const t of list) {
       const doneToday = t.done_at && dayKey(t.done_at, goal.timezone) === today;
       if (t.done_at && !doneToday) continue;
-      if (!t.done_at && used >= budget && todayFocus.some((x) => !x.done_at)) break;
+      if (!t.done_at && used >= budget) break;
       todayFocus.push(t);
-      if (!t.done_at) used += t.estimated_minutes;
+      // Work done today counts toward today's budget, so the list can actually be finished.
+      used += t.estimated_minutes;
     }
     if (used >= budget) break;
   }

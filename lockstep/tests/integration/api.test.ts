@@ -679,8 +679,9 @@ describe('POST /api/plan (SSE)', () => {
 
 describe('rate limiting', () => {
   it('answers 429 RATE_LIMITED with Retry-After once the window is used up, per IP', async () => {
-    const base = await start({ tuning: { rateLimit: { windowMax: 2 } } });
-    const ip = { headers: { 'X-Forwarded-For': '203.0.113.7, 10.0.0.1' } };
+    // Behind ONE trusted proxy, the client is the entry that proxy appended (the last one).
+    const base = await start({ env: { GEMINI_API_KEY: TEST_KEY, GEMINI_MODEL: MODEL, TRUST_PROXY: '1' }, tuning: { rateLimit: { windowMax: 2 } } });
+    const ip = { headers: { 'X-Forwarded-For': '10.9.9.9, 203.0.113.7' } };
     expect((await post(base, '/api/plan', { goal: 'x' }, ip)).status).toBe(400);
     expect((await post(base, '/api/plan', { goal: 'x' }, ip)).status).toBe(400);
     const limited = await post(base, '/api/plan', { goal: 'x' }, ip);
@@ -692,6 +693,22 @@ describe('rate limiting', () => {
     // Another IP is unaffected.
     const other = await post(base, '/api/plan', { goal: 'x' }, { headers: { 'X-Forwarded-For': '198.51.100.1' } });
     expect(other.status).toBe(400);
+  });
+
+  it('cannot be bypassed with a forged X-Forwarded-For when no proxy is trusted', async () => {
+    const base = await start({ tuning: { rateLimit: { windowMax: 2 } } });
+    const spoof = (n: number) => ({ headers: { 'X-Forwarded-For': `198.51.100.${n}` } });
+    expect((await post(base, '/api/plan', { goal: 'x' }, spoof(1))).status).toBe(400);
+    expect((await post(base, '/api/plan', { goal: 'x' }, spoof(2))).status).toBe(400);
+    expect((await post(base, '/api/plan', { goal: 'x' }, spoof(3))).status).toBe(429);
+  });
+
+  it('on Vercel uses the platform-set x-real-ip', async () => {
+    const base = await start({ env: { GEMINI_API_KEY: TEST_KEY, GEMINI_MODEL: MODEL, VERCEL: '1' }, tuning: { rateLimit: { windowMax: 1 } } });
+    const as = (ip: string) => ({ headers: { 'X-Real-IP': ip } });
+    expect((await post(base, '/api/plan', { goal: 'x' }, as('203.0.113.1'))).status).toBe(400);
+    expect((await post(base, '/api/plan', { goal: 'x' }, as('203.0.113.1'))).status).toBe(429);
+    expect((await post(base, '/api/plan', { goal: 'x' }, as('203.0.113.2'))).status).toBe(400);
   });
 
   it('uses Upstash (INCR + EXPIRE NX + TTL pipeline) when configured', async () => {

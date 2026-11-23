@@ -31,6 +31,9 @@ export type PaceStyle = (typeof PACES)[number];
 export type Feasibility = (typeof FEASIBILITY)[number];
 export type Difficulty = (typeof DIFFICULTY)[number];
 
+/** Plans reach at most ~3 years ahead (keeps day-by-day maths cheap and plans meaningful). */
+export const MAX_HORIZON_DAYS = 3 * 366;
+
 export const LIMITS = {
   goalChars: 300,
   constraintsChars: 1000,
@@ -46,7 +49,10 @@ const dayKeySchema = z.string().refine(isDayKey, 'Must be a real date in YYYY-MM
 /** What the user tells us in the wizard. */
 export const IntakeSchema = z.object({
   goal: z.string().trim().min(3, 'Describe your goal in a few words').max(LIMITS.goalChars),
-  deadlineDate: dayKeySchema,
+  deadlineDate: dayKeySchema.refine(
+    (d) => d <= new Date(Date.now() + (MAX_HORIZON_DAYS + 2) * 86_400_000).toISOString().slice(0, 10),
+    'Pick a deadline within the next 3 years',
+  ),
   deadlineTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Use HH:mm'),
   timezone: z.string().refine(isValidTimeZone, 'Unknown time zone'),
   level: z.enum(LEVELS),
@@ -172,7 +178,7 @@ export interface FeasibilityResult {
  *   ≤ 100 % → Tight
  *   > 100 % → Unrealistic
  */
-export function codeFeasibility(totalHours: number, cap: Capacity): FeasibilityResult {
+export function codeFeasibility(totalHours: number, cap: Capacity, subject = 'Plan'): FeasibilityResult {
   if (cap.workingDayCount === 0 || cap.capacityHours <= 0) {
     return {
       feasibility: 'Unrealistic',
@@ -182,7 +188,7 @@ export function codeFeasibility(totalHours: number, cap: Capacity): FeasibilityR
   }
   const ratio = totalHours / cap.capacityHours;
   const pct = Math.round(ratio * 100);
-  const base = `Plan needs ${fmtH(totalHours)} h; you have ${fmtH(cap.capacityHours)} h (${cap.workingDayCount} working day${cap.workingDayCount === 1 ? '' : 's'} × ${fmtH(cap.hoursPerDay)} h/day) — ${pct}% of your capacity.`;
+  const base = `${subject} needs ${fmtH(totalHours)} h; you have ${fmtH(cap.capacityHours)} h (${cap.workingDayCount} working day${cap.workingDayCount === 1 ? '' : 's'} × ${fmtH(cap.hoursPerDay)} h/day) — ${pct}% of your capacity.`;
   if (ratio <= 0.85) return { feasibility: 'Achievable', ratio, reason: `${base} That leaves room for bad days.` };
   if (ratio <= 1) return { feasibility: 'Tight', ratio, reason: `${base} Little slack — one missed day hurts.` };
   return { feasibility: 'Unrealistic', ratio, reason: `${base} It does not fit before the deadline.` };
@@ -370,9 +376,9 @@ export function validatePlan(raw: unknown, ctx: ValidationContext): ValidationRe
  * Code feasibility for a plan total, taking into account a FULL-goal estimate when
  * Gemini had to cut scope. Shared by server validation and client re-checks after edits.
  */
-export function feasibilityFor(planHours: number, fullScopeHours: number | null | undefined, cap: Capacity): FeasibilityResult {
+export function feasibilityFor(planHours: number, fullScopeHours: number | null | undefined, cap: Capacity, subject = 'Plan'): FeasibilityResult {
   const scope = fullScopeHours != null && fullScopeHours > planHours + 0.5 ? round1(fullScopeHours) : planHours;
-  return scope > planHours && scope > cap.capacityHours ? scopeFeasibility(scope, planHours, cap) : codeFeasibility(planHours, cap);
+  return scope > planHours && scope > cap.capacityHours ? scopeFeasibility(scope, planHours, cap) : codeFeasibility(planHours, cap, subject);
 }
 
 /** Feasibility when the plan was trimmed to fit: the full goal doesn't fit, by definition. */
@@ -422,7 +428,8 @@ export function suggestFixes(totalHours: number, ctx: ValidationContext): FixSug
   let hours = 0;
   let day = ctx.todayKey;
   const working = new Set(ctx.workingDays);
-  for (let i = 0; i < 730; i++) {
+  const limit = Math.max(0, diffDays(ctx.todayKey, cap.toKey)) + 3 * 366;
+  for (let i = 0; i < limit; i++) {
     if (working.has(weekdayOf(day))) hours += ctx.hoursPerDay;
     if (hours >= target && day > cap.toKey) {
       extendTo = day;

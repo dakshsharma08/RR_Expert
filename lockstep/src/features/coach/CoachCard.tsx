@@ -47,7 +47,11 @@ export function buildCoachContext(data: GoalData, m: GoalMetrics): CoachContext 
       pace: data.goal.pace_style,
     },
     todayKey: today,
-    milestones: data.milestones.map((ms) => {
+    // The API accepts up to 20 milestones: send every open one first, then the latest completed.
+    milestones: [...data.milestones.filter((x) => x.status !== 'completed'), ...data.milestones.filter((x) => x.status === 'completed').reverse()]
+      .slice(0, 20)
+      .sort((a, b) => a.order - b.order)
+      .map((ms) => {
       const t = data.tasks.filter((x) => x.milestone_id === ms.id);
       return {
         id: ms.id,

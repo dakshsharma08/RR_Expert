@@ -14,7 +14,8 @@ export function buildSnapshot(data: GoalData, m: GoalMetrics, motivation: string
   return {
     goalTitle: data.goal.title,
     deadlineUtc: data.goal.deadline_utc,
-    startUtc: data.goal.approved_at ?? data.goal.start_utc,
+    // Same start as the in-app countdown (creation time, which is never after approval).
+    startUtc: data.goal.start_utc,
     timezone: data.goal.timezone,
     completed: data.goal.status === 'completed',
     progressPct: m.progress,

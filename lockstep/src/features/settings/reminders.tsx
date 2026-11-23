@@ -25,7 +25,8 @@ export function ReminderScheduler() {
     if (!remindersEnabled) return;
     const check = async () => {
       const now = new Date();
-      const today = now.toISOString().slice(0, 10);
+      // Local calendar date (not UTC), matching the local reminder time.
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const [h, m] = reminderTime.split(':').map(Number);
       const due = now.getHours() > (h ?? 19) || (now.getHours() === h && now.getMinutes() >= (m ?? 0));
       if (!due) return;

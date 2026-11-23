@@ -24,7 +24,7 @@ import { createAiRouter } from './gemini/routes';
 import { createRunRecorder } from './lib/aiRuns';
 import { loadConfig, resolveTuning, type TuningOverrides } from './lib/config';
 import { AppError } from './lib/errors';
-import { createRateLimiter, rulesFrom } from './lib/rateLimit';
+import { createRateLimiter, rateLimitMiddleware, rulesFrom } from './lib/rateLimit';
 
 import { createAccountRouter } from './account';
 import { ImageModelResolver } from './gemini/background';
@@ -58,6 +58,10 @@ export function createApp(opts: CreateAppOptions = {}): Express {
 
   const app = express();
   app.disable('x-powered-by');
+  // Client IPs for rate limiting: trust Vercel's headers there; elsewhere only as many
+  // proxy hops as TRUST_PROXY says (0 = trust none; Cloud Run: 1). See lib/rateLimit.ts.
+  app.set('lockstep:vercel', !!env.VERCEL);
+  app.set('trust proxy', Math.max(0, Number(env.TRUST_PROXY ?? 0) || 0));
 
   app.use(
     helmet({
@@ -127,7 +131,25 @@ export function createApp(opts: CreateAppOptions = {}): Express {
   app.use('/api', createAccountRouter({ supabase: config.supabase }));
 
   // Living Wallpaper links (create / update / revoke / today's PNG).
-  app.use('/api', createWallpaperRouter({ store: wallpapers, now, publicUrl: env.PUBLIC_APP_URL?.trim() || null }));
+  // Separate, generous limits so wallpaper links can't be abused to burn CPU or storage.
+  const wallpaperWrites = createRateLimiter(config.upstash, [
+    { name: 'wp-window', windowSec: 10 * 60, max: 30 },
+    { name: 'wp-day', windowSec: 24 * 60 * 60, max: 200 },
+  ]);
+  const wallpaperReads = createRateLimiter(config.upstash, [
+    { name: 'wpget-window', windowSec: 10 * 60, max: 120 },
+    { name: 'wpget-day', windowSec: 24 * 60 * 60, max: 2000 },
+  ]);
+  app.use(
+    '/api',
+    createWallpaperRouter({
+      store: wallpapers,
+      now,
+      publicUrl: env.PUBLIC_APP_URL?.trim() || null,
+      writeLimit: rateLimitMiddleware(wallpaperWrites, 'wallpaper link changes'),
+      readLimit: rateLimitMiddleware(wallpaperReads, 'wallpaper downloads'),
+    }),
+  );
 
   // Unknown /api routes → JSON 404 (only /api; prod.ts adds the SPA after this).
   app.use('/api', (_req, _res, next) => next(new AppError('NOT_FOUND')));

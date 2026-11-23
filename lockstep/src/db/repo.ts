@@ -4,7 +4,7 @@
  */
 import { db, nowIso, uid, type GoalRow, type MilestoneRow, type PlanMeta, type ProgressLogRow, type StoredIntake, type TaskRow, type AiRunRow } from './db';
 import type { AiRunMeta, PlanResult, RescheduleChange } from '@shared/api';
-import { computeCapacity, feasibilityFor, round1, type Difficulty } from '@shared/plan';
+import { computeCapacity, feasibilityFor, round1, suggestFixes, type Difficulty } from '@shared/plan';
 import { dayKey, localToUtcIso } from '@shared/time';
 
 // ───────────────────────── Goals ─────────────────────────
@@ -130,7 +130,7 @@ export async function startManualPlan(goalId: string): Promise<void> {
   const goal = await db.goals.get(goalId);
   if (!goal) return;
   const existing = await db.milestones.where('goal_id').equals(goalId).toArray();
-  const meta = recomputeMeta(goal, existing, goal.plan_meta);
+  const meta = recomputeMeta(goal, existing, goal.plan_meta, await db.tasks.where('goal_id').equals(goalId).toArray());
   await db.goals.update(goalId, {
     plan_meta: { ...meta, source: goal.plan_meta?.source ?? 'manual' },
     status: goal.approved_at ? 'active' : 'review',
@@ -145,17 +145,39 @@ async function clearPlan(goalId: string) {
 }
 
 /** Recompute capacity + code feasibility after edits (dates/hours can change). */
-export function recomputeMeta(goal: GoalRow, milestones: Pick<MilestoneRow, 'estimated_hours'>[], prev: PlanMeta | null): PlanMeta {
+/**
+ * Recompute capacity + code feasibility after edits (dates/hours can change).
+ * Once a plan is under way we judge the REMAINING work against the capacity left from
+ * today (completed milestones and ticked task minutes don't count again).
+ */
+export function recomputeMeta(
+  goal: GoalRow,
+  milestones: Pick<MilestoneRow, 'id' | 'estimated_hours' | 'status'>[],
+  prev: PlanMeta | null,
+  tasks: Pick<TaskRow, 'milestone_id' | 'estimated_minutes' | 'done_at'>[] = [],
+): PlanMeta {
   const todayKey = dayKey(Date.now(), goal.timezone);
-  const capacity = computeCapacity({
+  const ctx = {
     todayKey,
     deadlineUtc: goal.deadline_utc,
     timezone: goal.timezone,
     hoursPerDay: goal.hours_per_day,
     workingDays: goal.working_days,
-  });
+  };
+  const capacity = computeCapacity(ctx);
   const total = round1(milestones.reduce((s, m) => s + m.estimated_hours, 0));
-  const code = feasibilityFor(total, prev?.fullScopeHours, capacity);
+  const remaining = round1(
+    milestones.reduce((s, m) => {
+      if (m.status === 'completed') return s;
+      const ts = tasks.filter((t) => t.milestone_id === m.id);
+      const all = ts.reduce((a, t) => a + t.estimated_minutes, 0);
+      const done = ts.filter((t) => t.done_at).reduce((a, t) => a + t.estimated_minutes, 0);
+      return s + m.estimated_hours * (all > 0 ? 1 - done / all : 1);
+    }, 0),
+  );
+  const started = remaining < total - 0.05;
+  const code = started ? feasibilityFor(remaining, null, capacity, 'Remaining work') : feasibilityFor(total, prev?.fullScopeHours, capacity);
+  const scope = started ? remaining : Math.max(total, prev?.fullScopeHours ?? 0);
   return {
     source: prev?.source ?? 'manual',
     modelFeasibility: prev?.modelFeasibility ?? null,
@@ -164,7 +186,8 @@ export function recomputeMeta(goal: GoalRow, milestones: Pick<MilestoneRow, 'est
     agrees: prev?.modelFeasibility ? prev.modelFeasibility === code.feasibility : true,
     checks: prev?.checks ?? [],
     capacity,
-    fixes: prev?.fixes ?? null,
+    // Fixes always reflect today's numbers, never stale ones from plan generation.
+    fixes: scope > 0 ? suggestFixes(scope, ctx) : null,
     risks: prev?.risks ?? [],
     recoveryStrategy: prev?.recoveryStrategy ?? '',
     dailyRitual: prev?.dailyRitual ?? '',
@@ -179,8 +202,8 @@ export function recomputeMeta(goal: GoalRow, milestones: Pick<MilestoneRow, 'est
 export async function refreshGoalMeta(goalId: string): Promise<void> {
   const goal = await db.goals.get(goalId);
   if (!goal) return;
-  const ms = await db.milestones.where('goal_id').equals(goalId).toArray();
-  await db.goals.update(goalId, { plan_meta: recomputeMeta(goal, ms, goal.plan_meta), updated_at: nowIso() });
+  const [ms, ts] = await Promise.all([db.milestones.where('goal_id').equals(goalId).toArray(), db.tasks.where('goal_id').equals(goalId).toArray()]);
+  await db.goals.update(goalId, { plan_meta: recomputeMeta(goal, ms, goal.plan_meta, ts), updated_at: nowIso() });
 }
 
 export async function approvePlan(goalId: string): Promise<void> {
@@ -225,7 +248,9 @@ export async function deleteGoal(goalId: string): Promise<Snapshot> {
     await db.tasks.where('goal_id').equals(goalId).delete();
     await db.milestones.where('goal_id').equals(goalId).delete();
     await db.progress_logs.where('goal_id').equals(goalId).delete();
-    await db.wallpapers.where('goal_id').equals(goalId).delete();
+    // Keep wallpaper rows whose link is still live (revoke failed): Settings can retry with their secret.
+    const wps = await db.wallpapers.where('goal_id').equals(goalId).toArray();
+    await db.wallpapers.bulkDelete(wps.filter((w) => !w.share_token || w.revoked_at || !w.share_secret).map((w) => w.id));
     await db.goals.delete(goalId);
   });
   const active = await getKv<string>('activeGoalId');
@@ -289,12 +314,13 @@ export async function addMilestone(goalId: string, data: { title: string; target
     source: 'user',
     edited: false,
     status: goal?.status === 'active' ? 'approved' : 'pending',
-    approved_at: goal?.status === 'active' ? now : null,
+    approved_at: goal?.status === 'active' || goal?.status === 'completed' ? now : null,
     completed_at: null,
     created_at: now,
     updated_at: now,
   });
   await refreshGoalMeta(goalId);
+  await syncGoalCompletion(goalId); // a new open milestone re-opens a completed goal
   return id;
 }
 
@@ -308,6 +334,7 @@ export async function deleteMilestone(id: string): Promise<{ milestone: Mileston
   });
   await normalizeOrder(m.goal_id);
   await refreshGoalMeta(m.goal_id);
+  await syncGoalCompletion(m.goal_id); // deleting the last open milestone completes the goal
   return { milestone: m, tasks };
 }
 
@@ -321,6 +348,7 @@ export async function restoreMilestone(data: { milestone: MilestoneRow; tasks: T
   });
   await normalizeOrder(data.milestone.goal_id);
   await refreshGoalMeta(data.milestone.goal_id);
+  await syncGoalCompletion(data.milestone.goal_id);
 }
 
 async function normalizeOrder(goalId: string) {
@@ -375,12 +403,43 @@ export async function updateTask(id: string, patch: Partial<Pick<TaskRow, 'title
   await db.tasks.update(id, { ...patch, edited: true, updated_at: nowIso() });
 }
 
-export async function deleteTask(id: string): Promise<TaskRow | null> {
+export interface DeletedTask {
+  task: TaskRow;
+  logs: ProgressLogRow[];
+}
+
+/** Delete a task (and the minutes it logged). Returns what Undo needs to put back. */
+export async function deleteTask(id: string): Promise<DeletedTask | null> {
   const t = await db.tasks.get(id);
   if (!t) return null;
-  await db.tasks.delete(id);
-  await db.progress_logs.where('task_id').equals(id).delete();
-  return t;
+  const logs = await db.progress_logs.where('task_id').equals(id).toArray();
+  await db.transaction('rw', [db.tasks, db.progress_logs], async () => {
+    await db.tasks.delete(id);
+    await db.progress_logs.where('task_id').equals(id).delete();
+  });
+  await syncMilestoneFromTasks(t.milestone_id);
+  return { task: t, logs };
+}
+
+export async function restoreTask(d: DeletedTask): Promise<void> {
+  await db.transaction('rw', [db.tasks, db.progress_logs], async () => {
+    await db.tasks.put(d.task);
+    if (d.logs.length) await db.progress_logs.bulkPut(d.logs);
+  });
+  await syncMilestoneFromTasks(d.task.milestone_id);
+}
+
+/** After tasks are added/removed: all remaining tasks done → milestone complete. */
+async function syncMilestoneFromTasks(milestoneId: string): Promise<void> {
+  const m = await db.milestones.get(milestoneId);
+  if (!m) return;
+  const ts = await db.tasks.where('milestone_id').equals(milestoneId).toArray();
+  const now = nowIso();
+  if (ts.length > 0 && ts.every((t) => t.done_at) && m.status !== 'completed') {
+    await db.milestones.update(m.id, { status: 'completed', completed_at: now, updated_at: now });
+  }
+  await syncGoalCompletion(m.goal_id);
+  await refreshGoalMeta(m.goal_id);
 }
 
 /**
@@ -416,7 +475,8 @@ export async function toggleTask(id: string, done: boolean): Promise<{ milestone
       if (allDone && m.status !== 'completed') {
         await db.milestones.update(m.id, { status: 'completed', completed_at: now, updated_at: now });
         milestoneCompleted = true;
-      } else if (!allDone && m.status === 'completed') {
+      } else if (!done && !allDone && m.status === 'completed') {
+        // Un-ticking a task re-opens its milestone. Ticking never re-opens one you completed by hand.
         await db.milestones.update(m.id, { status: m.approved_at ? 'approved' : 'pending', completed_at: null, updated_at: now });
       }
     }

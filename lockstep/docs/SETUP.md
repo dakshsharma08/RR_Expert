@@ -55,10 +55,10 @@ The repo is already set up for Vercel: `vercel.json` rewrites `/api/*` to the Ex
 
 ```bash
 gcloud run deploy lockstep --source . --region us-central1 --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=...,ALLOWED_ORIGINS=https://<service-url>,PUBLIC_APP_URL=https://<service-url>
+  --set-env-vars GEMINI_API_KEY=...,TRUST_PROXY=1,ALLOWED_ORIGINS=https://<service-url>,PUBLIC_APP_URL=https://<service-url>
 ```
 
-(Cloud Run builds with Google's Node buildpack: `npm run build`, then `npm start`.)
+(Cloud Run builds with Google's Node buildpack: `npm run build`, then `npm start`. `TRUST_PROXY=1` lets rate limiting see the real client IP behind Google's front end. Without it, all clients share one bucket, which is safe but strict.)
 
 ## 4. Durable rate limiting + Living Wallpaper storage (recommended for serverless)
 

@@ -143,25 +143,34 @@ export function createRateLimiter(
 }
 
 /**
- * The caller's IP: the FIRST x-forwarded-for entry (set by Vercel / Cloud Run),
- * otherwise the socket address. Note: on hosts that APPEND to a client-sent
- * x-forwarded-for, the first entry can be spoofed; Vercel overwrites it.
+ * The caller's IP, without trusting headers a client can forge.
+ * - On Vercel (app setting `lockstep:vercel`), the platform overwrites
+ *   x-forwarded-for and sets x-real-ip, so those are the real client.
+ * - Elsewhere we use `req.ip`, which honours Express' `trust proxy` setting
+ *   (TRUST_PROXY env = number of proxy hops, e.g. 1 on Cloud Run). With no trusted
+ *   proxy, it is the socket address, so a random X-Forwarded-For can't mint new buckets.
  */
 export function clientIp(req: Request): string {
-  const xff = req.headers['x-forwarded-for'];
-  const first = (Array.isArray(xff) ? xff[0] : xff)?.split(',')[0]?.trim();
-  return first || req.ip || req.socket.remoteAddress || 'unknown';
+  if (req.app?.get('lockstep:vercel')) {
+    const real = req.headers['x-real-ip'];
+    const realIp = (Array.isArray(real) ? real[0] : real)?.trim();
+    if (realIp) return realIp;
+    const xff = req.headers['x-forwarded-for'];
+    const first = (Array.isArray(xff) ? xff[0] : xff)?.split(',')[0]?.trim();
+    if (first) return first;
+  }
+  return req.ip || req.socket.remoteAddress || 'unknown';
 }
 
-export function rateLimitMiddleware(limiter: RateLimiter): RequestHandler {
+export function rateLimitMiddleware(limiter: RateLimiter, what = 'AI requests'): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
     const decision = await limiter.hit(clientIp(req));
     if (decision.ok) return next();
     const minutes = Math.ceil(decision.retryAfterSec / 60);
     const message =
-      decision.rule === 'day'
-        ? `You've reached today's limit for AI requests. Try again in about ${Math.ceil(minutes / 60)} hour(s).`
-        : `You've made a lot of AI requests in a short time. Try again in about ${minutes} minute(s).`;
+      decision.rule?.endsWith('day')
+        ? `You've reached today's limit for ${what}. Try again in about ${Math.ceil(minutes / 60)} hour(s).`
+        : `You've made a lot of ${what} in a short time. Try again in about ${minutes} minute(s).`;
     next(new AppError('RATE_LIMITED', message, { headers: { 'Retry-After': String(decision.retryAfterSec) } }));
   };
 }

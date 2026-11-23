@@ -76,6 +76,18 @@ describe('living wallpaper', () => {
     expect((await fetch(url)).status).toBe(404);
   });
 
+  it('strips everything but hex colours and caps link sizes', async () => {
+    const { safeDesign } = await import('../../server/wallpaper/living');
+    const d = safeDesign({ ...defaultDesign('monolith', undefined, 'custom'), custom: { width: 4096, height: 4096 }, colors: { accent: 'x'.repeat(1000), text: '#ffffff', junk: 'y' } } as never);
+    expect(d.colors).toEqual({ text: '#ffffff' });
+    expect(d.custom).toEqual({ width: 1600, height: 3600 });
+  });
+
+  it('refuses oversized bodies before parsing them', async () => {
+    const big = { design: { colors: { accent: 'x'.repeat(200_000) } }, snapshot };
+    expect((await json('POST', '/api/wallpaper', big)).status).toBe(413);
+  });
+
   it('rejects bad input and unknown tokens', async () => {
     expect((await json('POST', '/api/wallpaper', { design: {}, snapshot: { ...snapshot, timezone: 'Mars/Base' } })).status).toBe(400);
     expect((await fetch(`${base}/api/wallpaper/${'a'.repeat(32)}.png`)).status).toBe(404);
