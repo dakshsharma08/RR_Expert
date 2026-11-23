@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 /**
  * The Supabase client, created only when cloud sync is configured.
  *
@@ -8,25 +9,24 @@
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-// Read through a narrow type so this file also type-checks outside Vite (tests).
-const env = (import.meta as unknown as { env?: Record<string, string | undefined> }).env ?? {};
-const url = env.VITE_SUPABASE_URL?.trim() ?? '';
-const anonKey = env.VITE_SUPABASE_ANON_KEY?.trim() ?? '';
+// Written exactly as `import.meta.env.VITE_…` because Vite swaps in the values at build time.
+const url: string = (import.meta.env.VITE_SUPABASE_URL ?? '').trim();
+const anonKey: string = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? '').trim();
 
-/** True when the developer has set both env vars. The UI shows sync only then. */
+/** True only when the developer has set both env vars. The UI offers sync only then. */
 export const cloudConfigured = /^https?:\/\/\S+$/.test(url) && anonKey.length > 0;
 
 let client: SupabaseClient | null = null;
 
 /**
- * Lazy: the client (and its auth refresh timer) starts the first time sync is
- * actually used, not on every page load for guests. Returns null if not configured.
+ * Lazy: the client (and its token-refresh timer) starts the first time sync is
+ * used, not on every page load for guests. Returns null when not configured.
  */
 export function getSupabase(): SupabaseClient | null {
   if (!cloudConfigured) return null;
   client ??= createClient(url, anonKey, {
     auth: {
-      persistSession: true, // stay signed in across reloads (stored in localStorage)
+      persistSession: true, // stay signed in across reloads (kept in localStorage)
       autoRefreshToken: true,
       detectSessionInUrl: true, // finishes sign-in when the magic link brings you back
     },

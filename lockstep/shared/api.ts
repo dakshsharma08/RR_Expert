@@ -221,3 +221,14 @@ export interface LivingWallpaperCreateResponse {
   secret: string; // edit/revoke key, kept only on the device that created it
   url: string; // absolute URL of today's PNG
 }
+
+// ───────────── POST /api/background (only when HealthResponse.ai.imageModel is set) ─────────────
+export interface BackgroundRequestBody {
+  theme: 'champagne-gold' | 'ivory' | 'monochrome' | 'midnight-sapphire' | 'rose-gold' | 'emerald-noir';
+  mood: 'calm' | 'focused' | 'bold';
+}
+export interface BackgroundResponse {
+  image: string; // data: URL (PNG/JPEG), abstract and text-free
+  model: string;
+  run: AiRunMeta;
+}

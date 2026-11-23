@@ -4,6 +4,8 @@
  */
 import type {
   ApiError,
+  BackgroundRequestBody,
+  BackgroundResponse,
   CoachRequest,
   CoachResponse,
   HealthResponse,
@@ -65,6 +67,9 @@ export async function getHealth(): Promise<HealthResponse | null> {
 
 export const getMotivation = (req: MotivationRequest, signal?: AbortSignal) =>
   postJson<MotivationResponse>('/api/motivation', req, signal);
+
+export const generateBackground = (req: BackgroundRequestBody, signal?: AbortSignal) =>
+  postJson<BackgroundResponse>('/api/background', req, signal);
 
 export const askCoach = (req: CoachRequest, signal?: AbortSignal) => postJson<CoachResponse>('/api/coach', req, signal);
 

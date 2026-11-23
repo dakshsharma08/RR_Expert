@@ -26,6 +26,7 @@ import { loadConfig, resolveTuning, type TuningOverrides } from './lib/config';
 import { AppError } from './lib/errors';
 import { createRateLimiter, rulesFrom } from './lib/rateLimit';
 
+import { ImageModelResolver } from './gemini/background';
 import { createWallpaperRouter, storeFromEnv, type WallpaperStore } from './wallpaper/living';
 export type { GeminiLike } from './gemini/client';
 
@@ -116,6 +117,7 @@ export function createApp(opts: CreateAppOptions = {}): Express {
       now,
       limiter,
       motivationCache: new MotivationCache(),
+      images: gemini ? new ImageModelResolver(gemini, { pinned: env.GEMINI_IMAGE_MODEL?.trim() || null, cacheMs: tuning.modelCacheMs }) : null,
       wallpaperStore: wallpapers.kind,
     }),
   );

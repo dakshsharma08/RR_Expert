@@ -1,6 +1,9 @@
 /** Studio property panels: Template / Text / Color / Background / Layout. */
 import { useEffect, useRef, useState } from 'react';
-import { Check, ImagePlus, Trash2, Sparkles } from 'lucide-react';
+import { Check, ImagePlus, Trash2, Sparkles, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { ApiCallError, generateBackground, getHealth } from '@/lib/api';
+import { recordRuns } from '@/db/repo';
 import { toast } from 'sonner';
 import { Segmented, Slider, SwitchRow } from '@/components/ui/controls';
 import { Input, Textarea } from '@/components/ui/form';
@@ -208,6 +211,28 @@ export function ReadabilityNotes({ warnings }: { warnings: ReadabilityWarning[] 
 export function BackgroundPanel({ design, update }: { design: WallpaperDesign; update: Update }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [mood, setMood] = useState<'calm' | 'focused' | 'bold'>('calm');
+  const health = useQuery({ queryKey: ['health'], queryFn: getHealth, staleTime: 60_000 });
+  // Only offered when the server confirmed an image-capable Gemini model for its key.
+  const imageModel = health.data?.ai.imageModel ?? null;
+
+  async function aiBackground() {
+    setAiBusy(true);
+    try {
+      const r = await generateBackground({ theme: design.theme, mood });
+      await recordRuns([r.run]);
+      const blob = await (await fetch(r.image)).blob();
+      const src = await saveImageBlob(blob, `gemini-background-${Date.now()}.png`);
+      update((d) => ({ ...d, background: { ...d.background, kind: 'image', image: { src, blur: 0, dim: 0.25, zoom: 1, x: 0, y: 0 } } }));
+      toast.success('AI background added', { description: `✦ AI suggestion · ${r.model}. Not what you wanted? Generate again or remove it.` });
+    } catch (e) {
+      toast.error('Could not generate a background', { description: e instanceof ApiCallError ? e.error.message : (e as Error).message });
+      void health.refetch();
+    } finally {
+      setAiBusy(false);
+    }
+  }
   const bg = design.background;
   const img = bg.image;
   const setImg = (patch: Partial<NonNullable<WallpaperDesign['background']['image']>>) =>
@@ -274,6 +299,15 @@ export function BackgroundPanel({ design, update }: { design: WallpaperDesign; u
               <LabeledSlider label="Vertical" value={img.y} min={-1} max={1} step={0.05} fmt={(v) => v.toFixed(2)} onChange={(v) => setImg({ y: v })} />
             </>
           )}
+        </Group>
+      )}
+      {imageModel && (
+        <Group title="✦ AI background">
+          <p className="text-xs text-muted">Gemini paints an abstract, text-free background in your theme's colours. No people, nothing personal.</p>
+          <Segmented label="Mood" value={mood} onChange={setMood} options={[{ value: 'calm', label: 'Calm' }, { value: 'focused', label: 'Focused' }, { value: 'bold', label: 'Bold' }]} />
+          <Button variant="secondary" className="w-full" onClick={() => void aiBackground()} disabled={aiBusy} icon={aiBusy ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" strokeWidth={1.5} />}>
+            {aiBusy ? 'Painting…' : 'Generate with Gemini'}
+          </Button>
         </Group>
       )}
       <Group title="Texture">

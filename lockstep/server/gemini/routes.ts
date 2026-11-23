@@ -30,6 +30,7 @@ import type { GeminiLike, ModelResolver } from './client';
 import { CoachRequestSchema, runCoach } from './coach';
 import { WeeklyInsightRequestSchema, generateWeeklyInsight } from './insight';
 import { MotivationRequestSchema, generateMotivation, type MotivationCache } from './motivation';
+import { BackgroundRequestSchema, generateBackground, type ImageModelResolver } from './background';
 import { generatePlan, preparePlanJob } from './plan';
 
 export interface AiDeps {
@@ -41,6 +42,8 @@ export interface AiDeps {
   now: () => Date;
   limiter: RateLimiter;
   motivationCache: MotivationCache;
+  /** Image model discovery for AI backgrounds (null when AI isn't configured). */
+  images?: ImageModelResolver | null;
   wallpaperStore: HealthResponse['wallpaperStore'];
 }
 
@@ -86,7 +89,7 @@ export function createAiRouter(deps: AiDeps): Router {
         configured: !!deps.gemini,
         model,
         heavyModel: deps.models?.heavy ?? null,
-        imageModel: null, // image generation is a later tier
+        imageModel: deps.images ? await deps.images.resolve() : null,
       },
       rateLimit: deps.limiter.kind,
       wallpaperStore: deps.wallpaperStore,
@@ -115,6 +118,14 @@ export function createAiRouter(deps: AiDeps): Router {
     } finally {
       sse.close();
     }
+  });
+
+  router.post('/background', limit, async (req, res) => {
+    const body = parseBody(BackgroundRequestSchema, req.body);
+    const { gemini } = requireAi(deps);
+    if (!deps.images) throw new AppError('AI_NOT_CONFIGURED');
+    const call = callContext(deps, gemini, abortOnDisconnect(res));
+    res.json(await generateBackground(call, deps.images, body));
   });
 
   router.post('/motivation', limit, async (req, res) => {
