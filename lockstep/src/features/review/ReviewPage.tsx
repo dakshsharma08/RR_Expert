@@ -87,7 +87,9 @@ export default function ReviewPage() {
     if (kind === 'extend-deadline' && fixes?.extendTo) intake.deadlineDate = fixes.extendTo;
     if (kind === 'add-hours' && fixes?.hoursPerDay) intake.hoursPerDay = fixes.hoursPerDay;
     await updateGoalIntake(goal.id, intake);
-    if (meta?.source === 'ai') {
+    // Never regenerate an approved plan: that would wipe completed milestones and ticked tasks.
+    // For active goals a fix only changes the settings (the coach can propose a replan instead).
+    if (meta?.source === 'ai' && !isActive) {
       setAdjustment(goal.id, kind);
       await db.goals.update(goal.id, { status: 'planning' });
       navigate(`/goals/${goal.id}/plan`);
@@ -111,7 +113,7 @@ export default function ReviewPage() {
       {meta?.source === 'ai' && <GeneratedStamp className="mt-2" model={meta.model} at={meta.generatedAt} />}
       {meta?.source === 'manual' && <p className="mt-2 text-xs text-muted">Built by you{meta.generatedAt ? ' (started from a Gemini plan)' : ''}.</p>}
 
-      {meta && milestones.length > 0 && <FeasibilityPanel goal={goal} onFix={applyFix} />}
+      {meta && milestones.length > 0 && <FeasibilityPanel goal={goal} onFix={applyFix} regenerates={meta.source === 'ai' && !isActive} />}
 
       <div className="mb-3 mt-10 flex items-center justify-between gap-3">
         <h2 className="text-xl">
@@ -221,7 +223,7 @@ export default function ReviewPage() {
   );
 }
 
-function FeasibilityPanel({ goal, onFix }: { goal: GoalRow; onFix: (k: 'extend-deadline' | 'add-hours' | 'reduce-scope') => void }) {
+function FeasibilityPanel({ goal, onFix, regenerates }: { goal: GoalRow; onFix: (k: 'extend-deadline' | 'add-hours' | 'reduce-scope') => void; regenerates: boolean }) {
   const meta = goal.plan_meta!;
   const [open, setOpen] = useState(false);
   const code = meta.code;
@@ -253,14 +255,17 @@ function FeasibilityPanel({ goal, onFix }: { goal: GoalRow; onFix: (k: 'extend-d
               Work {meta.fixes.hoursPerDay} h/day
             </Button>
           )}
-          {meta.source === 'ai' && (
+          {regenerates && (
             <Button variant="secondary" size="sm" onClick={() => onFix('reduce-scope')} icon={<Scissors className="size-4" strokeWidth={1.5} />}>
               Reduce scope
             </Button>
           )}
         </div>
       )}
-      {showFixes && meta.source === 'ai' && <p className="mt-2 text-xs text-muted">Each fix asks Gemini for a new plan with the new settings.</p>}
+      {showFixes && regenerates && <p className="mt-2 text-xs text-muted">Each fix asks Gemini for a new plan with the new settings.</p>}
+      {showFixes && !regenerates && goal.status === 'active' && (
+        <p className="mt-2 text-xs text-muted">Your plan is approved, so a fix only changes your deadline or hours. Your progress stays. Ask the coach to rebalance the milestones.</p>
+      )}
 
       {meta.checks.length > 0 && (
         <div className="mt-4 border-t border-hairline pt-3">
