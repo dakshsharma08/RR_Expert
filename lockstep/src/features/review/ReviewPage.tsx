@@ -229,7 +229,7 @@ function FeasibilityPanel({ goal, onFix }: { goal: GoalRow; onFix: (k: 'extend-d
     <section className="card mt-6 p-5" aria-label="Feasibility">
       <div className="flex flex-wrap items-center gap-2">
         <FeasibilityBadge value={code.feasibility} prefix="Our check:" />
-        {meta.modelFeasibility && <FeasibilityBadge value={meta.modelFeasibility} prefix="Gemini:" className="opacity-80" />}
+        {meta.modelFeasibility && <FeasibilityBadge value={meta.modelFeasibility} prefix="Gemini:" />}
       </div>
       <p className="mt-3 text-sm text-text">{code.reason}</p>
       {meta.modelFeasibility && !meta.agrees && (

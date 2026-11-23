@@ -11,7 +11,7 @@ const variants: Record<Variant, string> = {
     'bg-gold text-obsidian font-semibold hover:bg-gold-light active:bg-gold-deep active:text-ivory shadow-[0_1px_0_rgba(255,255,255,0.18)_inset]',
   secondary: 'border border-accent text-accent-text hover:bg-accent/10 active:bg-accent/20',
   ghost: 'text-text hover:bg-surface-2 active:bg-surface-2/70',
-  destructive: 'bg-danger/15 text-danger border border-danger/40 hover:bg-danger/25',
+  destructive: 'bg-transparent text-danger border border-danger/60 hover:border-danger',
   subtle: 'bg-surface-2 text-text border border-hairline hover:border-line-strong',
 };
 

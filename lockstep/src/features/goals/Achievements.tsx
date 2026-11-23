@@ -47,9 +47,9 @@ export function AchievementsCard({ data, m }: { data: GoalData; m: GoalMetrics }
       </div>
       <ul className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         {list.map((a) => (
-          <li key={a.id} className={cn('rounded-[14px] border p-3', a.unlocked ? 'border-accent/50' : 'border-hairline opacity-60')} aria-label={`${a.title}: ${a.unlocked ? 'unlocked' : 'locked'}. ${a.description}`}>
+          <li key={a.id} className={cn('rounded-[14px] border p-3', a.unlocked ? 'border-accent/50' : 'border-dashed border-hairline')} aria-label={`${a.title}: ${a.unlocked ? 'unlocked' : 'locked'}. ${a.description}`}>
             {a.unlocked ? <Award className="size-5 text-accent-text" strokeWidth={1.5} aria-hidden /> : <Lock className="size-5 text-muted" strokeWidth={1.5} aria-hidden />}
-            <p className="mt-2 text-sm font-medium leading-tight">{a.title}</p>
+            <p className={cn('mt-2 text-sm font-medium leading-tight', !a.unlocked && 'text-muted')}>{a.title}</p>
             <p className="mt-0.5 text-[11px] leading-snug text-muted">{a.description}</p>
           </li>
         ))}
