@@ -6,7 +6,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/cn';
 import { getDevice } from '@shared/wallpaper/devices';
-import { normalizeDesign } from '@shared/wallpaper/templates';
+import { getTemplate, normalizeDesign } from '@shared/wallpaper/templates';
+import { THEMES } from '@shared/wallpaper/themes';
 import type { ElementId, RenderReport, WallpaperData, WallpaperDesign } from '@shared/wallpaper/types';
 import { ensureFonts, loadDesignImage, renderTo } from './canvas';
 
@@ -84,6 +85,8 @@ export function PhonePreview({ design, data, width, showUi, showSafe, onReport, 
 
   const radius = Math.round(width * 0.13);
   const ios = device.platform === 'ios';
+  // Phones tint the clock dark over light wallpapers; mirror that so the mock stays readable.
+  const lightBg = !!getTemplate(d.template).paper || (d.background.kind === 'theme' && THEMES[d.theme].mode === 'light');
   const sx = report ? width / report.width : 0;
 
   return (
@@ -94,7 +97,7 @@ export function PhonePreview({ design, data, width, showUi, showSafe, onReport, 
         <canvas ref={canvasRef} role="img" aria-label={label ?? `Wallpaper preview: ${data.daysLeft} days left, ${Math.round(data.progressPct * 100)}% done${data.nextMilestone ? `, next milestone ${data.nextMilestone.title}` : ''}`} className="block size-full" />
         {error && <p className="absolute inset-x-4 top-1/2 text-center text-xs text-danger">{error}</p>}
 
-        {showUi && <LockScreenUi width={width} height={height} ios={ios} safe={device.safe} />}
+        {showUi && <LockScreenUi width={width} height={height} ios={ios} safe={device.safe} light={lightBg} />}
 
         {showSafe && (
           <div className="pointer-events-none absolute inset-0" aria-hidden>
@@ -126,14 +129,14 @@ export function PhonePreview({ design, data, width, showUi, showSafe, onReport, 
 }
 
 /** A faint mock of the phone's own lock-screen UI, to judge placement. */
-function LockScreenUi({ width, height, ios, safe }: { width: number; height: number; ios: boolean; safe: ReturnType<typeof getDevice>['safe'] }) {
+function LockScreenUi({ width, height, ios, safe, light }: { width: number; height: number; ios: boolean; safe: ReturnType<typeof getDevice>['safe']; light?: boolean }) {
   const clockTop = safe.clock[0] * height;
   const clockH = (safe.clock[1] - safe.clock[0]) * height;
   const now = new Date();
   const time = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: false });
   const date = now.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' });
   return (
-    <div className="pointer-events-none absolute inset-0 text-white/85" aria-hidden>
+    <div className={cn('pointer-events-none absolute inset-0', light ? 'text-black/75' : 'text-white/85')} aria-hidden>
       {ios ? (
         <div className="absolute left-1/2 rounded-full bg-black" style={{ top: height * 0.014, width: width * 0.3, height: width * 0.085, transform: 'translateX(-50%)' }} />
       ) : (
@@ -145,14 +148,14 @@ function LockScreenUi({ width, height, ios, safe }: { width: number; height: num
       </div>
       <div className="absolute inset-x-[10%] flex justify-center gap-[3%]" style={{ top: safe.widgets[0] * height + 4, height: (safe.widgets[1] - safe.widgets[0]) * height - 10 }}>
         {[0, 1, 2].map((i) => (
-          <div key={i} className="flex-1 rounded-[22%] bg-white/12 backdrop-blur-sm" />
+          <div key={i} className={cn('flex-1 rounded-[22%] backdrop-blur-sm', light ? 'bg-black/8' : 'bg-white/12')} />
         ))}
       </div>
       <div className="absolute flex w-full justify-between px-[12%]" style={{ top: (safe.bottomControls[0] + 0.03) * height }}>
-        <span className="rounded-full bg-white/15 backdrop-blur-sm" style={{ width: width * 0.13, height: width * 0.13 }} />
-        <span className="rounded-full bg-white/15 backdrop-blur-sm" style={{ width: width * 0.13, height: width * 0.13 }} />
+        <span className={cn('rounded-full backdrop-blur-sm', light ? 'bg-black/10' : 'bg-white/15')} style={{ width: width * 0.13, height: width * 0.13 }} />
+        <span className={cn('rounded-full backdrop-blur-sm', light ? 'bg-black/10' : 'bg-white/15')} style={{ width: width * 0.13, height: width * 0.13 }} />
       </div>
-      {ios && <div className="absolute left-1/2 h-[4px] w-[34%] -translate-x-1/2 rounded-full bg-white/70" style={{ bottom: height * 0.01 }} />}
+      {ios && <div className={cn('absolute left-1/2 h-[4px] w-[34%] -translate-x-1/2 rounded-full', light ? 'bg-black/60' : 'bg-white/70')} style={{ bottom: height * 0.01 }} />}
     </div>
   );
 }

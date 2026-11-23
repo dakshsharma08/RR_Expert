@@ -2,7 +2,7 @@
 import type { GoalRow, MilestoneRow } from '@/db/db';
 import { addDays, effectiveDeadlineKey } from '@shared/time';
 
-const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
 const d = (key: string) => key.replace(/-/g, '');
 const stamp = () => new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
 

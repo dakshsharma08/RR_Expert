@@ -14,3 +14,4 @@ coverage
 # The small _sheet-* contact sheets stay tracked as evidence.
 docs/evidence/wallpapers/*.png
 !docs/evidence/wallpapers/_sheet-*.png
+dist-server

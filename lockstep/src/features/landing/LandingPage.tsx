@@ -14,7 +14,7 @@ function useCan3D() {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const small = window.innerWidth < 768;
     const saveData = (navigator as unknown as { connection?: { saveData?: boolean } }).connection?.saveData;
-    let webgl = false;
+    let webgl: boolean;
     try {
       webgl = !!document.createElement('canvas').getContext('webgl2');
     } catch {

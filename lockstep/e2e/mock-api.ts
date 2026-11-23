@@ -113,7 +113,7 @@ const mock = setupServer(
     });
   }),
 );
-mock.listen({ onUnhandledRequest: 'bypass' });
+mock.listen(); // MSW v3: unmatched requests pass through to the network by default
 
 const { createApp } = await import('../server/app');
 const port = Number(process.env.PORT) || 8787;
