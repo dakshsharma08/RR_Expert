@@ -57,7 +57,7 @@ async function main() {
     execSync('npm run build', { cwd: root, stdio: 'inherit' });
   }
   console.log(`› starting app on ${base}`);
-  const server = spawn('npx', ['tsx', 'server/prod.ts'], { cwd: root, env: { ...process.env, PORT: String(port), NODE_ENV: 'production', ALLOWED_ORIGINS: base }, stdio: ['ignore', 'pipe', 'pipe'] });
+  const server = spawn('npx', ['tsx', 'server/prod.ts'], { cwd: root, env: { ...process.env, PORT: String(port), NODE_ENV: 'production', ALLOWED_ORIGINS: base }, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
   server.stderr.on('data', (d) => process.stderr.write(`[server] ${d}`));
   try {
     for (let i = 0; i < 60; i++) {
@@ -270,11 +270,18 @@ npm run submission -- --url https://<your-live-url>
     console.log(`› mode: ${run.mode}`);
     if (checks.some((c) => !c.ok) || chars > 480) process.exitCode = 1;
   } finally {
-    server.kill('SIGTERM');
+    // Kill the whole process group (npx → tsx → node), or the server would outlive the script.
+    try {
+      process.kill(-server.pid, 'SIGTERM');
+    } catch {
+      server.kill('SIGTERM');
+    }
   }
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+main()
+  .then(() => process.exit(process.exitCode ?? 0))
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
