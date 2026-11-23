@@ -72,6 +72,13 @@ export const MIN_CONTRAST = 4.5;
 /** Scrims never go darker than this, so the photo still shows through. */
 export const MAX_SCRIM_ALPHA = 0.75;
 
+/**
+ * Text boxes carry a little invisible padding (and descenders hang below a
+ * row), so a box may poke this far (in reference px) outside the band while
+ * all the ink is still inside it.
+ */
+export const BAND_SLACK = 24;
+
 /** Reference phone the template sizes are designed on. */
 const REF_W = 1080;
 const REF_H = 2340;
@@ -131,8 +138,9 @@ export function renderWallpaper(ctx: Ctx2D, args: RenderArgs): RenderReport {
     ctx.restore();
     const b = boundsOf(blocks);
     if (!b) break;
-    const tooTall = b.h > band.height + 0.5;
-    const outside = b.y < band.top - 0.5 || b.y + b.h > band.bottom + 0.5;
+    const slack = BAND_SLACK * ref;
+    const tooTall = b.h > band.height + slack * 2;
+    const outside = b.y < band.top - slack || b.y + b.h > band.bottom + slack;
     if (!tooTall && !outside) break;
     fit *= Math.min(0.97, band.height / Math.max(1, b.h));
   }
@@ -238,7 +246,7 @@ function paintBackground(
     const pattern = ctx.createPattern(tile, 'repeat');
     if (pattern) {
       ctx.save();
-      ctx.globalAlpha = Math.min(1, bgSpec.grain * (pal.mode === 'dark' ? 0.42 : 0.3));
+      ctx.globalAlpha = Math.min(1, bgSpec.grain * (pal.mode === 'dark' ? 0.26 : 0.2));
       ctx.fillStyle = pattern;
       ctx.fillRect(0, 0, W, H);
       ctx.restore();

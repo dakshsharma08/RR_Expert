@@ -70,7 +70,7 @@ export default function LandingPage() {
               >
                 Your deadline,
                 <br />
-                <span className="italic text-gold-light">locked in.</span>
+                <span className="italic text-accent-text">locked in.</span>
               </motion.h1>
               <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mt-6 max-w-xl text-base text-muted sm:text-lg">
                 LOCKSTEP turns a distant deadline into a feasibility-checked milestone plan, a live countdown, and a lock-screen wallpaper that shows your real progress every time you unlock your phone.

@@ -13,14 +13,17 @@ import {
   motivationRow,
   numeral,
   paragraph,
+  boundsOf,
   rule,
   stack,
   stampRow,
   text,
+  type Block,
+  type Frame,
   type Row,
   type TemplateDef,
 } from './kit';
-import type { ElementId } from '../types';
+import type { Ctx2D, ElementId } from '../types';
 
 export const minimalMono: TemplateDef = {
   id: 'minimal-mono',
@@ -39,22 +42,6 @@ export const minimalMono: TemplateDef = {
   },
   vignette: 0.4,
   glow: () => null,
-  paintBackground(ctx, B) {
-    // Registration marks at the corners of the content band, like a print proof.
-    const arm = 14 * B.u;
-    const t = Math.max(1, Math.round(1.2 * B.u));
-    ctx.fillStyle = B.pal.faint;
-    const corners = [
-      [B.band.left, B.band.top - 40 * B.u],
-      [B.band.right, B.band.top - 40 * B.u],
-      [B.band.left, B.band.bottom + 10 * B.u],
-      [B.band.right, B.band.bottom + 10 * B.u],
-    ] as const;
-    for (const [x, y] of corners) {
-      ctx.fillRect(Math.round(x - arm), Math.round(y), Math.round(arm * 2), t);
-      ctx.fillRect(Math.round(x), Math.round(y - arm), t, Math.round(arm * 2));
-    }
-  },
   layout(F) {
     const { s, g, u, band, pal, str, show } = F;
     const mono = F.fonts.ui;
@@ -62,7 +49,7 @@ export const minimalMono: TemplateDef = {
     const kx = x0 + band.width * 0.12; // key column
     const vx = x0 + band.width * 0.36; // value column
     const vw = band.right - vx;
-    const size = 22 * s;
+    const size = 26 * s;
     let index = 0;
 
     const cell = (t: string, x: number, element: ElementId, color = pal.muted) =>
@@ -142,6 +129,26 @@ export const minimalMono: TemplateDef = {
       entries.length > 0 ? rule(F, { gap: 60 * g, color: pal.hairline, weight: 1 }) : null,
       stampRow(F, { font: mono, gap: 32 * g, align: 'left', x: x0 }),
     ];
-    return stack(F, rows, 'upper');
+    const blocks = stack(F, rows, 'upper');
+    const b = boundsOf(blocks);
+    return b ? [...registrationMarks(F, b.y - 44 * u, b.y + b.h + 40 * u), ...blocks] : blocks;
   },
 };
+
+/** Tiny "+" registration marks at the four corners of the content, like a print proof. */
+function registrationMarks(F: Frame, top: number, bottom: number): Block[] {
+  const arm = 14 * F.u;
+  const t = Math.max(1, Math.round(1.2 * F.u));
+  const ys = [Math.max(F.band.top, top), Math.min(F.band.bottom, bottom)];
+  const xs = [F.band.left, F.band.right];
+  return ys.flatMap((y) =>
+    xs.map((x) => ({
+      box: { x: x - arm, y: y - arm, w: arm * 2, h: arm * 2 },
+      draw(ctx: Ctx2D) {
+        ctx.fillStyle = F.pal.hairline;
+        ctx.fillRect(Math.round(x - arm), Math.round(y), Math.round(arm * 2), t);
+        ctx.fillRect(Math.round(x), Math.round(y - arm), t, Math.round(arm * 2));
+      },
+    })),
+  );
+}

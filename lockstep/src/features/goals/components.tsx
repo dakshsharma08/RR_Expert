@@ -58,10 +58,10 @@ export function CountdownDigits({ c, size = 'lg', showSeconds = true }: { c: Cou
       <p className="sr-only" aria-live="polite" aria-atomic>
         {srText}
       </p>
-      <div className="flex items-end gap-[0.18em]" aria-hidden>
+      <div className="flex items-start gap-[0.32em]" aria-hidden style={{ fontSize: 'inherit' }}>
         {units.map(([v, label], i) => (
-          <div key={label} className="flex items-end">
-            {i > 0 && <span className={cn('font-display leading-none text-gold-deep', num)} style={{ fontSize: '0.6em' }}>:</span>}
+          <div key={label} className="flex items-start">
+            {i > 0 && <span className={cn('mr-[0.14em] font-display font-light leading-[0.9] text-gold-deep/80', num)}>:</span>}
             <div className="flex flex-col items-center">
               <span className={cn('font-display font-light leading-[0.9] tabular text-text', num)} style={{ fontVariationSettings: '"opsz" 144' }}>
                 {v}

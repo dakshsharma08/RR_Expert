@@ -167,7 +167,8 @@ export interface TextMetricsLike {
 }
 
 export interface ImageDataLike {
-  readonly data: Uint8ClampedArray;
+  /** RGBA bytes (a Uint8ClampedArray in practice; typed loosely so napi's ImageData also fits). */
+  readonly data: { readonly length: number; [index: number]: number };
   readonly width: number;
   readonly height: number;
 }

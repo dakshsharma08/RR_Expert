@@ -894,6 +894,30 @@ describe('POST /api/motivation', () => {
   });
 });
 
+describe('safety blocks', () => {
+  it('reports a blocked prompt clearly instead of retrying or repairing', async () => {
+    mock.use(
+      http.post(GENERATE_URL, async ({ request }) => {
+        await capture(request);
+        return HttpResponse.json({ promptFeedback: { blockReason: 'SAFETY' }, usageMetadata: { totalTokenCount: 7 } });
+      }),
+      http.post(STREAM_URL, async ({ request }) => {
+        await capture(request);
+        const enc = new TextEncoder();
+        const body = `data: ${JSON.stringify({ promptFeedback: { blockReason: 'PROHIBITED_CONTENT' } })}\r\n\r\n`;
+        return new HttpResponse(enc.encode(body), { headers: { 'Content-Type': 'text/event-stream' } });
+      }),
+    );
+    const base = await start();
+    const res = await post(base, '/api/motivation', MOTIVATION);
+    expect(res.status).toBe(400);
+    expect((await res.json()) as ApiError).toMatchObject({ code: 'INVALID_INPUT', details: ['blocked: SAFETY'] });
+    const events = await readAll(await post(base, '/api/plan', INTAKE));
+    expect(events.at(-1)).toMatchObject({ event: 'error', data: { code: 'INVALID_INPUT', details: ['blocked: PROHIBITED_CONTENT'] } });
+    expect(captured).toHaveLength(2); // one call each: no retries, no repair
+  });
+});
+
 describe('POST /api/insights/weekly', () => {
   it('returns a short summary and its run', async () => {
     mock.use(

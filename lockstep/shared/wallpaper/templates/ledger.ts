@@ -51,7 +51,7 @@ export const ledger: TemplateDef = {
     const valueW = x1 - vx0;
     const rowGap = 30 * g;
 
-    const label = (t: string, element: ElementId) => caps(F, t, { align: 'left', x: x0, size: 19 * s, element, maxWidth: labelW - 24 * F.u });
+    const label = (t: string, element: ElementId) => caps(F, t, { align: 'left', x: x0, size: 23 * s, element, maxWidth: labelW - 44 * F.u });
     const value = (t: string, element: ElementId, size = 34) =>
       text(F, { text: t, font: F.fonts.display, size: size * s, weight: 400, color: pal.text, align: 'right', x: x1, maxWidth: valueW, element });
     const entry = (r: Row | null) => (r ? [{ ...r, gap: rowGap }, rule(F, { gap: rowGap, color: pal.faint })] : []);
@@ -72,7 +72,7 @@ export const ledger: TemplateDef = {
         element: 'daysLeft',
       });
       const lab = label('Remaining', 'daysLeft');
-      const sub = caps(F, str.daysLabel, { align: 'right', x: x1, color: pal.accentInk, size: 20 * s, element: 'daysLeft', gap: 30 * g, maxWidth: valueW });
+      const sub = caps(F, str.daysLabel, { align: 'right', x: x1, color: pal.accentInk, size: 24 * s, element: 'daysLeft', gap: 30 * g, maxWidth: valueW });
       const col = column([num, sub])!;
       totalRow = custom(col.h, 0, (y) => [...col.place(y), ...lab.place(y + num.h - lab.h)]);
     }
@@ -115,7 +115,7 @@ export const ledger: TemplateDef = {
                 element: 'nextMilestone',
               }),
               str.milestoneDate
-                ? caps(F, str.milestoneDate, { align: 'right', x: x1, size: 19 * s, weight: 600, color: pal.accentInk, element: 'nextMilestone', gap: 20 * g })
+                ? caps(F, str.milestoneDate, { align: 'right', x: x1, size: 23 * s, weight: 600, color: pal.accentInk, element: 'nextMilestone', gap: 20 * g })
                 : null,
             ]),
           ])

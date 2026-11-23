@@ -30,9 +30,13 @@ export function goalMetrics(
   logs: ProgressLogRow[],
   nowMs: number,
 ): GoalMetrics {
+  // The plan starts when the goal was created (never in the future). Clamping `now`
+  // to the start avoids a false "upcoming" state when a minute-rounded clock lags behind.
+  const startMs = Math.min(Date.parse(goal.start_utc), Date.parse(goal.approved_at ?? goal.start_utc));
+  nowMs = Math.max(nowMs, startMs);
   const countdown = computeCountdown({
     nowMs,
-    startUtc: goal.approved_at ?? goal.start_utc,
+    startUtc: new Date(startMs).toISOString(),
     deadlineUtc: goal.deadline_utc,
     timezone: goal.timezone,
     completed: goal.status === 'completed',

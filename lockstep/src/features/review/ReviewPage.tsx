@@ -110,7 +110,7 @@ export default function ReviewPage() {
       {meta?.source === 'ai' && <GeneratedStamp className="mt-2" model={meta.model} at={meta.generatedAt} />}
       {meta?.source === 'manual' && <p className="mt-2 text-xs text-muted">Built by you{meta.generatedAt ? ' (started from a Gemini plan)' : ''}.</p>}
 
-      {meta && <FeasibilityPanel goal={goal} onFix={applyFix} />}
+      {meta && milestones.length > 0 && <FeasibilityPanel goal={goal} onFix={applyFix} />}
 
       <div className="mb-3 mt-10 flex items-center justify-between gap-3">
         <h2 className="text-xl">
@@ -194,7 +194,7 @@ export default function ReviewPage() {
           {isActive ? (
             <Button onClick={() => navigate(`/goals/${goal.id}`)} icon={<Check className="size-4" strokeWidth={2} />}>Done</Button>
           ) : (
-            <Button onClick={() => void approve()} loading={approving} size="lg" icon={<ShieldCheck className="size-5" strokeWidth={1.5} />}>
+            <Button onClick={() => void approve()} loading={approving} disabled={milestones.length === 0} size="lg" icon={<ShieldCheck className="size-5" strokeWidth={1.5} />}>
               Approve plan
             </Button>
           )}

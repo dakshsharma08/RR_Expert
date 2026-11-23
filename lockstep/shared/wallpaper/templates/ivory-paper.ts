@@ -102,7 +102,7 @@ function rows(F: Frame): (Row | null)[] {
   const colW = band.width * 0.48;
   const pair = (label: string, value: string, element: 'dayOfTotal' | 'targetDate', align: Align, x: number) =>
     column([
-      caps(F, label, { align, x, element, size: 18 * s, maxWidth: colW }),
+      caps(F, label, { align, x, element, size: 22 * s, maxWidth: colW }),
       text(F, { text: value, font: F.fonts.display, size: 34 * s, weight: 400, color: pal.text, align, x, maxWidth: colW, element, gap: 20 * g }),
     ]);
   // In a centred card, two pairs sit at the quarter points; otherwise they follow the alignment.
@@ -127,14 +127,14 @@ function rows(F: Frame): (Row | null)[] {
           gap: 72 * g,
         })
       : null,
-    show.daysLeft ? caps(F, str.daysLabel, { size: 24 * s, color: pal.accentInk, weight: 600, element: 'daysLeft', gap: 46 * g }) : null,
+    show.daysLeft ? caps(F, str.daysLabel, { size: 29 * s, color: pal.accentInk, weight: 600, element: 'daysLeft', gap: 46 * g }) : null,
     ornament(F, 56 * g),
     beside([dayPair, duePair], 56 * g),
     milestoneRow(F, { gap: 60 * g, size: 36 }),
     show.progress
       ? column(
           [
-            caps(F, str.progress, { size: 18 * s, element: 'progress' }),
+            caps(F, str.progress, { size: 22 * s, element: 'progress' }),
             bar(F, { x0: bx, x1: bx + barW, pct: str.pct, thickness: 2, track: pal.faint, gap: 22 * g }),
           ],
           60 * g,
@@ -151,7 +151,7 @@ function anchor(F: Frame): number {
 
 /** "——  GOAL TITLE  ——": small caps with short rules on each side (only when centred). */
 function flanked(F: Frame, goal: string): Row {
-  const label = caps(F, goal, { size: 21 * F.s, weight: 600, color: F.pal.text, element: 'goalTitle', maxWidth: F.band.width * 0.7 });
+  const label = caps(F, goal, { size: 26 * F.s, weight: 600, color: F.pal.text, element: 'goalTitle', maxWidth: F.band.width * 0.7 });
   if (F.align !== 'center') return label;
   return custom(label.h, 0, (y) => {
     const blocks = label.place(y);

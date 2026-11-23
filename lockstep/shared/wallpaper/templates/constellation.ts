@@ -60,9 +60,9 @@ export const constellation: TemplateDef = {
     const x0 = band.left;
     const x1 = band.right;
     const chord = x1 - x0;
-    const sag = Math.min(chord * 0.16, 150 * u); // how high the arc rises in the middle
-    const top = 22 * u; // room for the tallest star above the apex
-    const labelSize = 17 * s;
+    const sag = Math.min(chord * 0.2, 190 * u); // how high the arc rises in the middle
+    const top = 32 * u; // room for the tallest star / ring above the apex
+    const labelSize = 21 * s;
     const labelGap = 46 * g;
     const labels = [
       caps(F, 'Start', { align: 'left', x: x0, size: labelSize, element: 'progress' }),
@@ -107,45 +107,46 @@ export const constellation: TemplateDef = {
                   ctx.arc(cx, cy, R, aL, at(pct));
                   ctx.stroke();
                 }
-                // Milestone stars.
+                // Milestone stars: reached ones are lit sparkles, the rest dim points.
                 for (const m of pts) {
                   const p = point(m.at);
                   const isEnd = m.at >= 0.999;
                   if (m.done) {
                     ctx.fillStyle = pal.accentSoft;
-                    sparklePath(ctx, p.x, p.y, (isEnd ? 22 : 15) * u);
+                    sparklePath(ctx, p.x, p.y, (isEnd ? 24 : 18) * u);
                     ctx.fill();
-                  } else {
+                  } else if (isEnd) {
                     ctx.strokeStyle = pal.hairline;
                     ctx.lineWidth = Math.max(1, 1.4 * u);
-                    if (isEnd) {
-                      sparklePath(ctx, p.x, p.y, 20 * u);
-                      ctx.stroke();
-                    } else {
-                      ctx.fillStyle = pal.base;
-                      ctx.beginPath();
-                      ctx.arc(p.x, p.y, 5 * u, 0, Math.PI * 2);
-                      ctx.fill();
-                      ctx.stroke();
-                    }
+                    sparklePath(ctx, p.x, p.y, 22 * u);
+                    ctx.stroke();
+                  } else {
+                    ctx.fillStyle = pal.hairline;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4.5 * u, 0, Math.PI * 2);
+                    ctx.fill();
                   }
                 }
-                // Start point and "you are here".
+                // Start point.
                 const s0 = point(0);
                 ctx.fillStyle = pal.accent;
                 ctx.beginPath();
                 ctx.arc(s0.x, s0.y, 4 * u, 0, Math.PI * 2);
                 ctx.fill();
-                const here = point(pct);
+                // "You are here": a fine ring. If a star sits right there, the ring circles that star.
+                const near = pts.find((m) => Math.abs(m.at - pct) < 0.04 && m.at < 0.999);
+                const here = point(near ? near.at : pct);
                 ctx.strokeStyle = pal.accent;
                 ctx.lineWidth = Math.max(1, 1.6 * u);
                 ctx.beginPath();
-                ctx.arc(here.x, here.y, 11 * u, 0, Math.PI * 2);
+                ctx.arc(here.x, here.y, (near ? 28 : 11) * u, 0, Math.PI * 2);
                 ctx.stroke();
-                ctx.fillStyle = pal.text;
-                ctx.beginPath();
-                ctx.arc(here.x, here.y, 3.5 * u, 0, Math.PI * 2);
-                ctx.fill();
+                if (!near) {
+                  ctx.fillStyle = pal.text;
+                  ctx.beginPath();
+                  ctx.arc(here.x, here.y, 3.5 * u, 0, Math.PI * 2);
+                  ctx.fill();
+                }
               },
             },
           ];
@@ -156,7 +157,7 @@ export const constellation: TemplateDef = {
       : null;
 
     const rows: (Row | null)[] = [
-      show.goalTitle ? caps(F, str.goal, { color: pal.accentInk, weight: 600, size: 21 * s, element: 'goalTitle' }) : null,
+      show.goalTitle ? caps(F, str.goal, { color: pal.accentInk, weight: 600, size: 26 * s, element: 'goalTitle' }) : null,
       arc ? { ...arc, gap: 44 * g } : null,
       show.daysLeft
         ? numeral(F, {
@@ -171,8 +172,8 @@ export const constellation: TemplateDef = {
             gap: 84 * g,
           })
         : null,
-      show.daysLeft ? caps(F, str.daysLabel, { size: 24 * s, color: pal.text, element: 'daysLeft', gap: 46 * g }) : null,
-      show.dayOfTotal ? caps(F, str.dayOfTotal, { size: 19 * s, color: pal.accentInk, element: 'dayOfTotal', gap: 64 * g }) : null,
+      show.daysLeft ? caps(F, str.daysLabel, { size: 29 * s, color: pal.text, element: 'daysLeft', gap: 46 * g }) : null,
+      show.dayOfTotal ? caps(F, str.dayOfTotal, { size: 23 * s, color: pal.accentInk, element: 'dayOfTotal', gap: 64 * g }) : null,
       show.targetDate
         ? text(F, {
             text: `Due ${str.target}`,

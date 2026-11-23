@@ -16,7 +16,7 @@ import type { AiKind, AiRunMeta } from '../../shared/api';
 import type { RunRecorder } from '../lib/aiRuns';
 import { runMeta } from '../lib/aiRuns';
 import type { AiTuning } from '../lib/config';
-import { isRetryableUpstream, toAppError } from '../lib/errors';
+import { AppError, isRetryableUpstream, toAppError } from '../lib/errors';
 import { withRetry } from '../lib/retry';
 import { raceAbort, timeoutError, withTimeout } from '../lib/timeout';
 import type { GeminiLike } from './client';
@@ -60,6 +60,23 @@ function tokensOf(r: GenerateContentResponse | undefined): number | null {
   return typeof t === 'number' ? t : null;
 }
 
+const SAFETY_FINISH = new Set(['SAFETY', 'PROHIBITED_CONTENT', 'BLOCKLIST', 'SPII', 'RECITATION', 'IMAGE_SAFETY']);
+
+/** Why Gemini refused to answer (prompt blocked or answer stopped for safety), if it did. */
+export function blockReason(r: GenerateContentResponse): string | null {
+  const prompt = r.promptFeedback?.blockReason;
+  if (prompt) return String(prompt);
+  const finish = r.candidates?.[0]?.finishReason;
+  return finish && SAFETY_FINISH.has(String(finish)) ? String(finish) : null;
+}
+
+/** A refusal is not a server fault and retrying won't help, so it gets its own clear message. */
+function blockedError(reason: string): AppError {
+  return new AppError('INVALID_INPUT', 'Gemini declined this request for safety reasons. Try rephrasing it.', {
+    details: [`blocked: ${reason}`],
+  });
+}
+
 function record(ctx: CallContext, meta: AiRunMeta) {
   ctx.runs.push(meta);
   ctx.recorder.record(meta);
@@ -68,8 +85,9 @@ function record(ctx: CallContext, meta: AiRunMeta) {
 /** One non-streaming call with timeout, retries and logging. */
 export async function callGemini(ctx: CallContext, args: CallArgs): Promise<GenerateContentResponse> {
   const t = ctx.tuning;
+  let response: GenerateContentResponse;
   try {
-    return await withRetry(
+    response = await withRetry(
       async () => {
         const started = Date.now();
         try {
@@ -102,6 +120,9 @@ export async function callGemini(ctx: CallContext, args: CallArgs): Promise<Gene
   } catch (err) {
     throw toAppError(err, ctx.signal);
   }
+  const blocked = blockReason(response);
+  if (blocked) throw blockedError(blocked);
+  return response;
 }
 
 export interface StreamArgs extends CallArgs {
@@ -127,8 +148,11 @@ export async function streamGemini(ctx: CallContext, args: StreamArgs): Promise<
   let text = '';
   let attemptSignal: AbortSignal = total;
 
+  // `as` widens the type: TypeScript can't see the assignment inside consume().
+  let blocked = null as string | null;
   const consume = (chunk: GenerateContentResponse) => {
     if (chunk.usageMetadata) lastUsage = chunk;
+    blocked = blockReason(chunk) ?? blocked;
     const delta = responseText(chunk);
     if (delta) {
       text += delta;
@@ -201,6 +225,7 @@ export async function streamGemini(ctx: CallContext, args: StreamArgs): Promise<
       throw err;
     }
     record(ctx, runMeta(args.kind, args.model, started, true, tokensOf(lastUsage)));
+    if (blocked) throw blockedError(blocked);
     return text;
   } catch (err) {
     // attemptSignal carries our abort reason (TIMEOUT / CANCELLED) if we pressed stop.

@@ -42,7 +42,7 @@ export const orbit: TemplateDef = {
     // Everything inside the ring is centred on the ring.
     const inner = column([
       show.dayOfTotal
-        ? caps(F, str.dayOfTotal, { align: 'center', x: cx, maxWidth: D * 0.6, color: pal.accentInk, size: 19 * s, element: 'dayOfTotal' })
+        ? caps(F, str.dayOfTotal, { align: 'center', x: cx, maxWidth: D * 0.6, color: pal.accentInk, size: 23 * s, element: 'dayOfTotal' })
         : null,
       show.daysLeft
         ? numeral(F, {
@@ -61,7 +61,7 @@ export const orbit: TemplateDef = {
           })
         : null,
       show.daysLeft
-        ? caps(F, str.daysLabel, { align: 'center', x: cx, maxWidth: D * 0.62, color: pal.text, size: 22 * s, element: 'daysLeft', gap: 40 * g })
+        ? caps(F, str.daysLabel, { align: 'center', x: cx, maxWidth: D * 0.62, color: pal.text, size: 27 * s, element: 'daysLeft', gap: 40 * g })
         : null,
     ]);
 
@@ -87,7 +87,7 @@ export const orbit: TemplateDef = {
               const r0 = R - (major ? 30 : 17) * u;
               const r1 = R - 9 * u;
               ctx.strokeStyle = major ? pal.hairline : pal.faint;
-              ctx.lineWidth = major ? Math.max(1, 2 * u) : hair * 0.8;
+              ctx.lineWidth = major ? Math.max(1, 2 * u) : hair;
               ctx.beginPath();
               ctx.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0);
               ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
@@ -128,13 +128,13 @@ export const orbit: TemplateDef = {
     const tx = F.align === 'center' ? cx : F.align === 'left' ? band.left : band.right;
     const align = F.align;
     const rows: (Row | null)[] = [
-      show.goalTitle ? caps(F, str.goal, { color: pal.accentInk, weight: 600, size: 22 * s, element: 'goalTitle', align, x: tx }) : null,
+      show.goalTitle ? caps(F, str.goal, { color: pal.accentInk, weight: 600, size: 27 * s, element: 'goalTitle', align, x: tx }) : null,
       { ...ring, gap: show.goalTitle ? 64 * g : 0 },
-      show.progress ? caps(F, str.progress, { color: pal.accentInk, element: 'progress', size: 20 * s, gap: 56 * g, align, x: tx }) : null,
+      show.progress ? caps(F, str.progress, { color: pal.accentInk, element: 'progress', size: 24 * s, gap: 56 * g, align, x: tx }) : null,
       show.targetDate
         ? column(
             [
-              caps(F, 'Target', { element: 'targetDate', size: 18 * s, align, x: tx }),
+              caps(F, 'Target', { element: 'targetDate', size: 22 * s, align, x: tx }),
               text(F, {
                 text: str.target,
                 font: F.fonts.display,

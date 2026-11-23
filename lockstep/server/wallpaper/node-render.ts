@@ -17,17 +17,15 @@
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { existsSync } from 'node:fs';
-import { GlobalFonts, Image, createCanvas, loadImage, type Canvas, type SKRSContext2D } from '@napi-rs/canvas';
+import { GlobalFonts, Image, createCanvas, loadImage, type Canvas } from '@napi-rs/canvas';
 import {
   FONT_FAMILIES,
   renderWallpaper,
   resolveSize,
   normalizeDesign,
   type CanvasFactory,
-  type Ctx2D,
   type FontId,
   type ImageLike,
-  type Layer,
   type RenderReport,
   type WallpaperData,
   type WallpaperDesign,
@@ -78,13 +76,11 @@ export function registerWallpaperFonts(): FontRegistration[] {
   return registered;
 }
 
-/** napi's createCanvas, typed as the renderer's offscreen-layer factory. */
-export const napiCanvasFactory: CanvasFactory = (w, h) => createCanvas(Math.max(1, Math.round(w)), Math.max(1, Math.round(h))) as unknown as Layer;
-
-/** The napi context, seen through the renderer's minimal Ctx2D type. */
-export function asCtx2D(ctx: SKRSContext2D): Ctx2D {
-  return ctx as unknown as Ctx2D;
-}
+/**
+ * napi's createCanvas as the renderer's offscreen-layer factory. No cast is
+ * needed: napi's Canvas already matches the renderer's small `Layer` shape.
+ */
+export const napiCanvasFactory: CanvasFactory = (w, h) => createCanvas(Math.max(1, Math.round(w)), Math.max(1, Math.round(h)));
 
 export type BackgroundSource = Buffer | string | Image | Canvas | ImageLike | null | undefined;
 
@@ -128,7 +124,7 @@ export async function renderWallpaperPng(
   const image =
     d.background.kind === 'image' ? await loadBackground(opts.image ?? d.background.image?.src ?? null) : null;
   const canvas = createCanvas(size.width, size.height);
-  const report = renderWallpaper(asCtx2D(canvas.getContext('2d')), {
+  const report = renderWallpaper(canvas.getContext('2d'), {
     design: d,
     data,
     createCanvas: napiCanvasFactory,

@@ -24,7 +24,7 @@ import {
 /** Small-caps label over a serif value. */
 function pair(F: Frame, label: string, value: string, element: 'dayOfTotal' | 'targetDate', align: Align, x: number): Row | null {
   return column([
-    caps(F, label, { align, x, element, size: 19 * F.s }),
+    caps(F, label, { align, x, element, size: 23 * F.s }),
     text(F, {
       text: value,
       font: F.fonts.display,
@@ -72,7 +72,7 @@ export const monolith: TemplateDef = {
       : null;
 
     const rows: (Row | null)[] = [
-      show.goalTitle ? caps(F, str.goal, { color: pal.accentInk, weight: 600, size: 24 * s, element: 'goalTitle' }) : null,
+      show.goalTitle ? caps(F, str.goal, { color: pal.accentInk, weight: 600, size: 29 * s, element: 'goalTitle' }) : null,
       rule(F, { gap: 34 * g }),
       ...(show.daysLeft
         ? [
@@ -87,7 +87,7 @@ export const monolith: TemplateDef = {
               element: 'daysLeft',
               gap: 80 * g,
             }),
-            caps(F, str.daysLabel, { size: 26 * s, color: pal.text, element: 'daysLeft', gap: 50 * g }),
+            caps(F, str.daysLabel, { size: 32 * s, color: pal.text, element: 'daysLeft', gap: 50 * g }),
           ]
         : []),
       rule(F, { gap: 60 * g }),
@@ -96,7 +96,7 @@ export const monolith: TemplateDef = {
       show.progress
         ? column(
             [
-              caps(F, str.progress, { element: 'progress', size: 19 * s }),
+              caps(F, str.progress, { element: 'progress', size: 23 * s }),
               bar(F, { pct: str.pct, thickness: 2, gap: 22 * g }),
             ],
             64 * g,

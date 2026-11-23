@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import * as Tabs from '@radix-ui/react-tabs';
-import { Drawer } from 'vaul';
+import { BottomSheet } from '@/components/ui/bottom-sheet';
 import { Download, Smartphone } from 'lucide-react';
 import { useActiveGoalId, useGoalData, useGoals } from '@/db/hooks';
 import { useMinuteMetrics, useMotivation } from '@/features/goals/components';
@@ -95,14 +95,16 @@ export default function StudioPage() {
   const [showSafe, setShowSafe] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [tab, setTab] = useState<Tab>('template');
-  const [snap, setSnap] = useState<number | string | null>(0.42);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const desktop = useMedia('(min-width: 1024px)');
   const previewBox = useRef<HTMLDivElement>(null);
   const [previewW, setPreviewW] = useState(300);
 
-  const wpData = useMemo(() => (data && m ? buildWallpaperData(data, m, motivation.line, Math.max(refreshAt, Date.now())) : null), [data, m, motivation.line, refreshAt]);
+  const wpDataMemo = useMemo(() => (data && m ? buildWallpaperData(data, m, motivation.line, Math.max(refreshAt, Date.now())) : null), [data, m, motivation.line, refreshAt]);
 
   // Fit the phone into the available space.
+  const wpData = wpDataMemo;
+  const hasPreview = !!design && !!wpData;
   useEffect(() => {
     const el = previewBox.current;
     if (!el || !design) return;
@@ -115,7 +117,9 @@ export default function StudioPage() {
     });
     ro.observe(el);
     return () => ro.disconnect();
-  }, [design, desktop]);
+    // Re-measure when the preview mounts, the device (aspect) changes, or the layout switches.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasPreview, design?.device, desktop]);
 
   const refresh = useCallback(async () => {
     setRefreshAt(Date.now());
@@ -230,32 +234,22 @@ export default function StudioPage() {
       {preview}
       {/* Spacer so the page can scroll past the sheet's resting height. */}
       <div className="h-[40dvh]" aria-hidden />
-      <Drawer.Root open modal={false} dismissible={false} snapPoints={[0.42, 0.9]} activeSnapPoint={snap} setActiveSnapPoint={setSnap}>
-        <Drawer.Portal>
-          <Drawer.Content
-            aria-label="Studio controls"
-            className="fixed inset-x-0 bottom-0 z-[35] flex h-[92dvh] flex-col rounded-t-[24px] border-t border-line-strong bg-surface shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.8)] outline-none"
-          >
-            <Drawer.Title className="sr-only">Studio controls</Drawer.Title>
-            <Drawer.Description className="sr-only">Drag up for more space. Choose a tab to edit the wallpaper.</Drawer.Description>
-            <div className="mx-auto mt-2.5 h-1.5 w-12 shrink-0 rounded-full bg-line-strong" aria-hidden />
-            <Tabs.Root value={tab} onValueChange={(v) => { setTab(v as Tab); setSnap(0.9); }} className="flex min-h-0 flex-1 flex-col">
-              <Tabs.List aria-label="Studio sections" className="flex shrink-0 gap-1 overflow-x-auto px-3 pb-2 pt-3 scrollbar-none">
-                {MOBILE_TABS.map((t) => (
-                  <Tabs.Trigger key={t.id} value={t.id} className="h-11 shrink-0 rounded-full border border-hairline px-4 text-sm text-muted data-[state=active]:border-accent data-[state=active]:bg-accent/15 data-[state=active]:text-accent-text">
-                    {t.label}
-                  </Tabs.Trigger>
-                ))}
-              </Tabs.List>
-              {MOBILE_TABS.map((t) => (
-                <Tabs.Content key={t.id} value={t.id} className="min-h-0 flex-1 overflow-y-auto px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-2" data-vaul-no-drag>
-                  {panel(t.id)}
-                </Tabs.Content>
-              ))}
-            </Tabs.Root>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
+      <BottomSheet label="Studio controls" expanded={sheetOpen} onExpandedChange={setSheetOpen}>
+        <Tabs.Root value={tab} onValueChange={(v) => { setTab(v as Tab); setSheetOpen(true); }} className="flex min-h-0 flex-1 flex-col">
+          <Tabs.List aria-label="Studio sections" className="flex shrink-0 gap-1 overflow-x-auto px-3 pb-2 pt-1 scrollbar-none">
+            {MOBILE_TABS.map((t) => (
+              <Tabs.Trigger key={t.id} value={t.id} className="h-11 shrink-0 rounded-full border border-hairline px-4 text-sm text-muted data-[state=active]:border-accent data-[state=active]:bg-accent/15 data-[state=active]:text-accent-text">
+                {t.label}
+              </Tabs.Trigger>
+            ))}
+          </Tabs.List>
+          {MOBILE_TABS.map((t) => (
+            <Tabs.Content key={t.id} value={t.id} className="min-h-0 flex-1 overflow-y-auto px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-2">
+              {panel(t.id)}
+            </Tabs.Content>
+          ))}
+        </Tabs.Root>
+      </BottomSheet>
       <ExportDialog open={exportOpen} onOpenChange={setExportOpen} design={design} data={wpData} goalTitle={data.goal.title} todayKey={m.countdown.todayKey} onRefresh={refresh} />
     </div>
   );

@@ -605,7 +605,7 @@ export function caps(F: Frame, t: string, o: Partial<TextOpts> = {}): Row {
   return text(F, {
     text: t,
     font: F.fonts.ui,
-    size: 22 * F.s,
+    size: 26 * F.s,
     weight: 500,
     color: F.pal.muted,
     caps: true,
@@ -640,7 +640,7 @@ export function milestoneRow(
   const common = { align, x: o.x, maxWidth, element: 'nextMilestone' as const };
   return column(
     [
-      o.label === null ? null : caps(F, o.label ?? 'Next milestone', { ...common, size: (o.labelSize ?? 20) * F.s }),
+      o.label === null ? null : caps(F, o.label ?? 'Next milestone', { ...common, size: (o.labelSize ?? 24) * F.s }),
       paragraph(F, {
         ...common,
         text: title,
@@ -656,7 +656,7 @@ export function milestoneRow(
         ? caps(F, F.str.milestoneDate, {
             ...common,
             font: o.dateFont ?? F.fonts.ui,
-            size: (o.labelSize ?? 20) * F.s,
+            size: (o.labelSize ?? 24) * F.s,
             weight: 600,
             color: F.pal.accentInk,
             gap: inner,
@@ -703,7 +703,7 @@ export function motivationRow(
 /** The small "Updated 23 Nov" stamp. */
 export function stampRow(F: Frame, o: Partial<TextOpts> = {}): Row | null {
   if (!F.show.updatedStamp || !F.str.updated) return null;
-  return caps(F, F.str.updated, { size: 18 * F.s, element: 'updatedStamp', ...o });
+  return caps(F, F.str.updated, { size: 22 * F.s, element: 'updatedStamp', ...o });
 }
 
 /** A copy of the frame whose band is inset (for framed layouts). */

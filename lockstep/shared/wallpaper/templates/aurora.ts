@@ -78,7 +78,7 @@ export const aurora: TemplateDef = {
     const barW = Math.min(band.width, 560 * F.u);
     const bx0 = F.align === 'left' ? band.left : F.align === 'right' ? band.right - barW : F.W / 2 - barW / 2;
     const rows: (Row | null)[] = [
-      show.goalTitle ? caps(F, str.goal, { color: pal.text, weight: 500, size: 22 * s, element: 'goalTitle' }) : null,
+      show.goalTitle ? caps(F, str.goal, { color: pal.text, weight: 500, size: 27 * s, element: 'goalTitle' }) : null,
       show.daysLeft
         ? numeral(F, {
             text: str.numeral,
@@ -92,17 +92,17 @@ export const aurora: TemplateDef = {
             gap: 70 * g,
           })
         : null,
-      show.daysLeft ? caps(F, str.daysLabel, { size: 24 * s, color: pal.text, element: 'daysLeft', gap: 50 * g }) : null,
+      show.daysLeft ? caps(F, str.daysLabel, { size: 29 * s, color: pal.text, element: 'daysLeft', gap: 50 * g }) : null,
       show.progress
         ? column(
             [
               bar(F, { x0: bx0, x1: bx0 + barW, pct: str.pct, thickness: 3, rounded: true, dot: true, track: withAlpha(pal.text, 0.16), fill: pal.text }),
-              caps(F, str.progress, { size: 19 * s, color: pal.text, element: 'progress', gap: 34 * g }),
+              caps(F, str.progress, { size: 23 * s, color: pal.text, element: 'progress', gap: 34 * g }),
             ],
             78 * g,
           )
         : null,
-      show.dayOfTotal ? caps(F, str.dayOfTotal, { size: 19 * s, element: 'dayOfTotal', gap: 70 * g }) : null,
+      show.dayOfTotal ? caps(F, str.dayOfTotal, { size: 23 * s, element: 'dayOfTotal', gap: 70 * g }) : null,
       show.targetDate
         ? text(F, {
             text: str.target,
