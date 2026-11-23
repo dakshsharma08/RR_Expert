@@ -103,15 +103,7 @@ export class ModelResolver {
 
   private async lookup(): Promise<string> {
     try {
-      const names: string[] = [];
-      // A timeout so /api/health can never hang on a slow listing.
-      const pager = await this.gemini.models.list({ config: { pageSize: 100, abortSignal: AbortSignal.timeout(10_000) } });
-      for await (const model of pager) {
-        const actions = model.supportedActions;
-        if (model.name && (!actions || actions.includes('generateContent'))) names.push(model.name);
-        if (names.length > 500) break;
-      }
-      const picked = pickNewestStableFlash(names);
+      const picked = pickNewestStableFlash(await this.listedNames());
       if (picked) {
         this.cached = { model: picked, until: this.nowMs() + this.opts.cacheMs };
         return picked;
@@ -121,5 +113,33 @@ export class ModelResolver {
     }
     this.cached = { model: FALLBACK_MODEL, until: this.nowMs() + (this.opts.failCacheMs ?? 5 * 60 * 1000) };
     return FALLBACK_MODEL;
+  }
+
+  private names: { list: string[]; until: number } | null = null;
+  private namesInflight: Promise<string[]> | null = null;
+
+  /**
+   * Model names this key can call (cached). Shared by the text-model choice and the
+   * image-model discovery, so /api/health lists models at most once per cache period.
+   */
+  async listedNames(): Promise<string[]> {
+    if (this.names && this.names.until > this.nowMs()) return this.names.list;
+    this.namesInflight ??= this.fetchNames().finally(() => {
+      this.namesInflight = null;
+    });
+    return this.namesInflight;
+  }
+
+  private async fetchNames(): Promise<string[]> {
+    const names: string[] = [];
+    // A timeout so /api/health can never hang on a slow listing.
+    const pager = await this.gemini.models.list({ config: { pageSize: 100, abortSignal: AbortSignal.timeout(10_000) } });
+    for await (const model of pager) {
+      const actions = model.supportedActions;
+      if (model.name && (!actions || actions.includes('generateContent'))) names.push(model.name);
+      if (names.length > 500) break;
+    }
+    this.names = { list: names, until: this.nowMs() + this.opts.cacheMs };
+    return names;
   }
 }

@@ -57,7 +57,7 @@ async function seed(user: string, tag: string) {
   await pg.query('insert into auth.users (id) values ($1)', [user]);
   await pg.query(
     `insert into public.goals (id, user_id, title, deadline_utc, timezone, start_utc, status, pace_style, hours_per_day, working_days, level, intake)
-     values ($1, $2, $3, now() + interval '30 days', 'UTC', now(), 'active', 'steady', 2, '[1,2,3,4,5]', 'beginner', '{"goal":"x"}')`,
+     values ($1, $2, $3, now() + interval '30 days', 'UTC', now(), 'active', 'Steady', 2, '[1,2,3,4,5]', 'Beginner', '{"goal":"x"}')`,
     [`g${tag}`, user, `Goal ${tag}`],
   );
   await pg.query(
@@ -158,7 +158,7 @@ describe('row level security', () => {
   it('rejects creating a goal owned by someone else', async () => {
     await expect(
       as(A, `insert into public.goals (id, user_id, title, deadline_utc, timezone, start_utc, status, pace_style, hours_per_day, level, intake)
-             values ('gEvil', $1, 'x', now(), 'UTC', now(), 'active', 'steady', 1, 'beginner', '{}')`, [B]),
+             values ('gEvil', $1, 'x', now(), 'UTC', now(), 'active', 'Steady', 1, 'Beginner', '{}')`, [B]),
     ).rejects.toThrow(/row-level security/);
   });
 

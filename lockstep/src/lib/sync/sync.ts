@@ -13,7 +13,6 @@
  */
 import { useEffect, useState } from 'react';
 import type { Session, SupabaseClient } from '@supabase/supabase-js';
-import type { EntityTable } from 'dexie';
 import { db, nowIso, type AiRunRow, type GoalRow, type MilestoneRow, type ProgressLogRow, type TaskRow, type WallpaperRow } from '@/db/db';
 import { getKv, setKv } from '@/db/repo';
 import { cloudConfigured, getSupabase } from './client';
@@ -331,9 +330,6 @@ export type SyncResult =
   | { ok: true; at: string; total: SyncCounts; tables: Record<SyncTable, SyncCounts> }
   | { ok: false; message: string };
 
-/** A failure we already have a good sentence for. */
-class SyncStop extends Error {}
-
 const PAGE = 500; // below Supabase's default 1000-row response cap
 const UPSERT_CHUNK = 200;
 const DELETE_CHUNK = 100; // ids go in the URL, so keep it short
@@ -349,9 +345,17 @@ interface Ctx {
   cloudIds: PerTable<Set<string>>;
 }
 
+/** The few Dexie table methods sync needs (any Dexie table fits this shape). */
+interface LocalTable<L> {
+  toArray(): Promise<L[]>;
+  get(id: string): Promise<L | undefined>;
+  put(row: L): Promise<unknown>;
+  bulkDelete(ids: string[]): Promise<void>;
+}
+
 interface TableSpec<L extends { id: string }, C extends Versioned> {
   name: SyncTable;
-  table: EntityTable<L, 'id'>;
+  table: LocalTable<L>;
   toCloud: (row: L, userId: string) => C;
   fromCloud: (row: C, existing: L | undefined) => L;
   /** Parent rows this row needs in the cloud first: [table, id] pairs. */
@@ -621,7 +625,6 @@ function chunk<T>(items: readonly T[], size: number): T[][] {
 
 /** Any sync failure → one plain sentence. Raw database errors never reach the user. */
 export function syncMessage(e: unknown): string {
-  if (e instanceof SyncStop) return e.message;
   const err = (e ?? {}) as { code?: string; message?: string; name?: string; status?: number };
   const code = String(err.code ?? '');
   const text = err.message ?? '';
@@ -633,6 +636,6 @@ export function syncMessage(e: unknown): string {
   if (code === '42501') return 'The cloud refused a change for permission reasons. Sign out and back in, then try again.';
   if (code === '23503') return "Some items point at a goal that isn't in the cloud yet. Tap Sync now once more.";
   if (code.startsWith('22') || code.startsWith('23'))
-    return "Some data on this device didn't fit the cloud format, so sync stopped. Nothing on this device was changed by it.";
+    return "Some data on this device didn't fit the cloud format, so sync stopped. Your data on this device is safe.";
   return "Sync didn't finish. Nothing on this device was lost. Try again in a moment.";
 }

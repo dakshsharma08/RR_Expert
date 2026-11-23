@@ -117,7 +117,7 @@ export function createApp(opts: CreateAppOptions = {}): Express {
       now,
       limiter,
       motivationCache: new MotivationCache(),
-      images: gemini ? new ImageModelResolver(gemini, { pinned: env.GEMINI_IMAGE_MODEL?.trim() || null, cacheMs: tuning.modelCacheMs }) : null,
+      images: models ? new ImageModelResolver(() => models.listedNames(), { pinned: env.GEMINI_IMAGE_MODEL?.trim() || null, cacheMs: tuning.modelCacheMs }) : null,
       wallpaperStore: wallpapers.kind,
     }),
   );

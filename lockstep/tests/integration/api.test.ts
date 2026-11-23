@@ -357,7 +357,8 @@ describe('GET /api/health', () => {
     const base = await start({ env: { GEMINI_API_KEY: TEST_KEY, GEMINI_MODEL_HEAVY: 'gemini-test-pro' } });
     const a = (await (await fetch(`${base}/api/health`)).json()) as HealthResponse;
     const b = (await (await fetch(`${base}/api/health`)).json()) as HealthResponse;
-    expect(a.ai).toEqual({ configured: true, model: 'gemini-3.8-flash', heavyModel: 'gemini-test-pro', imageModel: null });
+    // gemini-3.10-flash-image is listed, so AI backgrounds are offered (image model discovery shares the one listing).
+    expect(a.ai).toEqual({ configured: true, model: 'gemini-3.8-flash', heavyModel: 'gemini-test-pro', imageModel: 'gemini-3.10-flash-image' });
     expect(b.ai.model).toBe('gemini-3.8-flash');
     expect(listCalls).toBe(1);
   });

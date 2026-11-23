@@ -10,7 +10,6 @@ import { z } from 'zod';
 import type { BackgroundResponse } from '../../shared/api';
 import { AppError } from '../lib/errors';
 import { callGemini, type CallContext } from './call';
-import type { GeminiLike } from './client';
 
 export const BackgroundRequestSchema = z.object({
   theme: z.enum(['champagne-gold', 'ivory', 'monochrome', 'midnight-sapphire', 'rose-gold', 'emerald-noir']),
@@ -69,7 +68,8 @@ export class ImageModelResolver {
   private cached: { model: string | null; until: number } | null = null;
   private brokenUntil = 0;
   constructor(
-    private readonly gemini: GeminiLike,
+    /** Where model names come from (shared with the text-model resolver's cached listing). */
+    private readonly listNames: () => Promise<string[]>,
     private readonly opts: { pinned: string | null; cacheMs: number; nowMs?: () => number },
   ) {}
   private now() {
@@ -81,10 +81,7 @@ export class ImageModelResolver {
     if (this.cached && this.cached.until > this.now()) return this.cached.model;
     let model: string | null;
     try {
-      const names: string[] = [];
-      const pager = await this.gemini.models.list({ config: { pageSize: 100, abortSignal: AbortSignal.timeout(10_000) } });
-      for await (const m of pager) if (m.name) names.push(m.name);
-      model = pickImageModel(names);
+      model = pickImageModel(await this.listNames());
     } catch {
       model = null;
     }
