@@ -348,8 +348,8 @@ interface Ctx {
 /** The few Dexie table methods sync needs (any Dexie table fits this shape). */
 interface LocalTable<L> {
   toArray(): Promise<L[]>;
-  get(id: string): Promise<L | undefined>;
-  put(row: L): Promise<unknown>;
+  bulkGet(ids: string[]): Promise<(L | undefined)[]>;
+  bulkPut(rows: readonly L[]): Promise<unknown>;
   bulkDelete(ids: string[]): Promise<void>;
 }
 
@@ -520,20 +520,26 @@ async function syncTable<L extends { id: string }, C extends Versioned>(spec: Ta
   // 3. Apply on this device, in one transaction.
   const deletedHere = new Set<string>();
   await db.transaction('rw', [db.goals, db.milestones, db.tasks, db.progress_logs, db.wallpapers, db.ai_runs, db.kv], async () => {
-    for (const remote of toLocal) {
-      const current = await spec.table.get(remote.id);
+    // Re-read inside the transaction so nothing can change between the check and the write.
+    const currents = await spec.table.bulkGet(toLocal.map((r) => r.id));
+    const writes: L[] = [];
+    toLocal.forEach((remote, i) => {
+      const current = currents[i];
       // Edited on this device while we were busy talking to the server? That edit is newer; keep it.
-      if (current && toMillis(stamp(current)) > toMillis(remote.updated_at)) continue;
+      if (current && toMillis(stamp(current)) > toMillis(remote.updated_at)) return;
       const next = spec.fromCloud(remote, current);
-      if (current && sameContent(next, current)) continue; // just an echo of our own upload
-      await spec.table.put(next);
-      counts.pulled++;
-    }
-    for (const id of deleteLocal) {
-      const current = await spec.table.get(id);
-      if (!current || toMillis(stamp(current)) > toMillis(stampAtRead.get(id))) continue;
-      deletedHere.add(id);
-    }
+      if (current && sameContent(next, current)) return; // just an echo of our own upload
+      writes.push(next);
+    });
+    await spec.table.bulkPut(writes);
+    counts.pulled = writes.length;
+
+    const doomed = await spec.table.bulkGet(deleteLocal);
+    deleteLocal.forEach((id, i) => {
+      const current = doomed[i];
+      // Only delete if it hasn't been edited here since we looked.
+      if (current && toMillis(stamp(current)) <= toMillis(stampAtRead.get(id))) deletedHere.add(id);
+    });
     await deleteOnDevice(spec, [...deletedHere]);
   });
   counts.deleted += deletedHere.size;

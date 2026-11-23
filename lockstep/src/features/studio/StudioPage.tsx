@@ -184,7 +184,7 @@ export default function StudioPage() {
   );
 
   const preview = (
-    <div ref={previewBox} className={cn('flex items-center justify-center', desktop ? 'h-[calc(100dvh-120px)]' : 'h-[56dvh] pt-2')}>
+    <div ref={previewBox} className={cn('flex items-center justify-center', desktop ? 'h-[calc(100dvh-120px)]' : 'h-[calc(100dvh-8.5rem-31dvh)] min-h-[300px] pt-1')}>
       <PhonePreview design={design} data={wpData} width={previewW} showUi={showUi} showSafe={showSafe} onReport={setReport} />
     </div>
   );
@@ -233,8 +233,8 @@ export default function StudioPage() {
       {header}
       {preview}
       {/* Spacer so the page can scroll past the sheet's resting height. */}
-      <div className="h-[40dvh]" aria-hidden />
-      <BottomSheet label="Studio controls" expanded={sheetOpen} onExpandedChange={setSheetOpen}>
+      <div className="h-[30dvh]" aria-hidden />
+      <BottomSheet label="Studio controls" peek={0.31} expanded={sheetOpen} onExpandedChange={setSheetOpen}>
         <Tabs.Root value={tab} onValueChange={(v) => { setTab(v as Tab); setSheetOpen(true); }} className="flex min-h-0 flex-1 flex-col">
           <Tabs.List aria-label="Studio sections" className="flex shrink-0 gap-1 overflow-x-auto px-3 pb-2 pt-1 scrollbar-none">
             {MOBILE_TABS.map((t) => (
