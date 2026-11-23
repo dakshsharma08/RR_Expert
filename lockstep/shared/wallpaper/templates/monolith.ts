@@ -22,7 +22,14 @@ import {
 } from './kit';
 
 /** Small-caps label over a serif value. */
-function pair(F: Frame, label: string, value: string, element: 'dayOfTotal' | 'targetDate', align: Align, x: number): Row | null {
+function pair(
+  F: Frame,
+  label: string,
+  value: string,
+  element: 'dayOfTotal' | 'targetDate',
+  align: Align,
+  x: number,
+): Row | null {
   return column([
     caps(F, label, { align, x, element, size: 23 * F.s }),
     text(F, {
@@ -72,7 +79,9 @@ export const monolith: TemplateDef = {
       : null;
 
     const rows: (Row | null)[] = [
-      show.goalTitle ? caps(F, str.goal, { color: pal.accentInk, weight: 600, size: 29 * s, element: 'goalTitle' }) : null,
+      show.goalTitle
+        ? caps(F, str.goal, { color: pal.accentInk, weight: 600, size: 29 * s, element: 'goalTitle' })
+        : null,
       rule(F, { gap: 34 * g }),
       ...(show.daysLeft
         ? [

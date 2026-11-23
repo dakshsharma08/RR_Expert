@@ -53,15 +53,41 @@ export const minimalMono: TemplateDef = {
     let index = 0;
 
     const cell = (t: string, x: number, element: ElementId, color = pal.muted) =>
-      text(F, { text: t, font: mono, size, weight: 400, color, caps: true, tracking: F.tracking, align: 'left', x, element });
+      text(F, {
+        text: t,
+        font: mono,
+        size,
+        weight: 400,
+        color,
+        caps: true,
+        tracking: F.tracking,
+        align: 'left',
+        x,
+        element,
+      });
     /** "01  KEY   value" with an auto-incrementing index. */
     const entry = (key: string, element: ElementId, valueRow: Row | null): Row | null => {
       if (!valueRow) return null;
       index += 1;
-      return beside([cell(String(index).padStart(2, '0'), x0, element), cell(key, kx, element), valueRow], 36 * g);
+      return beside(
+        [cell(String(index).padStart(2, '0'), x0, element), cell(key, kx, element), valueRow],
+        36 * g,
+      );
     };
     const value = (t: string, element: ElementId) =>
-      text(F, { text: t, font: mono, size, weight: 400, color: pal.text, caps: true, tracking: F.tracking * 0.5, align: 'left', x: vx, maxWidth: vw, element });
+      text(F, {
+        text: t,
+        font: mono,
+        size,
+        weight: 400,
+        color: pal.text,
+        caps: true,
+        tracking: F.tracking * 0.5,
+        align: 'left',
+        x: vx,
+        maxWidth: vw,
+        element,
+      });
 
     // Progress as 20 square-ish cells.
     const cells = 20;
@@ -90,13 +116,43 @@ export const minimalMono: TemplateDef = {
         'nextMilestone',
         show.nextMilestone && str.milestoneTitle
           ? column([
-              paragraph(F, { text: str.milestoneTitle, font: mono, size, weight: 400, color: pal.text, align: 'left', x: vx, maxWidth: vw, maxLines: 2, leading: 1.5, element: 'nextMilestone' }),
-              str.milestoneDate ? { ...cell(str.milestoneDate, vx, 'nextMilestone', pal.accentInk), gap: 18 * g } : null,
+              paragraph(F, {
+                text: str.milestoneTitle,
+                font: mono,
+                size,
+                weight: 400,
+                color: pal.text,
+                align: 'left',
+                x: vx,
+                maxWidth: vw,
+                maxLines: 2,
+                leading: 1.5,
+                element: 'nextMilestone',
+              }),
+              str.milestoneDate
+                ? { ...cell(str.milestoneDate, vx, 'nextMilestone', pal.accentInk), gap: 18 * g }
+                : null,
             ])
           : null,
       ),
-      entry('Done', 'progress', show.progress ? column([value(str.pctText, 'progress'), { ...progressCells, gap: 20 * g }]) : null),
-      entry('Note', 'motivation', motivationRow(F, { font: mono, size: 22, weight: 400, quotes: false, align: 'left', x: vx, maxWidth: vw })),
+      entry(
+        'Done',
+        'progress',
+        show.progress ? column([value(str.pctText, 'progress'), { ...progressCells, gap: 20 * g }]) : null,
+      ),
+      entry(
+        'Note',
+        'motivation',
+        motivationRow(F, {
+          font: mono,
+          size: 22,
+          weight: 400,
+          quotes: false,
+          align: 'left',
+          x: vx,
+          maxWidth: vw,
+        }),
+      ),
     ]
       .filter((r): r is Row => r !== null)
       // The first entry sits a little further from the rule above it.
@@ -106,7 +162,19 @@ export const minimalMono: TemplateDef = {
       show.goalTitle
         ? beside([
             cell('00', x0, 'goalTitle'),
-            text(F, { text: str.goal, font: mono, size, weight: 500, color: pal.text, caps: true, tracking: F.tracking, align: 'left', x: kx, maxWidth: band.right - kx, element: 'goalTitle' }),
+            text(F, {
+              text: str.goal,
+              font: mono,
+              size,
+              weight: 500,
+              color: pal.text,
+              caps: true,
+              tracking: F.tracking,
+              align: 'left',
+              x: kx,
+              maxWidth: band.right - kx,
+              element: 'goalTitle',
+            }),
           ])
         : null,
       rule(F, { gap: 34 * g, color: pal.hairline, weight: 1 }),
@@ -123,7 +191,16 @@ export const minimalMono: TemplateDef = {
             gap: 64 * g,
           })
         : null,
-      show.daysLeft ? caps(F, str.daysLabel, { font: mono, size, weight: 500, color: pal.accentInk, element: 'daysLeft', gap: 40 * g }) : null,
+      show.daysLeft
+        ? caps(F, str.daysLabel, {
+            font: mono,
+            size,
+            weight: 500,
+            color: pal.accentInk,
+            element: 'daysLeft',
+            gap: 40 * g,
+          })
+        : null,
       rule(F, { gap: 60 * g, color: pal.hairline, weight: 1 }),
       ...entries,
       entries.length > 0 ? rule(F, { gap: 60 * g, color: pal.hairline, weight: 1 }) : null,

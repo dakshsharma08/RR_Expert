@@ -81,7 +81,8 @@ export function normalizeDesign(input: WallpaperDesign): WallpaperDesign {
   const theme = input.theme in THEMES ? input.theme : base.theme;
   const device = input.device === 'custom' || input.device in DEVICES ? input.device : 'iphone';
   const t = { ...base.typography, ...input.typography };
-  const font = <K extends 'display' | 'ui' | 'numbers'>(k: K) => (t[k] in FONT_FAMILIES ? t[k] : base.typography[k]);
+  const font = <K extends 'display' | 'ui' | 'numbers'>(k: K) =>
+    t[k] in FONT_FAMILIES ? t[k] : base.typography[k];
   const bg = { ...base.background, ...input.background };
   const img = bg.image;
   return {
@@ -97,13 +98,20 @@ export function normalizeDesign(input: WallpaperDesign): WallpaperDesign {
       scale: clamp(t.scale, 0.7, 1.4, base.typography.scale),
       weight: clamp(t.weight, 300, 800, base.typography.weight),
       tracking: clamp(t.tracking, -0.05, 0.3, base.typography.tracking),
-      align: t.align === 'left' || t.align === 'center' || t.align === 'right' ? t.align : base.typography.align,
+      align:
+        t.align === 'left' || t.align === 'center' || t.align === 'right' ? t.align : base.typography.align,
     },
     colors: { ...input.colors },
     background: {
       kind: bg.kind === 'gradient' || bg.kind === 'image' ? bg.kind : 'theme',
       ...(bg.gradient
-        ? { gradient: { from: bg.gradient.from, to: bg.gradient.to, angle: clamp(bg.gradient.angle, -360, 360, 180) } }
+        ? {
+            gradient: {
+              from: bg.gradient.from,
+              to: bg.gradient.to,
+              angle: clamp(bg.gradient.angle, -360, 360, 180),
+            },
+          }
         : {}),
       ...(img
         ? {
@@ -120,12 +128,18 @@ export function normalizeDesign(input: WallpaperDesign): WallpaperDesign {
       grain: clamp(bg.grain, 0, 1, base.background.grain),
     },
     layout: {
-      position: ['auto', 'upper', 'middle', 'lower'].includes(input.layout?.position) ? input.layout.position : 'auto',
+      position: ['auto', 'upper', 'middle', 'lower'].includes(input.layout?.position)
+        ? input.layout.position
+        : 'auto',
     },
     text: {
       custom: typeof input.text?.custom === 'string' ? input.text.custom.slice(0, 200) : '',
-      source: input.text?.source === 'custom' || input.text?.source === 'none' ? input.text.source : 'motivation',
+      source:
+        input.text?.source === 'custom' || input.text?.source === 'none' ? input.text.source : 'motivation',
     },
-    show: Object.fromEntries(ELEMENT_IDS.map((id) => [id, input.show?.[id] ?? true])) as Record<ElementId, boolean>,
+    show: Object.fromEntries(ELEMENT_IDS.map((id) => [id, input.show?.[id] ?? true])) as Record<
+      ElementId,
+      boolean
+    >,
   };
 }

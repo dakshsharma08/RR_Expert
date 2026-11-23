@@ -81,7 +81,12 @@ export const ivoryPaper: TemplateDef = {
       ctx.lineWidth = Math.max(0.6, (0.5 + fr() * 0.8) * B.u);
       ctx.beginPath();
       ctx.moveTo(x, y);
-      ctx.quadraticCurveTo(x + Math.cos(a + 0.6) * len * 0.5, y + Math.sin(a + 0.6) * len * 0.5, x + Math.cos(a) * len, y + Math.sin(a) * len);
+      ctx.quadraticCurveTo(
+        x + Math.cos(a + 0.6) * len * 0.5,
+        y + Math.sin(a + 0.6) * len * 0.5,
+        x + Math.cos(a) * len,
+        y + Math.sin(a) * len,
+      );
       ctx.stroke();
     }
   },
@@ -100,15 +105,36 @@ function rows(F: Frame): (Row | null)[] {
   const { s, g, u, band, pal, str, show } = F;
   const both = show.dayOfTotal && show.targetDate;
   const colW = band.width * 0.48;
-  const pair = (label: string, value: string, element: 'dayOfTotal' | 'targetDate', align: Align, x: number) =>
+  const pair = (
+    label: string,
+    value: string,
+    element: 'dayOfTotal' | 'targetDate',
+    align: Align,
+    x: number,
+  ) =>
     column([
       caps(F, label, { align, x, element, size: 22 * s, maxWidth: colW }),
-      text(F, { text: value, font: F.fonts.display, size: 34 * s, weight: 400, color: pal.text, align, x, maxWidth: colW, element, gap: 20 * g }),
+      text(F, {
+        text: value,
+        font: F.fonts.display,
+        size: 34 * s,
+        weight: 400,
+        color: pal.text,
+        align,
+        x,
+        maxWidth: colW,
+        element,
+        gap: 20 * g,
+      }),
     ]);
   // In a centred card, two pairs sit at the quarter points; otherwise they follow the alignment.
   const q = (k: number) => band.left + band.width * k;
-  const dayPair = show.dayOfTotal ? pair(str.dayKey, str.dayValue, 'dayOfTotal', both ? 'center' : F.align, both ? q(0.25) : anchor(F)) : null;
-  const duePair = show.targetDate ? pair('Target', str.target, 'targetDate', both ? 'center' : F.align, both ? q(0.75) : anchor(F)) : null;
+  const dayPair = show.dayOfTotal
+    ? pair(str.dayKey, str.dayValue, 'dayOfTotal', both ? 'center' : F.align, both ? q(0.25) : anchor(F))
+    : null;
+  const duePair = show.targetDate
+    ? pair('Target', str.target, 'targetDate', both ? 'center' : F.align, both ? q(0.75) : anchor(F))
+    : null;
   const barW = Math.min(band.width * 0.7, 460 * u);
   const bx = F.align === 'left' ? band.left : F.align === 'right' ? band.right - barW : F.W / 2 - barW / 2;
 
@@ -127,7 +153,15 @@ function rows(F: Frame): (Row | null)[] {
           gap: 72 * g,
         })
       : null,
-    show.daysLeft ? caps(F, str.daysLabel, { size: 29 * s, color: pal.accentInk, weight: 600, element: 'daysLeft', gap: 46 * g }) : null,
+    show.daysLeft
+      ? caps(F, str.daysLabel, {
+          size: 29 * s,
+          color: pal.accentInk,
+          weight: 600,
+          element: 'daysLeft',
+          gap: 46 * g,
+        })
+      : null,
     ornament(F, 56 * g),
     beside([dayPair, duePair], 56 * g),
     milestoneRow(F, { gap: 60 * g, size: 36 }),
@@ -151,7 +185,13 @@ function anchor(F: Frame): number {
 
 /** "——  GOAL TITLE  ——": small caps with short rules on each side (only when centred). */
 function flanked(F: Frame, goal: string): Row {
-  const label = caps(F, goal, { size: 26 * F.s, weight: 600, color: F.pal.text, element: 'goalTitle', maxWidth: F.band.width * 0.7 });
+  const label = caps(F, goal, {
+    size: 26 * F.s,
+    weight: 600,
+    color: F.pal.text,
+    element: 'goalTitle',
+    maxWidth: F.band.width * 0.7,
+  });
   if (F.align !== 'center') return label;
   return custom(label.h, 0, (y) => {
     const blocks = label.place(y);

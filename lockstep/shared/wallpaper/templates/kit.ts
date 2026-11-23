@@ -98,7 +98,11 @@ export function buildStrings(data: WallpaperData, design: WallpaperDesign): Stri
   }
 
   const rawMotivation =
-    design.text.source === 'motivation' ? data.motivation : design.text.source === 'custom' ? design.text.custom : null;
+    design.text.source === 'motivation'
+      ? data.motivation
+      : design.text.source === 'custom'
+        ? design.text.custom
+        : null;
   const motivation = rawMotivation?.replace(/\s+/g, ' ').trim() || null;
 
   return {
@@ -296,7 +300,13 @@ export function paragraph(F: Frame, o: ParaOpts): Row | null {
   const css = fontCss(o.font, o.weight, o.size);
   const tracking = (o.tracking ?? 0) * o.size;
   F.measure.font = css;
-  const lines = wrapLines(F.measure, o.caps ? o.text.toUpperCase() : o.text, o.maxWidth, o.maxLines, tracking);
+  const lines = wrapLines(
+    F.measure,
+    o.caps ? o.text.toUpperCase() : o.text,
+    o.maxWidth,
+    o.maxLines,
+    tracking,
+  );
   if (lines.length === 0) return null;
   const { cap, desc } = fontMetrics(F, o.font, o.weight, o.size);
   const lead = o.size * (o.leading ?? 1.28);
@@ -640,7 +650,9 @@ export function milestoneRow(
   const common = { align, x: o.x, maxWidth, element: 'nextMilestone' as const };
   return column(
     [
-      o.label === null ? null : caps(F, o.label ?? 'Next milestone', { ...common, size: (o.labelSize ?? 24) * F.s }),
+      o.label === null
+        ? null
+        : caps(F, o.label ?? 'Next milestone', { ...common, size: (o.labelSize ?? 24) * F.s }),
       paragraph(F, {
         ...common,
         text: title,

@@ -66,7 +66,13 @@ export const constellation: TemplateDef = {
     const labelGap = 46 * g;
     const labels = [
       caps(F, 'Start', { align: 'left', x: x0, size: labelSize, element: 'progress' }),
-      caps(F, str.progress, { align: 'center', x: (x0 + x1) / 2, size: labelSize, color: pal.accentInk, element: 'progress' }),
+      caps(F, str.progress, {
+        align: 'center',
+        x: (x0 + x1) / 2,
+        size: labelSize,
+        color: pal.accentInk,
+        element: 'progress',
+      }),
       caps(F, 'Due', { align: 'right', x: x1, size: labelSize, element: 'progress' }),
     ];
     const arcH = top + sag + labelGap + labels[0]!.h;
@@ -157,7 +163,9 @@ export const constellation: TemplateDef = {
       : null;
 
     const rows: (Row | null)[] = [
-      show.goalTitle ? caps(F, str.goal, { color: pal.accentInk, weight: 600, size: 26 * s, element: 'goalTitle' }) : null,
+      show.goalTitle
+        ? caps(F, str.goal, { color: pal.accentInk, weight: 600, size: 26 * s, element: 'goalTitle' })
+        : null,
       arc ? { ...arc, gap: 44 * g } : null,
       show.daysLeft
         ? numeral(F, {
@@ -172,8 +180,12 @@ export const constellation: TemplateDef = {
             gap: 84 * g,
           })
         : null,
-      show.daysLeft ? caps(F, str.daysLabel, { size: 29 * s, color: pal.text, element: 'daysLeft', gap: 46 * g }) : null,
-      show.dayOfTotal ? caps(F, str.dayOfTotal, { size: 23 * s, color: pal.accentInk, element: 'dayOfTotal', gap: 64 * g }) : null,
+      show.daysLeft
+        ? caps(F, str.daysLabel, { size: 29 * s, color: pal.text, element: 'daysLeft', gap: 46 * g })
+        : null,
+      show.dayOfTotal
+        ? caps(F, str.dayOfTotal, { size: 23 * s, color: pal.accentInk, element: 'dayOfTotal', gap: 64 * g })
+        : null,
       show.targetDate
         ? text(F, {
             text: `Due ${str.target}`,

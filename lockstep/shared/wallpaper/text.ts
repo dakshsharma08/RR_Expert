@@ -70,7 +70,13 @@ export function ellipsize(ctx: Ctx2D, text: string, maxWidth: number, tracking =
  * Greedy word wrap into at most `maxLines` lines. If the text doesn't fit, the
  * last line ends with an ellipsis. A single word longer than a line is cut.
  */
-export function wrapLines(ctx: Ctx2D, text: string, maxWidth: number, maxLines: number, tracking = 0): string[] {
+export function wrapLines(
+  ctx: Ctx2D,
+  text: string,
+  maxWidth: number,
+  maxLines: number,
+  tracking = 0,
+): string[] {
   const words = text.replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
   if (words.length === 0 || maxLines < 1) return [];
   const fits = (s: string) => measureTracked(ctx, s, tracking) <= maxWidth;

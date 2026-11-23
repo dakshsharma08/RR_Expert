@@ -53,7 +53,9 @@ export const grain: TemplateDef = {
     });
 
     const rows: (Row | null)[] = [
-      show.goalTitle ? caps(F, str.goal, { font: mono, size: 27 * s, color: pal.text, element: 'goalTitle' }) : null,
+      show.goalTitle
+        ? caps(F, str.goal, { font: mono, size: 27 * s, color: pal.text, element: 'goalTitle' })
+        : null,
       show.daysLeft
         ? numeral(F, {
             text: str.numeral,
@@ -67,11 +69,34 @@ export const grain: TemplateDef = {
             gap: 60 * g,
           })
         : null,
-      show.daysLeft ? caps(F, str.daysLabel, { font: mono, size: 32 * s, color: pal.accentInk, weight: 500, element: 'daysLeft', gap: 48 * g }) : null,
+      show.daysLeft
+        ? caps(F, str.daysLabel, {
+            font: mono,
+            size: 32 * s,
+            color: pal.accentInk,
+            weight: 500,
+            element: 'daysLeft',
+            gap: 48 * g,
+          })
+        : null,
       tickRow,
-      show.dayOfTotal ? caps(F, str.dayOfTotal, { font: mono, size: 27 * s, color: pal.text, element: 'dayOfTotal', gap: 52 * g }) : null,
+      show.dayOfTotal
+        ? caps(F, str.dayOfTotal, {
+            font: mono,
+            size: 27 * s,
+            color: pal.text,
+            element: 'dayOfTotal',
+            gap: 52 * g,
+          })
+        : null,
       show.targetDate
-        ? caps(F, `Due ${str.target}`, { font: mono, size: 27 * s, color: pal.text, element: 'targetDate', gap: (show.dayOfTotal ? 26 : 52) * g })
+        ? caps(F, `Due ${str.target}`, {
+            font: mono,
+            size: 27 * s,
+            color: pal.text,
+            element: 'targetDate',
+            gap: (show.dayOfTotal ? 26 : 52) * g,
+          })
         : null,
       milestoneRow(F, { gap: 60 * g, label: 'Next', size: 38, weight: 500, dateFont: mono }),
       show.progress

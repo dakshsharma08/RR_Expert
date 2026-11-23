@@ -6,7 +6,15 @@
  *   resolveSize(design) → { width, height }
  */
 export * from './types';
-export { renderWallpaper, renderToLayer, familiesFor, MIN_CONTRAST, MAX_SCRIM_ALPHA, BAND_SLACK, type RenderArgs } from './render';
+export {
+  renderWallpaper,
+  renderToLayer,
+  familiesFor,
+  MIN_CONTRAST,
+  MAX_SCRIM_ALPHA,
+  BAND_SLACK,
+  type RenderArgs,
+} from './render';
 export { DEVICES, DEVICE_LIST, CUSTOM_LIMITS, getDevice, resolveSize } from './devices';
 export { THEMES, THEME_LIST, BRAND, makePalette, paperPalette, type Theme, type Palette } from './themes';
 export { TEMPLATES, TEMPLATE_LIST, getTemplate, defaultDesign, normalizeDesign } from './templates';

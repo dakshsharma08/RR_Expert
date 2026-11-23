@@ -38,7 +38,10 @@ const FONT_FILES: Record<FontId, { pkg: string; file: string }> = {
   fraunces: { pkg: '@fontsource-variable/fraunces', file: 'fraunces-latin-wght-normal.woff2' },
   inter: { pkg: '@fontsource-variable/inter', file: 'inter-latin-wght-normal.woff2' },
   'geist-mono': { pkg: '@fontsource-variable/geist-mono', file: 'geist-mono-latin-wght-normal.woff2' },
-  'instrument-serif': { pkg: '@fontsource/instrument-serif', file: 'instrument-serif-latin-400-normal.woff2' },
+  'instrument-serif': {
+    pkg: '@fontsource/instrument-serif',
+    file: 'instrument-serif-latin-400-normal.woff2',
+  },
 };
 
 export interface FontRegistration {
@@ -80,7 +83,8 @@ export function registerWallpaperFonts(): FontRegistration[] {
  * napi's createCanvas as the renderer's offscreen-layer factory. No cast is
  * needed: napi's Canvas already matches the renderer's small `Layer` shape.
  */
-export const napiCanvasFactory: CanvasFactory = (w, h) => createCanvas(Math.max(1, Math.round(w)), Math.max(1, Math.round(h)));
+export const napiCanvasFactory: CanvasFactory = (w, h) =>
+  createCanvas(Math.max(1, Math.round(w)), Math.max(1, Math.round(h)));
 
 export type BackgroundSource = Buffer | string | Image | Canvas | ImageLike | null | undefined;
 
@@ -122,7 +126,9 @@ export async function renderWallpaperPng(
   const d = normalizeDesign(design);
   const size = opts.size ?? resolveSize(d);
   const image =
-    d.background.kind === 'image' ? await loadBackground(opts.image ?? d.background.image?.src ?? null) : null;
+    d.background.kind === 'image'
+      ? await loadBackground(opts.image ?? d.background.image?.src ?? null)
+      : null;
   const canvas = createCanvas(size.width, size.height);
   const report = renderWallpaper(canvas.getContext('2d'), {
     design: d,

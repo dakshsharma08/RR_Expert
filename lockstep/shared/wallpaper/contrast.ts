@@ -103,7 +103,10 @@ export function mix(a: string, b: string, t: number): string {
 }
 
 export function toHex(c: { r: number; g: number; b: number }): string {
-  const h = (v: number) => Math.round(clamp(v, 0, 255)).toString(16).padStart(2, '0');
+  const h = (v: number) =>
+    Math.round(clamp(v, 0, 255))
+      .toString(16)
+      .padStart(2, '0');
   return `#${h(c.r)}${h(c.g)}${h(c.b)}`;
 }
 

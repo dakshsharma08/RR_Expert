@@ -152,12 +152,17 @@ export function getDevice(id: DeviceId, custom?: { width: number; height: number
 
 function clampCustom(custom?: { width: number; height: number }): { width: number; height: number } {
   const c = (v: number | undefined, fallback: number) =>
-    Math.round(Math.min(CUSTOM_LIMITS.max, Math.max(CUSTOM_LIMITS.min, Number.isFinite(v) ? (v as number) : fallback)));
+    Math.round(
+      Math.min(CUSTOM_LIMITS.max, Math.max(CUSTOM_LIMITS.min, Number.isFinite(v) ? (v as number) : fallback)),
+    );
   return { width: c(custom?.width, 1080), height: c(custom?.height, 2400) };
 }
 
 /** Output size in pixels for a design. */
-export function resolveSize(design: Pick<WallpaperDesign, 'device' | 'custom'>): { width: number; height: number } {
+export function resolveSize(design: Pick<WallpaperDesign, 'device' | 'custom'>): {
+  width: number;
+  height: number;
+} {
   const d = getDevice(design.device, design.custom);
   return { width: d.width, height: d.height };
 }

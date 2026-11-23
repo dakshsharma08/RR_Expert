@@ -27,7 +27,12 @@ export const FONT_FAMILIES: Record<FontId, FontInfo> = {
     label: 'Instrument Serif',
     kind: 'serif',
   },
-  inter: { family: 'Inter Variable', fallback: 'system-ui, -apple-system, sans-serif', label: 'Inter', kind: 'sans' },
+  inter: {
+    family: 'Inter Variable',
+    fallback: 'system-ui, -apple-system, sans-serif',
+    label: 'Inter',
+    kind: 'sans',
+  },
   'geist-mono': {
     family: 'Geist Mono Variable',
     fallback: "ui-monospace, 'SF Mono', Menlo, monospace",
@@ -62,5 +67,7 @@ export function fontCss(font: FontId, weight: number, sizePx: number): string {
  * rendering, so the first preview isn't drawn in a fallback font.
  */
 export function fontsToLoad(fonts: FontId[]): string[] {
-  return [...new Set(fonts)].map((f) => `${WEIGHT_RANGE[f][0] === 400 ? 400 : 300} 32px "${FONT_FAMILIES[f].family}"`);
+  return [...new Set(fonts)].map(
+    (f) => `${WEIGHT_RANGE[f][0] === 400 ? 400 : 300} 32px "${FONT_FAMILIES[f].family}"`,
+  );
 }

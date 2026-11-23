@@ -46,9 +46,9 @@ export const aurora: TemplateDef = {
     const sctx = ctxOf(small);
     const dark = B.pal.mode === 'dark';
     const blooms = [
-      { x: 0.78, y: B.band.top / B.H + 0.02, rx: 0.62, ry: 0.2, c: B.pal.blooms[1], a: dark ? 0.5 : 0.75 },
-      { x: 0.12, y: B.band.top / B.H + 0.16, rx: 0.55, ry: 0.18, c: B.pal.blooms[0], a: dark ? 0.55 : 0.7 },
-      { x: 0.62, y: 0.9, rx: 0.7, ry: 0.16, c: B.pal.blooms[2], a: dark ? 0.6 : 0.6 },
+      { x: 0.78, y: B.band.top / B.H + 0.02, rx: 0.62, ry: 0.2, c: B.pal.blooms[1], a: dark ? 0.5 : 0.6 },
+      { x: 0.12, y: B.band.top / B.H + 0.16, rx: 0.55, ry: 0.18, c: B.pal.blooms[0], a: dark ? 0.55 : 0.5 },
+      { x: 0.62, y: 0.9, rx: 0.7, ry: 0.16, c: B.pal.blooms[2], a: dark ? 0.6 : 0.32 },
     ];
     for (const b of blooms) {
       const cx = b.x * sw;
@@ -78,7 +78,9 @@ export const aurora: TemplateDef = {
     const barW = Math.min(band.width, 560 * F.u);
     const bx0 = F.align === 'left' ? band.left : F.align === 'right' ? band.right - barW : F.W / 2 - barW / 2;
     const rows: (Row | null)[] = [
-      show.goalTitle ? caps(F, str.goal, { color: pal.text, weight: 500, size: 27 * s, element: 'goalTitle' }) : null,
+      show.goalTitle
+        ? caps(F, str.goal, { color: pal.text, weight: 500, size: 27 * s, element: 'goalTitle' })
+        : null,
       show.daysLeft
         ? numeral(F, {
             text: str.numeral,
@@ -92,11 +94,22 @@ export const aurora: TemplateDef = {
             gap: 70 * g,
           })
         : null,
-      show.daysLeft ? caps(F, str.daysLabel, { size: 29 * s, color: pal.text, element: 'daysLeft', gap: 50 * g }) : null,
+      show.daysLeft
+        ? caps(F, str.daysLabel, { size: 29 * s, color: pal.text, element: 'daysLeft', gap: 50 * g })
+        : null,
       show.progress
         ? column(
             [
-              bar(F, { x0: bx0, x1: bx0 + barW, pct: str.pct, thickness: 3, rounded: true, dot: true, track: withAlpha(pal.text, 0.16), fill: pal.text }),
+              bar(F, {
+                x0: bx0,
+                x1: bx0 + barW,
+                pct: str.pct,
+                thickness: 3,
+                rounded: true,
+                dot: true,
+                track: withAlpha(pal.text, 0.16),
+                fill: pal.text,
+              }),
               caps(F, str.progress, { size: 23 * s, color: pal.text, element: 'progress', gap: 34 * g }),
             ],
             78 * g,

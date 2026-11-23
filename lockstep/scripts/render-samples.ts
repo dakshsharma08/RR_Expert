@@ -47,9 +47,14 @@ export const SAMPLE_DATA: WallpaperData = {
 
 const filter = process.argv[2] ?? '';
 
-async function save(name: string, design: WallpaperDesign, data = SAMPLE_DATA, image?: Buffer) {
+/**
+ * Render one sample. Full-size PNGs are written only when `keep` is true; the
+ * device and state checks go into contact sheets instead (grain makes
+ * full-size PNGs 1–4 MB each, so 100+ of them would bloat the repo).
+ */
+async function save(name: string, design: WallpaperDesign, data = SAMPLE_DATA, image?: Buffer, keep = true) {
   const { png, report } = await renderWallpaperPng(design, data, { image });
-  writeFileSync(join(OUT, `${name}.png`), png);
+  if (keep) writeFileSync(join(OUT, `${name}.png`), png);
   const warn = report.warnings.map((w) => `${w.element}:${w.contrast}${w.fixed ? '✓' : '✗'}`).join(' ');
   console.log(`${name.padEnd(44)} ${report.width}×${report.height}${warn ? `  warnings: ${warn}` : ''}`);
   return png;
@@ -66,7 +71,7 @@ function makeBusyPhoto(): Buffer {
   x.fillStyle = g;
   x.fillRect(0, 0, 900, 1600);
   let seed = 7;
-  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   for (let i = 0; i < 260; i++) {
     x.fillStyle = `hsla(${Math.floor(rnd() * 360)}, 60%, ${55 + rnd() * 40}%, ${0.4 + rnd() * 0.5})`;
     x.beginPath();
@@ -104,7 +109,8 @@ async function main() {
   for (const t of TEMPLATE_LIST) {
     if (filter && !t.id.includes(filter)) continue;
     const pngs: Buffer[] = [];
-    for (const th of THEME_LIST) pngs.push(await save(`${t.id}--${th.id}`, defaultDesign(t.id, th.id, 'iphone')));
+    for (const th of THEME_LIST)
+      pngs.push(await save(`${t.id}--${th.id}`, defaultDesign(t.id, th.id, 'iphone')));
     await contactSheet(t.id, pngs, 6);
   }
 
@@ -113,8 +119,11 @@ async function main() {
     const devices: DeviceId[] = Object.keys(DEVICES) as DeviceId[];
     for (const t of TEMPLATE_LIST) {
       const pngs: Buffer[] = [];
-      for (const dev of devices) pngs.push(await save(`device--${t.id}--${dev}`, defaultDesign(t.id, undefined, dev)));
-      await contactSheet(`devices-${t.id}`, pngs.slice(0, 1).concat(pngs.slice(1)), devices.length);
+      for (const dev of devices) {
+        const design = defaultDesign(t.id, undefined, dev);
+        pngs.push(await save(`device--${t.id}--${dev}`, design, SAMPLE_DATA, undefined, false));
+      }
+      await contactSheet(`devices-${t.id}`, pngs, devices.length);
     }
 
     // States.
@@ -124,16 +133,24 @@ async function main() {
       ['expired', { state: 'expired', daysLeft: -3, dayNumber: 120, progressPct: 0.88, nextMilestone: null }],
       ['completed', { state: 'completed', daysLeft: 0, dayNumber: 120, progressPct: 1, nextMilestone: null }],
     ];
+    const statePngs: Buffer[] = [];
     for (const [name, patch] of states) {
-      await save(`state--${name}--monolith`, defaultDesign('monolith'), { ...SAMPLE_DATA, ...patch });
-      await save(`state--${name}--orbit`, defaultDesign('orbit'), { ...SAMPLE_DATA, ...patch });
+      for (const t of ['monolith', 'orbit'] as const) {
+        const data = { ...SAMPLE_DATA, ...patch };
+        statePngs.push(await save(`state--${name}--${t}`, defaultDesign(t), data, undefined, false));
+      }
     }
+    await contactSheet('states', statePngs, 8);
 
     // Busy bright photo: must trigger readability scrims.
     const photo = makeBusyPhoto();
     for (const t of ['monolith', 'aurora', 'minimal-mono'] as const) {
       const d = defaultDesign(t, 'champagne-gold');
-      d.background = { kind: 'image', grain: 0.1, image: { src: '', blur: 12, dim: 0.15, zoom: 1, x: 0, y: 0 } };
+      d.background = {
+        kind: 'image',
+        grain: 0.1,
+        image: { src: '', blur: 12, dim: 0.15, zoom: 1, x: 0, y: 0 },
+      };
       await save(`photo--${t}`, d, SAMPLE_DATA, photo);
     }
 
@@ -144,8 +161,12 @@ async function main() {
     await save('variant--gradient-right-large', g, {
       ...SAMPLE_DATA,
       goalTitle: 'Run the Lisbon marathon under four hours, finally',
-      nextMilestone: { title: 'Long run: 30 km at easy pace along the river, then stretch and refuel properly', dateLabel: 'Sun 6 Dec' },
-      motivation: 'The miles you run today are the ones that carry you on race day, when your legs are tired and the crowd is loud.',
+      nextMilestone: {
+        title: 'Long run: 30 km at easy pace along the river, then stretch and refuel properly',
+        dateLabel: 'Sun 6 Dec',
+      },
+      motivation:
+        'The miles you run today are the ones that carry you on race day, when your legs are tired and the crowd is loud.',
     });
   }
   console.log(`Done in ${((Date.now() - t0) / 1000).toFixed(1)} s → ${OUT}`);

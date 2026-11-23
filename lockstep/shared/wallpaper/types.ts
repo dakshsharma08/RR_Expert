@@ -12,24 +12,11 @@
  */
 
 export type TemplateId =
-  | 'monolith'
-  | 'orbit'
-  | 'ledger'
-  | 'constellation'
-  | 'aurora'
-  | 'grain'
-  | 'minimal-mono'
-  | 'ivory-paper';
-export type ThemeId = 'champagne-gold' | 'ivory' | 'monochrome' | 'midnight-sapphire' | 'rose-gold' | 'emerald-noir';
+  'monolith' | 'orbit' | 'ledger' | 'constellation' | 'aurora' | 'grain' | 'minimal-mono' | 'ivory-paper';
+export type ThemeId =
+  'champagne-gold' | 'ivory' | 'monochrome' | 'midnight-sapphire' | 'rose-gold' | 'emerald-noir';
 export type DeviceId =
-  | 'iphone-se'
-  | 'iphone'
-  | 'iphone-pro'
-  | 'iphone-pro-max'
-  | 'pixel'
-  | 'galaxy-s'
-  | 'android-1080'
-  | 'custom';
+  'iphone-se' | 'iphone' | 'iphone-pro' | 'iphone-pro-max' | 'pixel' | 'galaxy-s' | 'android-1080' | 'custom';
 export type FontId = 'fraunces' | 'instrument-serif' | 'inter' | 'geist-mono';
 export type ElementId =
   | 'goalTitle'
@@ -117,7 +104,14 @@ export interface WallpaperDesign {
   background: {
     kind: 'theme' | 'gradient' | 'image';
     gradient?: { from: string; to: string; angle: number };
-    image?: { src: string; blur: number /*0–40 px at 1080w*/; dim: number /*0–0.9*/; zoom: number /*1–3*/; x: number /*-1..1*/; y: number /*-1..1*/ };
+    image?: {
+      src: string;
+      blur: number /*0–40 px at 1080w*/;
+      dim: number /*0–0.9*/;
+      zoom: number /*1–3*/;
+      x: number /*-1..1*/;
+      y: number; /*-1..1*/
+    };
     grain: number; // 0–1
   };
   layout: { position: Position };
@@ -204,7 +198,14 @@ export interface Ctx2D {
   closePath(): void;
   moveTo(x: number, y: number): void;
   lineTo(x: number, y: number): void;
-  arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, counterclockwise?: boolean): void;
+  arc(
+    x: number,
+    y: number,
+    radius: number,
+    startAngle: number,
+    endAngle: number,
+    counterclockwise?: boolean,
+  ): void;
   ellipse(
     x: number,
     y: number,

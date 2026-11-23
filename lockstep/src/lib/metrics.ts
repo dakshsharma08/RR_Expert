@@ -78,8 +78,12 @@ export function goalMetrics(
   const todayFocus: TaskRow[] = [];
   let used = 0;
   for (const m of ordered) {
-    if (m.status === 'completed') continue;
     const list = (tasksByMilestone.get(m.id) ?? []).sort((a, b) => a.order - b.order);
+    if (m.status === 'completed') {
+      // Keep today's ticks visible (satisfying, and lets you undo), skip the rest.
+      for (const t of list) if (t.done_at && dayKey(t.done_at, goal.timezone) === today) todayFocus.push(t);
+      continue;
+    }
     for (const t of list) {
       const doneToday = t.done_at && dayKey(t.done_at, goal.timezone) === today;
       if (t.done_at && !doneToday) continue;

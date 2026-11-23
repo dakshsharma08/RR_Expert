@@ -193,7 +193,7 @@ export default function StudioPage() {
     return (
       <div className="flex min-h-dvh flex-col">
         {header}
-        <div className="grid flex-1 grid-cols-[260px_1fr_340px] gap-6 px-6 pb-6">
+        <div className="grid flex-1 grid-cols-[240px_1fr_360px] gap-6 px-6 pb-6">
           <aside aria-label="Templates" className="max-h-[calc(100dvh-120px)] overflow-y-auto pr-1 scrollbar-none">
             <p className="eyebrow mb-3 mt-2">Templates</p>
             <TemplatePanel design={design} data={wpData} update={update} />
@@ -208,9 +208,9 @@ export default function StudioPage() {
           </section>
           <aside aria-label="Properties" className="card max-h-[calc(100dvh-120px)] overflow-hidden p-0">
             <Tabs.Root value={tab === 'template' ? 'text' : tab} onValueChange={(v) => setTab(v as Tab)} className="flex h-full flex-col">
-              <Tabs.List aria-label="Properties" className="flex shrink-0 gap-1 overflow-x-auto border-b border-hairline p-2 scrollbar-none">
+              <Tabs.List aria-label="Properties" className="grid shrink-0 grid-cols-5 gap-1 border-b border-hairline p-2">
                 {MOBILE_TABS.filter((t) => t.id !== 'template').map((t) => (
-                  <Tabs.Trigger key={t.id} value={t.id} className="h-11 shrink-0 rounded-[10px] px-3 text-sm text-muted data-[state=active]:bg-surface-2 data-[state=active]:text-accent-text">
+                  <Tabs.Trigger key={t.id} value={t.id} className="h-11 min-w-0 truncate rounded-[10px] px-1 text-[13px] text-muted data-[state=active]:bg-surface-2 data-[state=active]:text-accent-text">
                     {t.label}
                   </Tabs.Trigger>
                 ))}

@@ -51,10 +51,22 @@ export const ledger: TemplateDef = {
     const valueW = x1 - vx0;
     const rowGap = 30 * g;
 
-    const label = (t: string, element: ElementId) => caps(F, t, { align: 'left', x: x0, size: 23 * s, element, maxWidth: labelW - 44 * F.u });
+    const label = (t: string, element: ElementId) =>
+      caps(F, t, { align: 'left', x: x0, size: 23 * s, element, maxWidth: labelW - 44 * F.u });
     const value = (t: string, element: ElementId, size = 34) =>
-      text(F, { text: t, font: F.fonts.display, size: size * s, weight: 400, color: pal.text, align: 'right', x: x1, maxWidth: valueW, element });
-    const entry = (r: Row | null) => (r ? [{ ...r, gap: rowGap }, rule(F, { gap: rowGap, color: pal.faint })] : []);
+      text(F, {
+        text: t,
+        font: F.fonts.display,
+        size: size * s,
+        weight: 400,
+        color: pal.text,
+        align: 'right',
+        x: x1,
+        maxWidth: valueW,
+        element,
+      });
+    const entry = (r: Row | null) =>
+      r ? [{ ...r, gap: rowGap }, rule(F, { gap: rowGap, color: pal.faint })] : [];
 
     // The "total" row: label sits on the numeral's baseline, accountant style.
     let totalRow: Row | null = null;
@@ -72,7 +84,15 @@ export const ledger: TemplateDef = {
         element: 'daysLeft',
       });
       const lab = label('Remaining', 'daysLeft');
-      const sub = caps(F, str.daysLabel, { align: 'right', x: x1, color: pal.accentInk, size: 24 * s, element: 'daysLeft', gap: 30 * g, maxWidth: valueW });
+      const sub = caps(F, str.daysLabel, {
+        align: 'right',
+        x: x1,
+        color: pal.accentInk,
+        size: 24 * s,
+        element: 'daysLeft',
+        gap: 30 * g,
+        maxWidth: valueW,
+      });
       const col = column([num, sub])!;
       totalRow = custom(col.h, 0, (y) => [...col.place(y), ...lab.place(y + num.h - lab.h)]);
     }
@@ -115,7 +135,15 @@ export const ledger: TemplateDef = {
                 element: 'nextMilestone',
               }),
               str.milestoneDate
-                ? caps(F, str.milestoneDate, { align: 'right', x: x1, size: 23 * s, weight: 600, color: pal.accentInk, element: 'nextMilestone', gap: 20 * g })
+                ? caps(F, str.milestoneDate, {
+                    align: 'right',
+                    x: x1,
+                    size: 23 * s,
+                    weight: 600,
+                    color: pal.accentInk,
+                    element: 'nextMilestone',
+                    gap: 20 * g,
+                  })
                 : null,
             ]),
           ])
@@ -124,19 +152,32 @@ export const ledger: TemplateDef = {
     const progress = show.progress
       ? beside([
           label('Progress', 'progress'),
-          column([value(str.progress, 'progress'), bar(F, { x0: vx0 + valueW * 0.25, x1, pct: str.pct, thickness: 2, gap: 24 * g })]),
+          column([
+            value(str.progress, 'progress'),
+            bar(F, { x0: vx0 + valueW * 0.25, x1, pct: str.pct, thickness: 2, gap: 24 * g }),
+          ]),
         ])
       : null;
 
     const rows: (Row | null)[] = [
       rule(F, { double: true, color: pal.hairline }),
       ...entry(goal),
-      ...(totalRow ? [{ ...totalRow, gap: rowGap + 6 * g }, rule(F, { gap: rowGap, double: true, color: pal.hairline })] : []),
-      ...entry(show.dayOfTotal ? beside([label(str.dayKey, 'dayOfTotal'), value(str.dayValue, 'dayOfTotal')]) : null),
-      ...entry(show.targetDate ? beside([label('Due', 'targetDate'), value(str.target, 'targetDate')]) : null),
+      ...(totalRow
+        ? [{ ...totalRow, gap: rowGap + 6 * g }, rule(F, { gap: rowGap, double: true, color: pal.hairline })]
+        : []),
+      ...entry(
+        show.dayOfTotal ? beside([label(str.dayKey, 'dayOfTotal'), value(str.dayValue, 'dayOfTotal')]) : null,
+      ),
+      ...entry(
+        show.targetDate ? beside([label('Due', 'targetDate'), value(str.target, 'targetDate')]) : null,
+      ),
       ...entry(next),
       ...entry(progress),
-      motivationRow(F, { gap: 52 * g, size: 30, x: F.align === 'right' ? x1 : F.align === 'center' ? F.W / 2 : x0 }),
+      motivationRow(F, {
+        gap: 52 * g,
+        size: 30,
+        x: F.align === 'right' ? x1 : F.align === 'center' ? F.W / 2 : x0,
+      }),
       stampRow(F, { gap: 52 * g, align: 'left', x: x0 }),
     ];
     const blocks = stack(F, rows, 'upper');

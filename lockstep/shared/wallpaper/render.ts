@@ -89,7 +89,11 @@ export function renderWallpaper(ctx: Ctx2D, args: RenderArgs): RenderReport {
   const device = getDevice(design.device, design.custom);
   const template = getTemplate(design.template);
   const theme = THEMES[design.theme];
-  const pal = template.paper ? paperPalette(theme, design.colors) : makePalette(theme, design.colors);
+  const hasImage =
+    design.background.kind === 'image' && !!args.image && args.image.width > 0 && args.image.height > 0;
+  const themePal = template.paper ? paperPalette(theme, design.colors) : makePalette(theme, design.colors);
+  // On a photo, grey "muted" text is the first thing to get lost, so lift it toward the main text colour.
+  const pal: Palette = hasImage ? { ...themePal, muted: mix(themePal.text, themePal.muted, 0.45) } : themePal;
   const str = buildStrings(args.data, design);
   const ref = Math.min(W / REF_W, H / REF_H);
   const band: Band = {
@@ -104,8 +108,17 @@ export function renderWallpaper(ctx: Ctx2D, args: RenderArgs): RenderReport {
   // 1 ─ Background on its own layer (we sample it later for contrast).
   const bgLayer = args.createCanvas(W, H);
   const bg = ctxOf(bgLayer);
-  const hasImage = design.background.kind === 'image' && !!args.image && args.image.width > 0 && args.image.height > 0;
-  const B: BgFrame = { W, H, u: ref, band, pal, hasImage, createCanvas: args.createCanvas, str, data: args.data };
+  const B: BgFrame = {
+    W,
+    H,
+    u: ref,
+    band,
+    pal,
+    hasImage,
+    createCanvas: args.createCanvas,
+    str,
+    data: args.data,
+  };
   paintBackground(bg, B, design, template, hasImage ? args.image! : null);
 
   // 2 ─ Layout, shrinking until everything sits inside the safe band.
@@ -124,7 +137,11 @@ export function renderWallpaper(ctx: Ctx2D, args: RenderArgs): RenderReport {
       device,
       align: design.typography.align,
       position: design.layout.position,
-      fonts: { display: design.typography.display, ui: design.typography.ui, numbers: design.typography.numbers },
+      fonts: {
+        display: design.typography.display,
+        ui: design.typography.ui,
+        numbers: design.typography.numbers,
+      },
       weight: design.typography.weight,
       tracking: design.typography.tracking,
       pal,
@@ -154,7 +171,7 @@ export function renderWallpaper(ctx: Ctx2D, args: RenderArgs): RenderReport {
   ctx.drawImage(bgLayer, 0, 0);
 
   // 4 ─ Readability: measure contrast behind each text block, add scrims.
-  const { scrims, warnings } = checkReadability(bg, blocks, pal, W, H, ref);
+  const { scrims, warnings } = checkReadability(bg, blocks, pal, band, W, H, ref);
   for (const s of scrims) {
     roundRectPath(ctx, s.rect.x, s.rect.y, s.rect.w, s.rect.h, Math.min(30 * ref, s.rect.h / 2));
     ctx.fillStyle = withAlpha(s.color, s.alpha);
@@ -195,7 +212,12 @@ function paintBackground(
     const dx = Math.sin(rad);
     const dy = -Math.cos(rad);
     const half = (Math.abs(W * dx) + Math.abs(H * dy)) / 2;
-    const g = ctx.createLinearGradient(W / 2 - dx * half, H / 2 - dy * half, W / 2 + dx * half, H / 2 + dy * half);
+    const g = ctx.createLinearGradient(
+      W / 2 - dx * half,
+      H / 2 - dy * half,
+      W / 2 + dx * half,
+      H / 2 + dy * half,
+    );
     g.addColorStop(0, custom.from);
     g.addColorStop(1, custom.to);
     ctx.fillStyle = g;
@@ -210,7 +232,9 @@ function paintBackground(
 
   // A soft light behind the content (theme backgrounds only).
   if (!custom && !image) {
-    const at = template.glow ? template.glow(B) : { x: W / 2, y: B.band.top + B.band.height * 0.28, r: W * 0.85 };
+    const at = template.glow
+      ? template.glow(B)
+      : { x: W / 2, y: B.band.top + B.band.height * 0.28, r: W * 0.85 };
     if (at) {
       const g = ctx.createRadialGradient(at.x, at.y, 0, at.x, at.y, at.r);
       g.addColorStop(0, pal.glow);
@@ -342,6 +366,7 @@ function checkReadability(
   bg: Ctx2D,
   blocks: Block[],
   pal: Palette,
+  band: Band,
   W: number,
   H: number,
   u: number,
@@ -363,15 +388,22 @@ function checkReadability(
     if (before >= MIN_CONTRAST) continue;
 
     // Light text gets a dark scrim; dark text a light one.
-    const scrimColor = contrastRatio(block.color, '#000000') >= contrastRatio(block.color, '#ffffff') ? darkScrim : lightScrim;
+    const scrimColor =
+      contrastRatio(block.color, '#000000') >= contrastRatio(block.color, '#ffffff') ? darkScrim : lightScrim;
     const scrim = mustParse(scrimColor);
     const alpha = Math.max(
       ...candidates.map((c) => scrimAlphaFor(text, c, scrim, MIN_CONTRAST + 0.1, MAX_SCRIM_ALPHA)),
     );
-    const after = Math.min(...candidates.map((c) => contrastFromLuminance(tl, luminanceOf(blend(c, scrim, alpha)))));
-    const pad = 22 * u;
+    const after = Math.min(
+      ...candidates.map((c) => contrastFromLuminance(tl, luminanceOf(blend(c, scrim, alpha)))),
+    );
+    // Every scrim spans the whole content column (not just its text), so
+    // neighbouring scrims merge into one calm, straight-edged panel.
+    const pad = 28 * u;
+    const x0 = Math.max(0, Math.min(band.left, block.box.x) - pad);
+    const x1 = Math.min(W, Math.max(band.right, block.box.x + block.box.w) + pad);
     raw.push({
-      rect: { x: block.box.x - pad, y: block.box.y - pad * 0.8, w: block.box.w + pad * 2, h: block.box.h + pad * 1.6 },
+      rect: { x: x0, y: block.box.y - pad * 0.75, w: x1 - x0, h: block.box.h + pad * 1.5 },
       alpha,
       color: scrimColor,
     });
@@ -392,7 +424,7 @@ function checkReadability(
     }
   }
 
-  return { scrims: mergeScrims(raw, 18 * u), warnings: ELEMENT_IDS.flatMap((id) => worst.get(id) ?? []) };
+  return { scrims: mergeScrims(raw, 60 * u), warnings: ELEMENT_IDS.flatMap((id) => worst.get(id) ?? []) };
 }
 
 /** Join scrims that touch (within `slack` px) into one calm panel instead of a patchwork. */
@@ -448,7 +480,9 @@ function elementBoxes(blocks: Block[], W: number, H: number): RenderReport['boxe
     if (!b) return [];
     const x = Math.max(0, Math.round(b.x));
     const y = Math.max(0, Math.round(b.y));
-    return [{ element, x, y, w: Math.min(W, Math.round(b.x + b.w)) - x, h: Math.min(H, Math.round(b.y + b.h)) - y }];
+    return [
+      { element, x, y, w: Math.min(W, Math.round(b.x + b.w)) - x, h: Math.min(H, Math.round(b.y + b.h)) - y },
+    ];
   });
 }
 
