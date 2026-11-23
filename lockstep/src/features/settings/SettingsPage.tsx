@@ -9,7 +9,7 @@ import { ConfirmDialog } from '@/components/ui/dialog';
 import { Segmented, SwitchRow } from '@/components/ui/controls';
 import { Input } from '@/components/ui/form';
 import { useUi, type Mode } from '@/stores/ui';
-import { db } from '@/db/db';
+import { db, type WallpaperRow } from '@/db/db';
 import { deleteAllData, exportAll, importAll } from '@/db/repo';
 import { buildIcs, downloadBlob } from '@/lib/ics';
 import { getHealth } from '@/lib/api';
@@ -20,6 +20,7 @@ import { revokeLivingWallpaper } from '@/features/studio/living';
 export default function SettingsPage() {
   const ui = useUi();
   const [confirmWipe, setConfirmWipe] = useState(false);
+  const [revoking, setRevoking] = useState<WallpaperRow | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const health = useQuery({ queryKey: ['health'], queryFn: getHealth, staleTime: 30_000 });
   const shares = useLiveQuery(() => db.wallpapers.filter((w) => !!w.share_token).toArray(), []);
@@ -129,7 +130,7 @@ export default function SettingsPage() {
                   <p className="text-xs text-muted">{s.revoked_at ? 'Revoked' : 'Active'} · {s.device_preset}</p>
                 </div>
                 {!s.revoked_at && (
-                  <Button variant="destructive" size="sm" onClick={() => void revokeLivingWallpaper(s).then(() => toast.success('Link revoked'))}>
+                  <Button variant="destructive" size="sm" onClick={() => setRevoking(s)}>
                     Revoke
                   </Button>
                 )}
@@ -166,6 +167,14 @@ export default function SettingsPage() {
         <p className="mt-2 text-xs text-muted">Removes every goal, plan, wallpaper and setting from this device and revokes your wallpaper links.</p>
       </Section>
 
+      <ConfirmDialog
+        open={!!revoking}
+        onOpenChange={(o) => !o && setRevoking(null)}
+        title="Revoke this wallpaper link?"
+        description="The link stops working immediately, including in any Shortcuts automation that uses it. You can create a new link later."
+        confirmLabel="Revoke link"
+        onConfirm={() => revoking && void revokeLivingWallpaper(revoking).then(() => toast.success('Link revoked'))}
+      />
       <ConfirmDialog
         open={confirmWipe}
         onOpenChange={setConfirmWipe}

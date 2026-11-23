@@ -13,6 +13,7 @@ import { getDevice } from '@shared/wallpaper/devices';
 import { normalizeDesign } from '@shared/wallpaper/templates';
 import { createLivingWallpaper, revokeLivingWallpaper, updateLivingWallpaper } from './living';
 import { Group } from './Panels';
+import { ConfirmDialog } from '@/components/ui/dialog';
 
 export function ExportPanel({
   goalId,
@@ -35,6 +36,7 @@ export function ExportPanel({
 }) {
   const saved = useLiveQuery(() => db.wallpapers.where('goal_id').equals(goalId).reverse().sortBy('updated_at'), [goalId]);
   const [busy, setBusy] = useState<string | null>(null);
+  const [confirmRevoke, setConfirmRevoke] = useState(false);
   const device = getDevice(design.device, design.custom);
   const live = saved?.find((w) => w.share_token && !w.revoked_at) ?? null;
 
@@ -110,7 +112,7 @@ export function ExportPanel({
             <div className="flex flex-wrap gap-2">
               <Button size="sm" variant="secondary" onClick={() => void navigator.clipboard?.writeText(live.share_url ?? '').then(() => toast.success('Link copied'))} icon={<Copy className="size-4" strokeWidth={1.5} />}>Copy</Button>
               <Button size="sm" variant="secondary" loading={busy === 'push'} onClick={() => void pushProgress()} icon={<RefreshCw className="size-4" strokeWidth={1.5} />}>Update link</Button>
-              <Button size="sm" variant="destructive" onClick={() => void revokeLivingWallpaper(live).then(() => toast.success('Link revoked. It stops working now.'))}>Revoke</Button>
+              <Button size="sm" variant="destructive" onClick={() => setConfirmRevoke(true)}>Revoke</Button>
             </div>
             <Link to="/guide" className="inline-flex min-h-11 items-center text-xs text-accent-text hover:underline">Shortcuts setup guide →</Link>
           </div>
@@ -122,6 +124,14 @@ export function ExportPanel({
         {design.background.kind === 'image' && <p className="text-xs text-muted">Photos stay on your device, so the link uses the theme background instead.</p>}
       </Group>
 
+      <ConfirmDialog
+        open={confirmRevoke}
+        onOpenChange={setConfirmRevoke}
+        title="Revoke this wallpaper link?"
+        description="The link stops working immediately, including in any Shortcuts automation that uses it."
+        confirmLabel="Revoke link"
+        onConfirm={() => live && void revokeLivingWallpaper(live).then(() => toast.success('Link revoked. It stops working now.'))}
+      />
       <Group title="Saved designs">
         <Button variant="ghost" onClick={() => void saveToLibrary().then(() => toast.success('Design saved to your library'))} icon={<Save className="size-4" strokeWidth={1.5} />}>
           Save this design

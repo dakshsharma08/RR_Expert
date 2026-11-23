@@ -107,6 +107,7 @@ export default function ReviewPage() {
       <p className="mt-2 text-sm text-muted">
         Due {formatInZone(goal.deadline_utc, goal.timezone)} ({zoneLabel(goal.timezone, new Date(goal.deadline_utc))}) · {goal.hours_per_day} h/day · {goal.pace_style}
       </p>
+      {goal.dst_note && <p className="mt-1 text-xs text-warning">{goal.dst_note}</p>}
       {meta?.source === 'ai' && <GeneratedStamp className="mt-2" model={meta.model} at={meta.generatedAt} />}
       {meta?.source === 'manual' && <p className="mt-2 text-xs text-muted">Built by you{meta.generatedAt ? ' (started from a Gemini plan)' : ''}.</p>}
 

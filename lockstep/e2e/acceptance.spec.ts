@@ -177,6 +177,7 @@ test('Living Wallpaper link: create in Studio → URL returns today\'s PNG → r
 
   await page.goto('/settings');
   await page.getByRole('button', { name: 'Revoke' }).first().click();
+  await page.getByRole('button', { name: 'Revoke link' }).click();
   await expect(page.getByText('Revoked').first()).toBeVisible();
   const gone = await request.get(url.replace(/^https?:\/\/[^/]+/, 'http://localhost:4173'));
   expect(gone.status()).toBe(404);

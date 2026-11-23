@@ -147,7 +147,9 @@ export default function WizardPage() {
       pace: sample.pace,
     });
     setErrors({});
-    toast.success('Sample goal filled in', { description: 'Gemini will still plan it for real. Edit anything you like.' });
+    toast.success('Sample goal filled in', {
+      description: aiReady ? 'Gemini will still plan it for real. Edit anything you like.' : 'Edit anything you like.',
+    });
   }
 
   async function submit(mode: 'ai' | 'manual') {
