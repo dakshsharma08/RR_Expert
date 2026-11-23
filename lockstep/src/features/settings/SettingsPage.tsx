@@ -16,6 +16,8 @@ import { getHealth } from '@/lib/api';
 import { notificationsSupported, requestNotificationPermission } from './reminders';
 import { deviceTimeZone, isValidTimeZone, listTimeZones } from '@shared/time';
 import { revokeLivingWallpaper } from '@/features/studio/living';
+import { CloudSync } from './CloudSync';
+import { cloudConfigured } from '@/lib/sync/client';
 
 export default function SettingsPage() {
   const ui = useUi();
@@ -75,7 +77,11 @@ export default function SettingsPage() {
       <div>
         <p className="eyebrow mb-1">Preferences</p>
         <h1 className="text-[28px] sm:text-[40px]">Settings</h1>
-        <p className="mt-2 text-sm text-muted">You're using LOCKSTEP as a guest. Everything is stored on this device only.</p>
+        <p className="mt-2 text-sm text-muted">
+          {cloudConfigured
+            ? 'Everything is stored on this device. Sign in below only if you want to sync between devices.'
+            : "You're using LOCKSTEP as a guest. Everything is stored on this device only."}
+        </p>
       </div>
 
       <Section icon={<Moon className="size-4" />} title="Appearance">
@@ -149,6 +155,8 @@ export default function SettingsPage() {
         </div>
         <p className="mt-3 text-xs text-muted">{goals?.length ?? 0} goals stored on this device.</p>
       </Section>
+
+      <CloudSync />
 
       <Section icon={<Sparkles className="size-4" />} title="AI transparency">
         <p className="text-sm text-muted">

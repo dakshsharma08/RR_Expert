@@ -40,6 +40,8 @@ export interface PlanMeta {
   recoveryStrategy: string;
   dailyRitual: string;
   totalEstimatedHours: number;
+  /** Hours the complete goal needs when Gemini had to trim the plan to fit (else null). */
+  fullScopeHours?: number | null;
   generatedAt: string | null;
   model: string | null;
   repaired: boolean;

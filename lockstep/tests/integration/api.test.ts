@@ -448,6 +448,7 @@ describe('POST /api/plan (SSE)', () => {
       'feasibility',
       'feasibilityReason',
       'totalEstimatedHours',
+      'fullScopeHours',
       'milestones',
       'risks',
       'recoveryStrategy',

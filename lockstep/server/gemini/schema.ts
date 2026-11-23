@@ -22,6 +22,7 @@ export const PLAN_PROPERTY_ORDER = [
   'feasibility',
   'feasibilityReason',
   'totalEstimatedHours',
+  'fullScopeHours',
   'milestones',
   'risks',
   'recoveryStrategy',
@@ -51,6 +52,11 @@ export function buildPlanJsonSchema(allowedDates: readonly string[]): Record<str
       feasibility: { type: 'string', enum: [...FEASIBILITY] },
       feasibilityReason: { type: 'string', description: 'One or two sentences with the real numbers.' },
       totalEstimatedHours: { type: 'number', minimum: 0, description: 'Sum of milestone estimatedHours.' },
+      fullScopeHours: {
+        type: ['number', 'null'],
+        minimum: 0,
+        description: 'Hours the COMPLETE goal would need when that exceeds the capacity (so this plan keeps only the essentials). null when the full goal fits.',
+      },
       milestones: {
         type: 'array',
         minItems: 1,

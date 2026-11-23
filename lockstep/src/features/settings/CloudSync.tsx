@@ -9,12 +9,13 @@
 import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { toast } from 'sonner';
-import { Cloud, CloudOff, LogOut, Mail, RefreshCw } from 'lucide-react';
+import { Cloud, CloudOff, LogOut, Mail, RefreshCw, UserX } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Field, Input } from '@/components/ui/form';
 import { db } from '@/db/db';
 import { getKv } from '@/db/repo';
-import { cloudConfigured } from '@/lib/sync/client';
+import { cloudConfigured, getSupabase } from '@/lib/sync/client';
 import { SYNC_KEYS, signInWithEmail, signOut, syncNow, useSession, type SyncCounts } from '@/lib/sync/sync';
 
 export function CloudSync() {
@@ -113,6 +114,8 @@ function SignedIn({ userId, email }: { userId: string; email: string }) {
   const [syncing, setSyncing] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [status, setStatus] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const lastSyncedAt = useLiveQuery(() => getKv<string>(SYNC_KEYS.lastSyncedAt), []);
   const linked = useLiveQuery(() => getKv<{ id: string; email: string | null }>(SYNC_KEYS.account), []);
   const goalCount = useLiveQuery(() => db.goals.count(), []);
@@ -138,6 +141,23 @@ function SignedIn({ userId, email }: { userId: string; email: string }) {
     setSigningOut(false);
     if (r.ok) toast.success('Signed out', { description: 'Your data stays on this device.' });
     else toast.error("Couldn't sign out", { description: r.message });
+  }
+
+  /** Deletes the cloud account (server verifies our token, then removes the user; rows cascade). */
+  async function onDeleteAccount() {
+    setDeleting(true);
+    try {
+      const token = (await getSupabase()?.auth.getSession())?.data.session?.access_token;
+      const res = await fetch('/api/account', { method: 'DELETE', headers: { Authorization: `Bearer ${token ?? ''}` } });
+      const body = (await res.json().catch(() => null)) as { message?: string } | null;
+      if (!res.ok) throw new Error(body?.message ?? 'Could not delete the account right now.');
+      await signOut();
+      toast.success('Cloud account deleted', { description: 'Everything stored in the cloud is gone. Data on this device is untouched. Delete it below if you want.' });
+    } catch (e) {
+      toast.error("Couldn't delete the account", { description: (e as Error).message });
+    } finally {
+      setDeleting(false);
+    }
   }
 
   return (
@@ -167,7 +187,18 @@ function SignedIn({ userId, email }: { userId: string; email: string }) {
         <Button variant="ghost" onClick={() => void onSignOut()} loading={signingOut} icon={<LogOut className="size-4" strokeWidth={1.5} aria-hidden />}>
           Sign out
         </Button>
+        <Button variant="destructive" onClick={() => setConfirmDelete(true)} loading={deleting} icon={<UserX className="size-4" strokeWidth={1.5} aria-hidden />}>
+          Delete account
+        </Button>
       </div>
+      <ConfirmDialog
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        title="Delete your cloud account?"
+        description="This permanently deletes your LOCKSTEP account and every goal, plan and design stored in the cloud. Data on this device stays until you delete it in Settings. This cannot be undone."
+        confirmLabel="Delete account"
+        onConfirm={() => void onDeleteAccount()}
+      />
       <p role="status" aria-live="polite" className="mt-3 text-sm text-muted">
         {status}
       </p>

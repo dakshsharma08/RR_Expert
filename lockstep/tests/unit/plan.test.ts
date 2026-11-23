@@ -114,6 +114,24 @@ describe('validatePlan', () => {
   });
 });
 
+describe('trimmed scope', () => {
+  it('judges feasibility on the full goal when Gemini had to cut scope', () => {
+    // Plan fits (12 h of 20 h) but the complete goal needs 60 h.
+    const r = validatePlan(plan({ feasibility: 'Unrealistic', fullScopeHours: 60 }), ctx);
+    expect(r.ok).toBe(true);
+    expect(r.code.feasibility).toBe('Unrealistic');
+    expect(r.code.reason).toMatch(/full goal needs about 60 h/);
+    expect(r.agrees).toBe(true);
+    expect(r.scopeHours).toBe(60);
+    expect(r.checks.find((c) => c.id === 'capacity')!.ok).toBe(true); // the plan itself fits
+  });
+  it('ignores a full-scope estimate that is not larger than the plan', () => {
+    const r = validatePlan(plan({ fullScopeHours: null }), ctx);
+    expect(r.code.feasibility).toBe('Achievable');
+    expect(r.scopeHours).toBe(12);
+  });
+});
+
 describe('fix suggestions', () => {
   it('suggests a later deadline and more hours when over capacity', () => {
     const f = suggestFixes(30, ctx);

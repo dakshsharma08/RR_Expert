@@ -92,6 +92,11 @@ export const PlanSchema = z.object({
   feasibility: z.enum(FEASIBILITY),
   feasibilityReason: z.string().trim().min(1).max(600),
   totalEstimatedHours: z.number().nonnegative().max(20000),
+  /**
+   * Hours the COMPLETE goal would need, when that's more than the capacity (Gemini then
+   * plans only the essentials). Null/absent when the full goal fits.
+   */
+  fullScopeHours: z.number().nonnegative().max(20000).nullable().optional(),
   milestones: z.array(MilestoneSchema).min(1).max(LIMITS.maxMilestones),
   risks: z.array(z.string().trim().min(1).max(300)).max(8),
   recoveryStrategy: z.string().trim().max(600),
@@ -225,6 +230,8 @@ export interface ValidationResult {
   /** Gemini's own feasibility claim, for side-by-side display. */
   model: { feasibility: Feasibility; reason: string } | null;
   agrees: boolean;
+  /** Hours the whole goal needs (≥ the plan total). Equals the plan total when nothing was cut. */
+  scopeHours: number;
 }
 
 /**
@@ -248,6 +255,7 @@ export function validatePlan(raw: unknown, ctx: ValidationContext): ValidationRe
       code,
       model: null,
       agrees: false,
+      scopeHours: 0,
     };
   }
 
@@ -295,7 +303,10 @@ export function validatePlan(raw: unknown, ctx: ValidationContext): ValidationRe
   const sum = round1(plan.milestones.reduce((s, m) => s + m.estimatedHours, 0));
   const claimed = parsed.data.totalEstimatedHours;
   const sumOk = Math.abs(sum - claimed) <= 0.5;
-  const code = codeFeasibility(sum, capacity);
+  // If Gemini had to cut scope to fit, judge feasibility on the FULL goal, not the trimmed plan.
+  const fullScope = parsed.data.fullScopeHours ?? null;
+  const scopeHours = fullScope !== null && fullScope > sum + 0.5 ? round1(fullScope) : sum;
+  const code = feasibilityFor(sum, fullScope, capacity);
   const fits = sum <= capacity.capacityHours;
 
   const checks: PlanCheck[] = [
@@ -351,6 +362,25 @@ export function validatePlan(raw: unknown, ctx: ValidationContext): ValidationRe
     code,
     model,
     agrees: model.feasibility === code.feasibility,
+    scopeHours,
+  };
+}
+
+/**
+ * Code feasibility for a plan total, taking into account a FULL-goal estimate when
+ * Gemini had to cut scope. Shared by server validation and client re-checks after edits.
+ */
+export function feasibilityFor(planHours: number, fullScopeHours: number | null | undefined, cap: Capacity): FeasibilityResult {
+  const scope = fullScopeHours != null && fullScopeHours > planHours + 0.5 ? round1(fullScopeHours) : planHours;
+  return scope > planHours && scope > cap.capacityHours ? scopeFeasibility(scope, planHours, cap) : codeFeasibility(planHours, cap);
+}
+
+/** Feasibility when the plan was trimmed to fit: the full goal doesn't fit, by definition. */
+function scopeFeasibility(scopeHours: number, planHours: number, cap: Capacity): FeasibilityResult {
+  return {
+    feasibility: 'Unrealistic',
+    ratio: cap.capacityHours > 0 ? scopeHours / cap.capacityHours : Infinity,
+    reason: `The full goal needs about ${fmtH(scopeHours)} h; you have ${fmtH(cap.capacityHours)} h (${cap.workingDayCount} working day${cap.workingDayCount === 1 ? '' : 's'} × ${fmtH(cap.hoursPerDay)} h/day). This plan keeps the essentials (${fmtH(planHours)} h). Use a fix below to make room for the rest.`,
   };
 }
 

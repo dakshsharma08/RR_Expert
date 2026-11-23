@@ -176,7 +176,7 @@ export async function generatePlan(
     code: validation.code,
     model: validation.model,
     agrees: validation.agrees,
-    fixes: suggestFixes(plan.totalEstimatedHours, job.ctx),
+    fixes: suggestFixes(validation.scopeHours, job.ctx),
     repaired,
     deadlineUtc: job.deadlineUtc,
     dst: job.dst,

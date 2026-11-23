@@ -4,7 +4,7 @@
  */
 import { db, nowIso, uid, type GoalRow, type MilestoneRow, type PlanMeta, type ProgressLogRow, type StoredIntake, type TaskRow, type AiRunRow } from './db';
 import type { AiRunMeta, PlanResult, RescheduleChange } from '@shared/api';
-import { codeFeasibility, computeCapacity, round1, type Difficulty } from '@shared/plan';
+import { computeCapacity, feasibilityFor, round1, type Difficulty } from '@shared/plan';
 import { dayKey, localToUtcIso } from '@shared/time';
 
 // ───────────────────────── Goals ─────────────────────────
@@ -74,6 +74,7 @@ export async function savePlanResult(goalId: string, result: PlanResult): Promis
     recoveryStrategy: result.plan.recoveryStrategy,
     dailyRitual: result.plan.dailyRitual,
     totalEstimatedHours: result.plan.totalEstimatedHours,
+    fullScopeHours: result.plan.fullScopeHours ?? null,
     generatedAt,
     model,
     repaired: result.repaired,
@@ -154,7 +155,7 @@ export function recomputeMeta(goal: GoalRow, milestones: Pick<MilestoneRow, 'est
     workingDays: goal.working_days,
   });
   const total = round1(milestones.reduce((s, m) => s + m.estimated_hours, 0));
-  const code = codeFeasibility(total, capacity);
+  const code = feasibilityFor(total, prev?.fullScopeHours, capacity);
   return {
     source: prev?.source ?? 'manual',
     modelFeasibility: prev?.modelFeasibility ?? null,
@@ -168,6 +169,7 @@ export function recomputeMeta(goal: GoalRow, milestones: Pick<MilestoneRow, 'est
     recoveryStrategy: prev?.recoveryStrategy ?? '',
     dailyRitual: prev?.dailyRitual ?? '',
     totalEstimatedHours: total,
+    fullScopeHours: prev?.fullScopeHours ?? null,
     generatedAt: prev?.generatedAt ?? null,
     model: prev?.model ?? null,
     repaired: prev?.repaired ?? false,

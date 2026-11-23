@@ -121,7 +121,7 @@ export function buildPlanSystemInstruction(f: PlanPromptFacts): string {
       : `1. Every milestone targetDate is strictly after today (${f.todayKey}), on or before ${capacity.toKey}, and on a working day (${workingDays}).`,
     '2. Milestones are in chronological order: each targetDate is on or after the previous one.',
     `3. The milestone estimatedHours add up to at most ${fmtHours(capacity.capacityHours)}. totalEstimatedHours equals that sum.`,
-    '4. If the goal genuinely needs more time than the capacity, STILL keep the plan inside the capacity: prioritise the essentials, set feasibility "Unrealistic" and explain in feasibilityReason roughly how many hours the full goal needs and what was left out.',
+    '4. If the goal genuinely needs more time than the capacity, STILL keep the plan inside the capacity: prioritise the essentials, set feasibility "Unrealistic", set fullScopeHours to your honest estimate of the hours the COMPLETE goal needs, and say in feasibilityReason what was left out. Otherwise set fullScopeHours to null.',
     '5. Otherwise set feasibility by share of capacity used: up to 85% → "Achievable", up to 100% → "Tight".',
     '6. Use 3–8 milestones (never more than 12). Each has 2–6 concrete tasks with estimatedMinutes (5–600); the task minutes of a milestone roughly add up to its estimatedHours.',
     '7. Titles are specific and measurable ("Draft the 1,500-word introduction", not "Work on writing"). Descriptions say what "done" looks like.',
